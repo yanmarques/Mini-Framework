@@ -1,2 +1,2 @@
 # Mini-Framework
-A php framework 
+A php framework with services as routes, encryption, configuration.

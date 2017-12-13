@@ -1,0 +1,83 @@
+<?php
+
+use Core\Support\Config;
+use Core\Crypt\Crypter;
+use Core\Bootstrapers\Application;
+use Core\Http\RedirectResponse;
+use Core\Views\View;
+
+if ( ! function_exists('config') ) {
+    /**
+     * Get application configuration by it key name
+     *
+     * @param string $name
+     * @return string
+     */
+    function config(string $name)
+    {
+        return Config::instance()->{$name};
+    }
+}
+
+if ( ! function_exists('encrypt') ) {
+    /**
+     * Hash a given value using php password_hash with crypt algorithm
+     *
+     * @param string $value Value to hash
+     * @return string
+     */
+    function encrypt(string $value, bool $serialize = true)
+    {
+        return Crypter::instance()->encrypt($value, $serialize);
+    }
+}
+
+if ( ! function_exists('decrypt') ) {
+    /**
+     * Decrypt a payload with Crypter
+     *
+     * @param string $value Value to hash
+     * @return string
+     */
+    function decrypt(string $payload, bool $unserialize = true)
+    {
+        return Crypter::instance()->decrypt($payload, $unserialize);
+    }
+}
+
+if ( ! function_exists('app') ) {
+    /**
+     * Decrypt a payload with Crypter
+     *
+     * @param string $value Value to hash
+     * @return string
+     */
+    function app()
+    {
+        return Application::instance();
+    }
+}
+
+if ( ! function_exists('redirect') ) {
+    /**
+     * Get response class
+     *
+     * @return Core\Http\Response
+     */
+    function redirect(string $path, array $sessions = [], int $status = 302)
+    {
+        return RedirectResponse::make($path, $sessions, $status);
+    }
+}
+
+if ( ! function_exists('view') ) {
+    /**
+     * Get response class
+     *
+     * @return Core\Http\Response
+     */
+    function view(string $path)
+    {
+        return View::make($path);
+    }
+}

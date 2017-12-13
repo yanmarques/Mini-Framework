@@ -1,0 +1,21 @@
+{
+    "name": "yan/arkitetar",
+    "description": "Arkitetar",
+    "type": "project",
+    "license": "MIT",
+    "authors": [
+        {
+            "name": "Yan Marques",
+            "email": "marques_yan@outlook.com"
+        }
+    ],
+    "require": {
+        "nesbot/carbon": "^1.22"
+    },
+    "autoload": {
+        "psr-0": {
+            "App\\": "app",
+            "Core\\": "core"
+        }
+    }
+}
