@@ -122,7 +122,7 @@ class Response implements ResponseInterface
      *
      * @var string
      */
-    private $content;
+    protected $content = "";
 
     /**
      * Response headers
@@ -155,17 +155,15 @@ class Response implements ResponseInterface
     /**
      * Constructor of class
      *
-     * @param Core\Bootstrapers\Application $app
-     * @param Core\Http\Request|null $request
+     * @param $response
+     * @param int $status Status code
      * @return Core\Http\Response
      */
-    public function __construct($content, $status = 200, array $headers = [])
+    public function __construct($response, int $status = 200)
     {
-        $this->content = $content;
-        $this->headers = $this->buildHeaders()
-            ->merge($headers);
-
         $this->setStatusCode($status);
+        $this->headers = $this->buildHeaders();
+        $this->resolveResponse($response, $status);
     }
 
     /**
@@ -175,8 +173,9 @@ class Response implements ResponseInterface
      */
     public function send()
     {
-        $this->sendHeaders();
-        $this->sendContent();
+        $this->flashSession()
+            ->sendHeaders()
+            ->sendContent();
 
         exit();
     }
@@ -210,6 +209,8 @@ class Response implements ResponseInterface
         if ( isset($location) ) {
             header('Location: ' . $location);
         }
+
+        return $this;
     }
 
     /**
@@ -221,6 +222,17 @@ class Response implements ResponseInterface
     {
         echo $this->content;
 
+        return $this;
+    }
+
+    /**
+     * Flash session to response
+     *
+     * @return Core\Http\Response
+     */
+    private function flashSession()
+    {
+        app()->services()->session()->flash();
         return $this;
     }
 
@@ -266,6 +278,24 @@ class Response implements ResponseInterface
     private function buildHeaders()
     {
         return new HeadersStack(self::getDefaultHeaders());
+    }
+
+    /**
+     * Resolve response
+     *
+     * @param mixed $response Response
+     * @param int $status
+     * @return void
+     */
+    private function resolveResponse($response, int $status)
+    {
+        if ( $response instanceof RedirectResponse ) {
+            $this->headers->merge($response->getHeaders());
+        } elseif ( $response instanceof View ) {
+            include $response->path();
+        } else {
+            $this->content = (string) $response;
+        }
     }
 
     /**

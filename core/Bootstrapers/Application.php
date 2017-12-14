@@ -232,15 +232,6 @@ class Application implements ApplicationInterface
     public function handle(Request $request)
     {
         $response = $this->services()->routing()->dispatch($request);
-        
-        if ( $response instanceof RedirectResponse ) {
-            return new Response('', $response->getStatus(), $response->getHeaders());
-        } 
-        
-        if ( $response instanceof View ) {
-            return new Response($response->render());
-        }
-
-        return new Response((string) $response);
+        return new Response($response);
     }
 }

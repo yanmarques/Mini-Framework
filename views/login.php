@@ -14,9 +14,13 @@
 
     <div>
 
-        <h1>MINI FRAMEWORK</h1>
+        <h1>LOGIN</h1>
 
-        <p><?php echo $_SESSION['message'] ?></p>
+        <form action="/auth" method="POST">
+            <input type="text" name="name" value="" autofocus>
+            <input type="password" name="password" value="">
+            <input type="submit" value="Login">
+        </form>
 
     </div>
 

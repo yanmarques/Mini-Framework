@@ -16,3 +16,6 @@ namespace Routes;
 */
 
 $route->get('/', 'HomeController@index');
+$route->get('/dashboard', 'HomeController@dashboard');
+$route->get('/login', 'AuthController@login');
+$route->post('/auth', 'AuthController@auth');

@@ -89,12 +89,12 @@ class Config
     public function resolveConfiguration()
     {
         $path = $this->app->baseDir() .DIRECTORY_SEPARATOR. '.env';
-        
+
         // Configuration not exists
         if ( ! $this->fileHandler->isFile($path) ) {
             $this->create($path);
         }
-        
+
         // Set configuration
         $this->configuration = $this->renderFileContent(
             $this->fileHandler->read($path)

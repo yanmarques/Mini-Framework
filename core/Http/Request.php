@@ -13,28 +13,28 @@ class Request extends RequestKernel
 
     /**
      * Request is booted
-     * 
+     *
      * @var bool
      */
     private static $booted;
 
     /**
      * Request instance
-     * 
+     *
      * @var Core\Http\Request
      */
     private static $instance;
 
     /**
      * Request parameters
-     * 
+     *
      * @var Core\Stack\Stack
      */
     private $parameters;
 
     /**
      * Create an request instance from globals
-     * 
+     *
      * @return Core\Http\Request
      */
     public static function get()
@@ -42,13 +42,13 @@ class Request extends RequestKernel
         if ( ! self::$booted ) {
             self::$instance = parent::createFromGlobals();
         }
-    
+
         return self::$instance;
     }
 
     /**
      * Execute resolvers when request is created
-     * 
+     *
      * @return void
      */
     public function creating()
@@ -61,7 +61,7 @@ class Request extends RequestKernel
 
     /**
      * Get the request method
-     * 
+     *
      * @return string
      */
     public function method()
@@ -71,7 +71,7 @@ class Request extends RequestKernel
 
      /**
      * Get the request protocol
-     * 
+     *
      * @return string
      */
     public function protocol()
@@ -81,7 +81,7 @@ class Request extends RequestKernel
 
     /**
      * Get only the request uri without query string
-     * 
+     *
      * @return string
      */
     public function uri()
@@ -91,7 +91,7 @@ class Request extends RequestKernel
 
     /**
      * Get request uri with query string
-     * 
+     *
      * @return string
      */
     public function uriWithQueryString()
@@ -101,7 +101,7 @@ class Request extends RequestKernel
 
     /**
      * Get all request parameters
-     * 
+     *
      * @return array
      */
     public function all()
@@ -111,7 +111,7 @@ class Request extends RequestKernel
 
     /**
      * Get php running interface
-     * 
+     *
      * @return string|null
      */
     public function interface()
@@ -121,7 +121,7 @@ class Request extends RequestKernel
 
      /**
      * Get server ip address
-     * 
+     *
      * @return string|null
      */
     public function serverAddress()
@@ -131,17 +131,17 @@ class Request extends RequestKernel
 
     /**
      * Get server hostname
-     * 
+     *
      * @return string|null
      */
     public function hostname()
     {
         return $this->hostname;
     }
-    
+
     /**
      * Get server identification name
-     * 
+     *
      * @return string|null
      */
     public function server()
@@ -151,7 +151,7 @@ class Request extends RequestKernel
 
     /**
      * Get timestamp when request was executed
-     * 
+     *
      * @return string|null
      */
     public function time()
@@ -162,7 +162,7 @@ class Request extends RequestKernel
 
     /**
      * Get document root where script has run
-     * 
+     *
      * @return string|null
      */
     public function documentRoot()
@@ -171,8 +171,8 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get http host header 
-     * 
+     * Get http host header
+     *
      * @return string|null
      */
     public function host()
@@ -181,8 +181,8 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get http referer header 
-     * 
+     * Get http referer header
+     *
      * @return string|null
      */
     public function referer()
@@ -191,8 +191,8 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get http user agent header 
-     * 
+     * Get http user agent header
+     *
      * @return string|null
      */
     public function userAgent()
@@ -202,7 +202,7 @@ class Request extends RequestKernel
 
     /**
      * Request use HTTPS protocol
-     * 
+     *
      * @return bool
      */
     public function isSecure()
@@ -212,7 +212,7 @@ class Request extends RequestKernel
 
     /**
      * Get DNS lookup host
-     * 
+     *
      * @return string|null
      */
     public function dnsHost()
@@ -222,7 +222,7 @@ class Request extends RequestKernel
 
     /**
      * Get remote port
-     * 
+     *
      * @return string|null
      */
     public function serverPort()
@@ -232,7 +232,7 @@ class Request extends RequestKernel
 
     /**
      * Get server port
-     * 
+     *
      * @return string|null
      */
     public function remotePort()
@@ -242,7 +242,7 @@ class Request extends RequestKernel
 
     /**
      * Get request cookie
-     * 
+     *
      * @return string|null
      */
     public function cookies()
@@ -252,7 +252,7 @@ class Request extends RequestKernel
 
      /**
      * Get request session
-     * 
+     *
      * @return string|null
      */
     public function session()
@@ -262,7 +262,7 @@ class Request extends RequestKernel
 
     /**
      * Get request headers
-     * 
+     *
      * @return string|null
      */
     public function headers()
@@ -272,7 +272,7 @@ class Request extends RequestKernel
 
      /**
      * Get current local ip address
-     * 
+     *
      * @return string|null
      */
     public function ip()
@@ -282,7 +282,7 @@ class Request extends RequestKernel
 
     /**
      * Request has given attribute name
-     * 
+     *
      * @param string $name
      * @return bool
      */
@@ -293,7 +293,7 @@ class Request extends RequestKernel
 
     /**
      * Resolve get and/or post parameters into a custom stack
-     * 
+     *
      * @return Core\Stack\Stack
      */
     private function resolveParameters()
@@ -319,7 +319,7 @@ class Request extends RequestKernel
 
     /**
      * Resolve get and/or post parameters into a custom Stack
-     * 
+     *
      * @return Core\Http\HeadersStack
      */
     private function resolveHeaders()
@@ -328,8 +328,8 @@ class Request extends RequestKernel
     }
 
     /**
-     * Resolve request cookies and 
-     * 
+     * Resolve request cookies and
+     *
      * @return Core\Http\CookieStack
      */
     private function resolveCookies()
@@ -339,11 +339,11 @@ class Request extends RequestKernel
 
     /**
      * Resolve get and/or post parameters into a custom Stack
-     * 
+     *
      * @return Core\Session\SessionStack
      */
     private function resolveSession()
     {
-        return new SessionStack($this->session);
+        return app()->services()->session()->stack();
     }
 }
