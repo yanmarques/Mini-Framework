@@ -118,11 +118,11 @@ class Response implements ResponseInterface
     private $request;
 
     /**
-     * Response view
+     * Response content
      *
      * @var string
      */
-    protected $content = "";
+    protected $content;
 
     /**
      * Response headers
@@ -137,6 +137,20 @@ class Response implements ResponseInterface
      * @var string
      */
     private $version = '1.1';
+
+    /**
+     * View to render
+     * 
+     * @var Core\Views\View
+     */
+    private $view;
+
+    /**
+     * Redirect response
+     * 
+     * @var Core\Http\RedirectResponse
+     */
+    private $redirect;
 
     /**
      * Response status
@@ -173,9 +187,8 @@ class Response implements ResponseInterface
      */
     public function send()
     {
-        $this->flashSession()
-            ->sendHeaders()
-            ->sendContent();
+        $this->sendContent()
+            ->sendHeaders();
 
         exit();
     }
@@ -220,7 +233,11 @@ class Response implements ResponseInterface
      */
     private function sendContent()
     {
-        echo $this->content;
+        if ( $this->view ) {
+            $this->view->render();
+        } else {
+            echo $this->content;
+        }
 
         return $this;
     }
@@ -290,12 +307,29 @@ class Response implements ResponseInterface
     private function resolveResponse($response, int $status)
     {
         if ( $response instanceof RedirectResponse ) {
-            $this->headers->merge($response->getHeaders());
+            $this->resolveRedirect($response);
         } elseif ( $response instanceof View ) {
-            include $response->path();
+            $this->view = $response;
         } else {
             $this->content = (string) $response;
         }
+    }
+
+    /**
+     * Resolve redirect response
+     * 
+     * @param Core\Http\RedirectResponse $response
+     * @return void
+     */
+    private function resolveRedirect(RedirectResponse $response)
+    {
+        $this->redirect = $response;
+        
+        if ( $response->isView() ) {
+            $this->view = $response->getView();
+        }
+
+        $this->headers->merge($response->getHeaders());
     }
 
     /**

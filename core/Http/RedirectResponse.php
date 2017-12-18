@@ -14,13 +14,6 @@ class RedirectResponse
     private $url;
 
     /**
-     * Flashed sessions to response
-     *
-     * @var array
-     */
-    private $sessions;
-
-    /**
      * Redirect status
      *
      * @var int
@@ -35,18 +28,31 @@ class RedirectResponse
     private $headers;
 
     /**
+     * View to redirect
+     * 
+     * @var Core\Views\View
+     */
+    private $view;
+
+    /**
+     * Check wheter is a redirect to view 
+     * 
+     * @var bool
+     */
+    protected $viewRedirect = false;
+
+    /**
      * Constructor of class
      *
      * @param string $path Path to view
      * @param array $sessions Flash session to response
      * @return Core\Http\RedirectResponse
      */
-    public function __construct(string $url, array $sessions, int $status = 301)
+    public function __construct(string $url = null, int $status = 301)
     {
         $this->url = $url;
-        $this->setSessions($sessions);
         $this->status($status);
-        $this->headers = $this->redirectHeader();
+        $this->headers = stack();
     }
 
     /**
@@ -59,20 +65,74 @@ class RedirectResponse
      * @param array $sessions Flash session to response
      * @return Core\Http\RedirectResponse
      */
-    static function make(string $path, array $sessions = [], int $status = null)
+    static function make(string $path = null, int $status = 301)
     {
-        return new static($path, $sessions, $status);
+        return new static($path, $status);
     }
 
     /**
-     * Set array to flash on session
+     * Set path to view
      *
-     * @param array $sessions Parameters to flash
+     * @param string $path Relative path to view
      * @return Core\Http\RedirectResponse
      */
-    public function with(array $sessions)
+    public function toView(string $path, array $params = [])
     {
-        array_merge($this->sessions, $sessions);
+        $this->view = View::make($path)->with($params);
+        $this->viewRedirect = true;
+        return $this;
+    }
+
+    /**
+     * Check wheter is a redirect to view
+     * 
+     * @return bool
+     */
+    public function isView()
+    {
+        return $this->viewRedirect;
+    }
+
+    /**
+     * Get redirect view
+     * 
+     * @return Core\Views\View
+     */
+    public function getView()  
+    {
+        return $this->view;
+    }
+
+    /**
+     * Get redirect headers
+     *
+     * @return array
+     */
+    public function getHeaders()
+    {
+        return $this->headers->merge($this->redirectHeader())
+            ->all();
+    }
+
+     /**
+     * Get redirect status
+     *
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Set array with parameters
+     *
+     * @param array $params Parameters to be visible on view
+     * @return Core\Http\RedirectResponse
+     */
+    public function with(array $params)
+    {
+        $this->view->with($params);
         return $this;
     }
 
@@ -117,49 +177,22 @@ class RedirectResponse
     }
 
     /**
-     * Get redirect headers
-     *
-     * @return array
-     */
-    public function getHeaders()
-    {
-        return $this->headers->all();
-    }
-
-     /**
-     * Get redirect status
-     *
-     * @return int
-     */
-    public function getStatus()
-    {
-        return $this->status;
-    }
-
-    /**
      * Set Location header to redirect
      *
      * @return Core\Stack\Stack
      */
     private function redirectHeader()
     {
+        if ( $this->viewRedirect ) {
+            return [];
+        }
+
+        if ( ! $this->url ) {
+            throw new \RuntimeException("Redirect url must not be null.");
+        }
+
         return stack([
             'Location' => $this->url
         ]);
-    }
-
-    private function setSessions(array $session)
-    {
-        $this->sessions = $session;
-
-        if (app()->services()->session()->stack()->empty()) {
-            app()->services()->session()->stack()
-                ->add($session);
-        } else {
-            foreach ($session as $key => $value) {
-                app()->services()->session()->stack()
-                    ->add($value, $key);
-            }
-        }
     }
 }

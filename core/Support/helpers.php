@@ -89,9 +89,9 @@ if ( ! function_exists('redirect') ) {
      *
      * @return Core\Http\Response
      */
-    function redirect(string $path, array $sessions = [], int $status = 302)
+    function redirect(string $path = null, int $status = 302)
     {
-        return RedirectResponse::make($path, $sessions, $status);
+        return RedirectResponse::make($path, $status);
     }
 }
 
@@ -101,8 +101,8 @@ if ( ! function_exists('view') ) {
      *
      * @return Core\Http\Response
      */
-    function view(string $path)
+    function view(string $path, array $params = [])
     {
-        return View::make($path);
+        return View::make($path)->with($params);
     }
 }

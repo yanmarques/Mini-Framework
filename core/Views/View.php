@@ -43,6 +43,13 @@ class View
     private $path;
 
     /**
+     * View params
+     * 
+     * @var array
+     */
+    protected $params = [];
+
+    /**
      * Constructor of class
      *
      * @param Core\Bootstrapers\Application $app
@@ -90,6 +97,33 @@ class View
     }
 
     /**
+     * Parameters to render view with
+     * 
+     * @param string $name Parameter name
+     * @param mixed $value Parameter value
+     * @return Core\Views\View
+     */
+    public function with(array $params)
+    {
+        $this->params = array_merge($this->params, $params);
+        return $this;
+    }
+
+    /**
+     * Include view file to script with parameters
+     * 
+     * @return void
+     */
+    public function render()
+    {
+        foreach($this->params as $key => $value) {
+            ${$key} = $value;
+        }
+        
+        include $this->path;
+    }
+
+    /**
      * Get view path
      * 
      * @return string
@@ -97,15 +131,5 @@ class View
     public function path()
     {
         return $this->path;
-    }
-
-    /**
-     * Return rendered view
-     *
-     * @return string
-     */
-    public function render()
-    {
-        return $this->app->fileHandler()->read($this->path);
     }
 }

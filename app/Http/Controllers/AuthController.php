@@ -6,13 +6,16 @@ use Core\Http\Request;
 
 class AuthController
 {
-    public function login(Request $request)
+    public function login()
     {
         return view('login');
     }
 
     public function auth(Request $request)
     {
-        return redirect('/dashboard', ['message' => 'Voce esta cadastrado']);
+        return redirect()->toView('home', [
+            'name' => $request->name,
+            'password' => hcrypt($request->password)
+        ]);
     }
 }
