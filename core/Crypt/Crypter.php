@@ -113,7 +113,15 @@ class Crypter
      */
     static function random(int $length = 16)
     {
-        return base64_encode(random_bytes($length));
+        $string = '';
+
+        while ( ($str_len = strlen($string)) < $length ) {
+            $size_left = $length - $str_len;
+
+            $string .= substr(\str_replace(['/', '=', '+'], '', base64_encode(\random_bytes($size_left))), 0, $size_left);
+        }
+
+        return $string;
     }
 
     /**
