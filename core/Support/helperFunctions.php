@@ -61,18 +61,6 @@ if ( ! function_exists('stack') ) {
     }
 }
 
-if ( ! function_exists('request') ) {
-    /**
-     * Get current application request
-     *
-     * @return Core\Http\Request
-     */
-    function request()
-    {
-        return Request::get();
-    }
-}
-
 if ( ! function_exists('dd') ) {
     /**
      * Dump a item on browser

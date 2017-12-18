@@ -247,7 +247,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
             self::getRequestQueryString(), self::getRequestUri(), self::getPathInfo(), self::getDocumentRoot(), 
             self::getHttpHost(), self::getHttpReferer(), self::getUserAgent(), self::getHttps(), 
             self::getRemoteAddr(), self::getRemoteHost(), self::getRemotePort(), self::getServerPort(), 
-            $_GET, $_POST, $_COOKIE, $_SESSION
+            $_GET, $_POST, $_COOKIE, self::getSession()
         ];  
     }
 
@@ -450,5 +450,15 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     protected static function getServerPort()
     {
         return $_SERVER['SERVER_PORT'] ?? null;
+    }
+
+    /**
+     * Get php session
+     * 
+     * @return string|null
+     */
+    protected static function getSession()
+    {
+        return $_SESSION ?? null;
     }
 }

@@ -2,6 +2,8 @@
 
 namespace Core\Sessions;
 
+use Core\Crypt\Crypter;
+
 class SessionManager
 {
     /**
@@ -32,9 +34,7 @@ class SessionManager
      */
     public function __construct()
     {
-        // Start session and resolve drivers
-        $this->bootSession();
-        $this->session = new SessionStack($_SESSION);
+        // $this->bootSession();
     }
 
     /**
@@ -81,5 +81,6 @@ class SessionManager
     private function bootSession()
     {
         session_start();
+        $this->session = new SessionStack($_SESSION);
     }
 }

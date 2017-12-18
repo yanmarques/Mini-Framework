@@ -45,6 +45,31 @@ if ( ! function_exists('decrypt') ) {
     }
 }
 
+if ( ! function_exists('randomize') ) {
+    /**
+     * Get a secure random string
+     *
+     * @param string $length Length of string
+     * @return string
+     */
+    function randomize(int $length = 16)
+    {
+        return Crypter::random($length);
+    }
+}
+
+if ( ! function_exists('request') ) {
+    /**
+     * Get current application request
+     *
+     * @return Core\Http\Request
+     */
+    function request()
+    {
+        return Request::get();
+    }
+}
+
 if ( ! function_exists('app') ) {
     /**
      * Decrypt a payload with Crypter
