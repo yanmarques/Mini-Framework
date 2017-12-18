@@ -4,7 +4,7 @@ namespace Core\Support;
 
 use Core\Exceptions\Files\FileNotFoundException;
 use Core\Bootstrapers\Application;
-use Core\Crypter\Crypter;
+use Core\Crypt\Crypter;
 
 class Config
 {
@@ -24,7 +24,7 @@ class Config
 
     /**
      * Application
-     *
+     * 
      * @var Core\Bootstrapers\Application
      */
     private $app;
@@ -46,13 +46,14 @@ class Config
     /**
      * Constructor of class
      *
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Files\FileHandler $app
      * @return Core\Support\Config
      */
     public function __construct(Application $app)
     {
         $this->app = $app;
         $this->fileHandler = $app->fileHandler();
+        $this->resolveConfiguration();
     }
 
     /**
@@ -71,17 +72,6 @@ class Config
     }
 
     /**
-     * Get config instance
-     * If config is not booted, will return null
-     *
-     * @return null|Core\Support\Config
-     */
-    public static function instance()
-    {
-        return self::$instance;
-    }
-
-    /**
      * Resolve application file configuration
      *
      * @return void
@@ -93,12 +83,13 @@ class Config
         // Configuration not exists
         if ( ! $this->fileHandler->isFile($path) ) {
             $this->create($path);
-        }
+        } 
 
         // Set configuration
         $this->configuration = $this->renderFileContent(
             $this->fileHandler->read($path)
         );
+        $this->setKey();
     }
 
     /**
@@ -120,6 +111,17 @@ class Config
     private function generateKey()
     {
         return $this->app->services()->crypter()->getKey();
+    }
+
+    /**
+     * Set application key
+     *
+     * @return Core\Support\Config
+     */
+    private function setKey()
+    {
+        $this->app->services()->crypter()->setKey($this->key);
+        return $this;
     }
 
     /**
@@ -170,6 +172,7 @@ class Config
     private function template()
     {
         return [
+            'ENV' => 'dev',
             'KEY' => $this->generateKey(),
             'DOMAIN' => 'localhost'
         ];

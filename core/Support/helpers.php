@@ -6,6 +6,19 @@ use Core\Bootstrapers\Application;
 use Core\Http\RedirectResponse;
 use Core\Views\View;
 
+if ( ! function_exists('app') ) {
+    /**
+     * Decrypt a payload with Crypter
+     *
+     * @param string $value Value to hash
+     * @return string
+     */
+    function app()
+    {
+        return Application::instance();
+    }
+}
+
 if ( ! function_exists('config') ) {
     /**
      * Get application configuration by it key name
@@ -15,7 +28,7 @@ if ( ! function_exists('config') ) {
      */
     function config(string $name)
     {
-        return Config::instance()->{$name};
+        return app()->services()->config()->{$name};
     }
 }
 
@@ -28,7 +41,7 @@ if ( ! function_exists('encrypt') ) {
      */
     function encrypt(string $value, bool $serialize = true)
     {
-        return Crypter::instance()->encrypt($value, $serialize);
+        return app()->services()->crypter()->encrypt($value, $serialize);
     }
 }
 
@@ -41,7 +54,7 @@ if ( ! function_exists('decrypt') ) {
      */
     function decrypt(string $payload, bool $unserialize = true)
     {
-        return Crypter::instance()->decrypt($payload, $unserialize);
+        return app()->services()->crypter()->decrypt($payload, $unserialize);
     }
 }
 
@@ -67,19 +80,6 @@ if ( ! function_exists('request') ) {
     function request()
     {
         return Request::get();
-    }
-}
-
-if ( ! function_exists('app') ) {
-    /**
-     * Decrypt a payload with Crypter
-     *
-     * @param string $value Value to hash
-     * @return string
-     */
-    function app()
-    {
-        return Application::instance();
     }
 }
 

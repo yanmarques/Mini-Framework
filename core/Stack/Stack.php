@@ -14,11 +14,11 @@ class Stack implements StackInterface
      *
      * @var array
      */
-    private $stack;
+    private $itens;
 
     public function __construct(array $args = [])
     {
-        $this->stack = $args;
+        $this->itens = $args;
     }
 
     /**
@@ -28,7 +28,7 @@ class Stack implements StackInterface
      */
     public function all()
     {
-        return $this->stack;
+        return $this->itens;
     }
 
     /**
@@ -38,19 +38,26 @@ class Stack implements StackInterface
      * @param string|null $key Key to add this value in
      */
     public function add($value, $key = null)
-    {
-        // Associative array
-        if ( $this->isAssociative() ) {
+    {   
+        // Value to add is an array
+        if ( is_array($value) ) {
+            foreach($value as $key => $value) {
+                $this->itens[$key] = $value;
+            }
+        }
 
+        // Associative array
+        elseif ( $this->isAssociative() ) {
+            
             // Must have a key to add
             if ( ! $key ) throw new \Exception('The parameter $key must not be null');
 
-            $this->stack[$key] = $value;
+            $this->itens[$key] = $value;
         }
 
         // Sequential array
         else {
-            $this->stack[$this->empty() ? 0 : $this->length()] = $value;
+            $this->itens[$this->empty() ? 0 : $this->length()] = $value;   
         }
 
         return $this;
@@ -289,7 +296,7 @@ class Stack implements StackInterface
                     $newStack[$key] = $value;
                 }
 
-            }, $this->stack[$sequentialKey]);
+            }, $this->itens[$sequentialKey]);
         }
 
         return $recursivelyStack ? $newStack : new self($newStack);
@@ -323,14 +330,14 @@ class Stack implements StackInterface
                 if ( $keyEquals ) {
 
                     // Merge argument row with current row
-                    $this->stack[$key] = $mergeValue;
+                    $this->itens[$key] = $mergeValue;
                 }
 
                 // Value is an array
                 elseif ( is_array($value) ) {
-                    $this->stack[$key] = $this->internalMerge($args, $caseSensitive, $value);
+                    $this->itens[$key] = $this->internalMerge($args, $caseSensitive, $value);
                 } else {
-                    $this->stack[$mergeKey] = $mergeValue;
+                    $this->itens[$mergeKey] = $mergeValue;
                 }
 
             }, $stack ?: null);
@@ -350,10 +357,10 @@ class Stack implements StackInterface
     {
         if ( ! $this->has($key) ) throw \Exception("[$key] not found on stack.");
 
-        $element = $this->stack[$key];
+        $element = $this->itens[$key];
 
         // Unset element from stack
-        unset($this->stack[$key]);
+        unset($this->itens[$key]);
 
         // Return element
         return $element;
@@ -367,7 +374,7 @@ class Stack implements StackInterface
      */
     public function has($key)
     {
-        return isset($this->stack[$key]);
+        return isset($this->itens[$key]);
     }
 
     /**
@@ -381,7 +388,7 @@ class Stack implements StackInterface
         // Stack is associative try to get an element
         // by it's key
         if ( $this->isAssociative() ) {
-            return $this->stack[$key];
+            return $this->itens[$key];
         }
 
         // Stack is sequential try to get an element
@@ -396,7 +403,7 @@ class Stack implements StackInterface
      */
     public function length()
     {
-        return count($this->stack);
+        return count($this->itens);
     }
 
     /**
@@ -406,7 +413,7 @@ class Stack implements StackInterface
      */
     public function keys()
     {
-        return array_keys($this->stack);
+        return array_keys($this->itens);
     }
 
     /**
@@ -436,7 +443,7 @@ class Stack implements StackInterface
      */
     public function empty()
     {
-        return empty($this->stack);
+        return empty($this->itens);
     }
 
     /**
@@ -459,11 +466,11 @@ class Stack implements StackInterface
     {
         // It is an associative array
         if ( $this->isAssociative() ) {
-            return $this->stack[$this->keys()[$position]];
+            return $this->itens[$this->keys()[$position]];
         }
 
         // Return the position in case is set otherwise returns null
-        return $this->stack[$position] ?? null;
+        return $this->itens[$position] ?? null;
     }
 
     /**
@@ -475,7 +482,7 @@ class Stack implements StackInterface
      */
     private function isAssociative(array $stack = null)
     {
-        $stack = $stack ?: $this->stack;
+        $stack = $stack ?: $this->itens;
 
         // stack is empty
         if ( $this->empty() ) {
@@ -493,7 +500,7 @@ class Stack implements StackInterface
      */
     private function iterator(callable $callback, $stack = null)
     {
-        $stack = $stack ?: $this->stack;
+        $stack = $stack ?: $this->itens;
 
         // stack is an array
         if ( is_array($stack) ) {
@@ -517,7 +524,7 @@ class Stack implements StackInterface
      */
     private function iteratorWithNext(callable $callback, $stack = null)
     {
-        $stack = $stack ?: $this->stack;
+        $stack = $stack ?: $this->itens;
 
         // Stack is an array
         if ( is_array($stack) ) {
@@ -540,6 +547,6 @@ class Stack implements StackInterface
      */
     public function __toString()
     {
-        return $this->stack;
+        return $this->itens;
     }
 }

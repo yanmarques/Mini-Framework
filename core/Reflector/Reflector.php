@@ -154,7 +154,8 @@ class Reflector
         } elseif ( $class instanceof Closure ) {
             $this->closure = $class;
         } else {
-            throw new ReflectorException("Class must be an object, string or a Closure, not [{gettype($class)}]");
+            $type = gettype($class);
+            throw new ReflectorException("Class must be an object, string or a Closure, not [{$type}]");
         }
 
         $this->resolved = true;

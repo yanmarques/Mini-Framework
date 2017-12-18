@@ -2,7 +2,7 @@
 
 namespace Core\Crypt;
 
-use Core\Exceptions\Exception;
+use Core\Exceptions\Crypter\CrypterException;
 
 class Crypter
 {
@@ -50,13 +50,12 @@ class Crypter
     public function __construct(string $cipher)
     {
         // Cipher is not supported
-        if ( ! static::supported($cipher) ) {
-            throw new \RuntimeException('The only ciphers supported are AES-256-CBC, AES-128-CBC, not [{$cipher]');
-        }
+        if ( ! static::supported($cipher) ) 
+            throw new \RuntimeException("The only ciphers supported are AES-256-CBC, AES-128-CBC, not [{$cipher}]");
 
         $this->cipher = $cipher;
-        $this->length  = $this->length();
-        $this->key = $this->random($this->length);
+        $this->length = $this->length();
+        $this->key = static::random($this->length);
     }
 
     /**
@@ -75,16 +74,6 @@ class Crypter
     }
 
     /**
-     * Get a singleton instance of class
-     *
-     * @return Core\Crypter\Crypter
-     */
-    static function instance()
-    {
-        return self::$instance;
-    }
-
-    /**
      * Verify if given cipher is supported by application
      *
      * @param string $cipher Cipher name
@@ -96,6 +85,20 @@ class Crypter
     }
 
     /**
+     * Verify if given cipher is supported by application
+     *
+     * @param string $cipher Cipher name
+     * @return bool
+     */
+    public function validKey(string $key)
+    {
+        // Multibyte key length
+        $length = mb_strlen($key, '8bit');
+
+        return $this->length == $length;
+    }
+
+    /**
      * Get application key
      *
      * @return string
@@ -103,6 +106,22 @@ class Crypter
     public function getKey()
     {
         return $this->key;
+    }
+
+    /**
+     * Set a new application key
+     *
+     * @param string $key New application key
+     * @return Core\Cypt\Crypter
+     */
+    public function setKey(string $key)
+    {
+        if ( ! $this->validKey($key) ) {
+            throw new CrypterException("Invalid key length for cipher [$this->cipher]");
+        }
+
+        $this->key = $key;
+        return $this;
     }
 
      /**

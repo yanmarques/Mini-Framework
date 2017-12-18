@@ -16,7 +16,5 @@ return [
     */
     Core\Services\RoutingService::class,
     Core\Services\SessionsService::class,
-    Core\Services\CrypterService::class,
-    Core\Services\ConfigService::class,
     Core\Services\ViewService::class
 ];

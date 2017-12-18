@@ -12,7 +12,6 @@ use Core\Views\View;
 
 class Application implements ApplicationInterface
 {
-
     /**
      * Application instance
      *
@@ -26,20 +25,6 @@ class Application implements ApplicationInterface
      * @var string
      */
     private $baseDir;
-
-    /**
-     * Path to services configuration
-     *
-     * @var string
-     */
-    private $servicesConfig = DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'services.php';
-
-     /**
-     * Path to encryption configuration
-     *
-     * @var string
-     */
-    private $encryptionConfig = DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'encryption.php';
 
     /**
      * Services collection
@@ -71,14 +56,20 @@ class Application implements ApplicationInterface
     public function __construct(string $baseDir)
     {
         $this->baseDir = $baseDir;
+        $this->fileHandler = new FileHandler($this);
+        $this->services = new ServicesStack;
 
-        $this->bootConfig();
+        // Include some helper functions to boot system
+        $this->fileHandler->include('core/Support/baseFunctions.php');
+
         $this->bootEncryption();
+        $this->bootEnvironment();
         $this->bootServices();
 
         static::$instance = $this;
 
-        $this->bootAppConfiguration();
+        // Include all application helper functions
+        $this->fileHandler->include('core/Support/helpers.php');
     }
 
     /**
@@ -161,68 +152,6 @@ class Application implements ApplicationInterface
         return $this->baseDir .DIRECTORY_SEPARATOR. 'views';
     }
 
-     /**
-     * Initialize all services from configuration
-     *
-     * @return void
-     */
-    private function bootServices()
-    {
-        $services = stack($this->requireServices());
-
-        $services = $services->map(function ($service) {
-            return ServiceDispatcher::dispatch($this, $service);
-        })->collapse();
-
-        $this->services = new ServicesStack($services);
-    }
-
-    private function bootEncryption()
-    {
-        $this->encryption = stack($this->requireEncryption());
-    }
-
-    /**
-     * Initialize configuration classes
-     *
-     * @param Core\Bootstrapers\Application
-     */
-    protected function bootConfig()
-    {
-        $this->fileHandler = new FileHandler($this);
-        $this->fileHandler->include('core/Support/helperFunctions.php');
-    }
-
-    protected function bootAppConfiguration()
-    {
-        $this->fileHandler->include('core/Support/configFunctions.php');
-        $this->services()->config()->resolveConfiguration();
-    }
-
-    /**
-     * Get array with services from services configuration
-     *
-     * @return array
-     */
-    private function requireServices()
-    {
-        return $this->fileHandler->getRequiredContent(
-            $this->baseDir .DIRECTORY_SEPARATOR. $this->servicesConfig
-        );
-    }
-
-    /**
-     * Get array with encryption options from configuration
-     *
-     * @return array
-     */
-    private function requireEncryption()
-    {
-        return $this->fileHandler->getRequiredContent(
-            $this->baseDir .DIRECTORY_SEPARATOR. $this->encryptionConfig
-        );
-    }
-
     /**
      * Handle an incomming request
      *
@@ -233,5 +162,73 @@ class Application implements ApplicationInterface
     {
         $response = $this->services()->routing()->dispatch($request);
         return new Response($response);
+    }
+
+    /**
+     * Initialize all services from configuration
+     *
+     * @return void
+     */
+    private function bootServices()
+    {
+        $services = stack($this->fileHandler->getRequiredContent(
+                            $this->servicesConfigPath()
+                    ));
+
+        $services = $services->map(function ($service) {
+            return ServiceDispatcher::dispatch($this, $service);
+        })->collapse();
+
+        $this->services->add($services->all());
+    }
+
+    /**
+     * Initialize encyption application service
+     * 
+     * @return void
+     */
+    private function bootEncryption()
+    {
+        $this->encryption = stack($this->fileHandler->getRequiredContent(
+            $this->encryptionConfigPath()
+        ));
+
+        $this->services->add(
+            ServiceDispatcher::dispatch($this, \Core\Services\CrypterService::class),
+            'crypter'
+        );  
+    }
+
+    /**
+     * Initialize environment configuration
+     *
+     * @param Core\Bootstrapers\Application
+     */
+    protected function bootEnvironment()
+    {
+        $this->services->add(
+            ServiceDispatcher::dispatch($this, \Core\Services\ConfigService::class),
+            'config'
+        );
+    }
+
+    /**
+     * Get path to services configuration
+     *
+     * @return string
+     */
+    private function servicesConfigPath()
+    {
+        return $this->baseDir .DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'services.php';
+    }
+
+    /**
+     * Get path to encryption configuration
+     *
+     * @return string
+     */
+    private function encryptionConfigPath()
+    {
+        return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'encryption.php';
     }
 }
