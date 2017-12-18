@@ -3,6 +3,7 @@
 namespace Core\Sessions;
 
 use Core\Crypt\Crypter;
+use Core\Bootstrapers\Application;
 
 class SessionManager
 {
@@ -28,49 +29,48 @@ class SessionManager
     private $session;
 
     /**
+     * Application class
+     *
+     * @var Core\Bootstrapers\Application
+     */
+    private $app;
+
+    /**
      * Constructor of class
      *
+     * @param Core\Bootstrapers\Application
      * @return Core\Sessions\SessionManager
      */
-    public function __construct()
+    public function __construct(Application $app)
     {
-        // $this->bootSession();
+        $this->app = $app;
+        $this->bootSession();
+        $this->setCSRFToken();
     }
 
     /**
      * Boot session manager
      *
+     * @param Core\Bootstrapers\Application
      * @return Core\Sessions\SessionManager
      */
-    public static function boot()
+    public static function boot(Application $app)
     {
         if ( ! self::$booted ) {
-            self::$instance = new self;
+            self::$instance = new self($app);
         }
 
         return self::$instance;
     }
 
     /**
-     * Get session stack
-     *
+     * Get session stack with values
+     * 
      * @return Core\Sessions\SessionStack
      */
     public function stack()
     {
         return $this->session;
-    }
-
-    /**
-     * Flash sessions to php SESSION
-     *
-     * @return void
-     */
-    public function flash()
-    {
-        $this->session->each(function ($value, $key) {
-            $_SESSION[$key] = $value;
-        });
     }
 
     /**
@@ -82,5 +82,24 @@ class SessionManager
     {
         session_start();
         $this->session = new SessionStack($_SESSION);
+    }
+
+    /**
+     * Set Cross Site Request Forgery token for session
+     * 
+     * @return Core\Sessions\SessionManager
+     */
+    private function setCSRFToken()
+    {
+        $this->session->set('CSRFToken', Crypter::random(64));
+    }
+
+    public function __get($name)
+    {
+        if ( $value = $this->session->get($name) ) {
+            return $value;
+        }
+
+        return null;
     }
 }

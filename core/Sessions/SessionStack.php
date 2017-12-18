@@ -16,4 +16,29 @@ class SessionStack extends Stack
     {
         parent::__construct($args);
     }
+
+    /**
+     * Set a session key/value and add to stack
+     * 
+     * @param string $key Key of session
+     * @param mixed $value Key value
+     * @return Core\Sessions\SessionStack
+     */
+    public function set(string $key, $value)
+    {
+        $this->add($value, $key);
+        $_SESSION[$key] = $value;
+    }
+
+    /**
+     * Unset session key
+     * 
+     * @param string $key Key of session
+     * @return void
+     */
+    public function unset(string $key)
+    {
+        $this->pull($key);
+        unset($_SESSION[$key]);
+    }
 }

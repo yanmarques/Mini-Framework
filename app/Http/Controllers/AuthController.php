@@ -13,6 +13,7 @@ class AuthController
 
     public function auth(Request $request)
     {
+        dd($request->all());
         return redirect()->toView('home', [
             'name' => $request->name,
             'password' => hcrypt($request->password)

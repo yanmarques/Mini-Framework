@@ -23,6 +23,6 @@ class SessionsService extends Service
      */
     public static function boot(Application $app)
     {
-        return SessionManager::boot();
+        return SessionManager::boot($app);
     }
 }

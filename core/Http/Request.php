@@ -110,6 +110,18 @@ class Request extends RequestKernel
     }
 
     /**
+     * Get all request parameters and merge with parameters passed
+     *
+     * @param array $params Parameters to merge
+     * @return Core\Http\Request
+     */
+    public function merge(array $params)
+    {
+        $this->parameters->merge($params);
+        return $this;
+    }
+
+    /**
      * Get php running interface
      *
      * @return string|null
