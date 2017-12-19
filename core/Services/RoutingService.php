@@ -11,7 +11,7 @@ class RoutingService extends Service
 {
      /**
      * Service identifier name
-     * 
+     *
      * @var string
      */
     public static $name = 'routing';
@@ -24,10 +24,10 @@ class RoutingService extends Service
      */
     public static function boot(Application $app)
     {
-        $route = new Router;
-        
-        include $app->baseDir() .DIRECTORY_SEPARATOR. '/routes/app.php';
+        $route = new Router($app->fileHandler());
 
-        return new RouteResolver($route);
+        include $app->routesDir().'app.php';
+
+        return new RouteResolver($app, $route);
     }
 }

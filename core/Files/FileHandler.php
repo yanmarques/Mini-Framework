@@ -92,11 +92,11 @@ class FileHandler
     public function include(string $file)
     {
         // File was not found
-        if ( ! $file = $this->isFile($file) ) {
+        if ( ! $isFile = $this->isFile($file) ) {
             throw new FileNotFoundException("File [$file] not found.");
         }
 
-        include $file;
+        include $isFile;
     }
 
     /**
@@ -111,7 +111,7 @@ class FileHandler
         if ( ! file_exists($file) ) {
 
             // Try file with application base uri
-            $file = $this->application->baseDir() .DIRECTORY_SEPARATOR. $file;
+            $file = $this->application->baseDir() . $file;
 
             if ( ! file_exists($file) ) {
                 return false;

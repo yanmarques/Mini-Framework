@@ -33,6 +33,6 @@ class ViewMatcher
     public function get(string $path)
     {
         $path = str_replace('.', DIRECTORY_SEPARATOR, $path) . '.php';
-        return $this->app->viewsDir() .DIRECTORY_SEPARATOR. $path;
+        return $this->app->viewsDir() . $path;
     }
 }

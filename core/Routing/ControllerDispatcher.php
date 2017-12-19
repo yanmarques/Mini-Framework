@@ -2,8 +2,9 @@
 
 namespace Core\Routing;
 
-use \ReflectionClass;
+use Core\Files\FileHandler;
 use Core\Http\Request;
+use Core\Reflector\Reflector;
 
 class ControllerDispatcher
 {
@@ -15,16 +16,18 @@ class ControllerDispatcher
     private $action;
 
     /**
-     * Controller
+     * Controller name
      *
      * @var string
      */
     private $controller;
 
     /**
-     * @var Core\Application\Container
+     * Reflector class to dinamically access classes
+     *
+     * @var Core\Reflector\Reflector
      */
-    private $container;
+    private $reflector;
 
     /**
      * Path to controllers
@@ -40,11 +43,12 @@ class ControllerDispatcher
      */
     private $request;
 
-    public function __construct(Request $request, string $controller, string $action)
+    public function __construct(FileHandler $fileHandler, Request $request, string $controller, string $action)
     {
         $this->request = $request;
-        $this->controller = $controller;
+        $this->controller = $this->controllersPath . $controller;
         $this->action = $action;
+        $this->reflector = new Reflector($fileHandler);
     }
 
     /**
@@ -54,22 +58,7 @@ class ControllerDispatcher
      */
     public function dispatch()
     {
-        $reflector = (new ReflectionClass($this->getControllerPath()));
-
-        if ( ! $reflector->hasMethod($this->action) ) {
-            throw new \Exception("Method [$this->action] do not exists on [{$this->getControllerPath()}]");
-        }
-
-        return ($reflector->newInstance())->{$this->action}($this->request);
-    }
-
-    /**
-     * Build the controller  file path
-     *
-     * @return string
-     */
-    private function getControllerPath()
-    {
-        return $this->controllersPath . $this->controller;
+        return $this->reflector->bind($this->controller)
+            ->callMethod($this->action, [$this->request]);
     }
 }

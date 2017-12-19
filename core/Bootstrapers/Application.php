@@ -119,7 +119,7 @@ class Application implements ApplicationInterface
      */
     public function baseDir()
     {
-        return $this->baseDir;
+        return $this->baseDir . DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -129,7 +129,7 @@ class Application implements ApplicationInterface
      */
     public function appDir()
     {
-        return $this->baseDir .DIRECTORY_SEPARATOR. 'app';
+        return $this->baseDir .DIRECTORY_SEPARATOR. 'app' .DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -139,7 +139,17 @@ class Application implements ApplicationInterface
      */
     public function coreDir()
     {
-        return $this->baseDir .DIRECTORY_SEPARATOR. 'core';
+        return $this->baseDir .DIRECTORY_SEPARATOR. 'core' .DIRECTORY_SEPARATOR;
+    }
+
+    /**
+     * Return application routes directory
+     *
+     * @return string
+     */
+    public function routesDir()
+    {
+        return $this->baseDir .DIRECTORY_SEPARATOR. 'routes' .DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -149,7 +159,7 @@ class Application implements ApplicationInterface
      */
     public function viewsDir()
     {
-        return $this->baseDir .DIRECTORY_SEPARATOR. 'views';
+        return $this->baseDir .DIRECTORY_SEPARATOR. 'views' .DIRECTORY_SEPARATOR;
     }
 
     /**
@@ -184,7 +194,7 @@ class Application implements ApplicationInterface
 
     /**
      * Initialize encyption application service
-     * 
+     *
      * @return void
      */
     private function bootEncryption()
@@ -196,7 +206,7 @@ class Application implements ApplicationInterface
         $this->services->add(
             ServiceDispatcher::dispatch($this, \Core\Services\CrypterService::class),
             'crypter'
-        );  
+        );
     }
 
     /**

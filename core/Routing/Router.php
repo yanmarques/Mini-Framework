@@ -4,20 +4,29 @@ namespace Core\Routing;
 
 use Core\Routing\RouteManager;
 use Core\Routing\Route;
+use Core\Files\FileHandler;
 
 class Router extends RouteManager
 {
     /**
+     * Application fileHandler
+     *
+     * @var Core\Files\FileHandler
+     */
+    private $fileHandler;
+
+    /**
      * Constructor of class
      */
-    public function __construct()
+    public function __construct(FileHandler $fileHandler)
     {
         parent::__construct();
+        $this->fileHandler = $fileHandler;
     }
 
     /**
      * GET Route
-     * 
+     *
      * @param string $url The prefix of url
      * @param Closure|string
      */
@@ -28,7 +37,7 @@ class Router extends RouteManager
 
     /**
      * PUT Route
-     * 
+     *
      * @param string $url The prefix of url
      * @param Closure|string
      */
@@ -39,7 +48,7 @@ class Router extends RouteManager
 
     /**
      * POST Route
-     * 
+     *
      * @param string $url The prefix of url
      * @param Closure|string
      */
@@ -50,7 +59,7 @@ class Router extends RouteManager
 
     /**
      * PATCH Route
-     * 
+     *
      * @param string $url The prefix of url
      * @param Closure|string
      */
@@ -61,7 +70,7 @@ class Router extends RouteManager
 
     /**
      * DELETE Route
-     * 
+     *
      * @param string $url The prefix of url
      * @param Closure|string
      */
@@ -72,13 +81,13 @@ class Router extends RouteManager
 
    /**
     * Add route manager to router
-    * 
+    *
     * @param string $url Url prefix
     * @param Closure|string $action Route action
     * @return void
     */
     private function add(string $method, string $url, $action)
     {
-        $this->addRoute(new Route($method, $url, $action));
+        $this->addRoute(new Route($this->fileHandler, $method, $url, $action));
     }
 }

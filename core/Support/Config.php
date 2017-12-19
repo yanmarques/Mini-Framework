@@ -24,7 +24,7 @@ class Config
 
     /**
      * Application
-     * 
+     *
      * @var Core\Bootstrapers\Application
      */
     private $app;
@@ -78,12 +78,12 @@ class Config
      */
     public function resolveConfiguration()
     {
-        $path = $this->app->baseDir() .DIRECTORY_SEPARATOR. '.env';
+        $path = $this->app->baseDir() . '.env';
 
         // Configuration not exists
         if ( ! $this->fileHandler->isFile($path) ) {
             $this->create($path);
-        } 
+        }
 
         // Set configuration
         $this->configuration = $this->renderFileContent(

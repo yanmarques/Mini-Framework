@@ -11,68 +11,68 @@ use Core\Exceptions\Reflector\ReflectorException;
 use Core\Files\FileHandler;
 
 class Reflector
-{   
+{
     use CanGetProperties;
 
     /**
      * Class to reflect
-     * 
+     *
      * @var mixed
      */
     private $class;
 
     /**
      * Class namespace
-     * 
+     *
      * @var string
      */
     private $namespace;
 
     /**
      * Instance of the class to reflect
-     * 
+     *
      * @var object
      */
     private $object;
 
     /**
      * Use closure instead of class
-     * 
+     *
      * @var Closure
      */
     private $closure;
 
     /**
      * Reflector class
-     * 
+     *
      * @var ReflectorClass
      */
     private $reflector;
 
     /**
      * Class bindings are resolved
-     * 
+     *
      * @var bool
      */
     private $resolved;
 
     /**
      * List of reflector methods
-     * 
+     *
      * @var ReflectionMethod
      */
     private $methods = [];
 
     /**
      * Handles system files
-     * 
+     *
      * @var Core\Files\FileHandler
      */
     private $fileHandler;
 
     /**
      * Constructor of class
-     * 
+     *
      * @param Core\Files\FileHandler $fileHandler Handle files
      */
     public function __construct(FileHandler $fileHandler)
@@ -82,19 +82,19 @@ class Reflector
 
     /**
      * Bind container to given class
-     * 
+     *
      * @param mixed $class
      * @return $this
      */
     public function bind($class)
-    {       
+    {
         $this->resolveBinding($class);
         return $this;
     }
 
     /**
      * Get a static property from class by it's name
-     * 
+     *
      * @param string $name Property name
      * @return mixed
      */
@@ -112,26 +112,35 @@ class Reflector
 
     /**
      * Invoke reflector class method with arguments
-     * 
+     *
      * @param string $name Method name
      * @param array $arguments Array with arguments
      * @return mixed
      */
     public function callMethod(string $name, array $arguments = [])
     {
-        $this->canGetProperty();
-
-        // Reflector does not have such property
-        if ( ! $this->hasMethod($name) ) {
-            throw new ReflectorException("No method with name [{$name}] was found on [{$this->class}].");
-        }
+        $this->resolveCall($name);
 
         return $this->reflector->getMethod($name)->invoke($this->object, ...$arguments);
     }
 
     /**
+     * Invoke reflector class method with arguments
+     *
+     * @param string $name Method name
+     * @param array $arguments Array with arguments
+     * @return mixed
+     */
+    public function callStaticMethod(string $name, array $arguments = [])
+    {
+        $this->resolveCall($name);
+
+        return $this->reflector->getMethod($name)->invoke(null, ...$arguments);
+    }
+
+    /**
      * Check wheter reflector is a closure
-     * 
+     *
      * @return bool
      */
     public function isClosure()
@@ -141,7 +150,7 @@ class Reflector
 
     /**
      * Resolve an class and returns a class string
-     * 
+     *
      * @param $class Class to resolve
      * @return string
      */
@@ -164,8 +173,26 @@ class Reflector
     }
 
     /**
+     * Resolve calls dependencies
+     *
+     * @throws ReflectorException
+     *
+     * @param string $name Name of method
+     * @return void
+     */
+    private function resolveCall(string $name)
+    {
+        $this->canGetProperty();
+
+        // Reflector does not have such property
+        if ( ! $this->hasMethod($name) ) {
+            throw new ReflectorException("No method with name [{$name}] was found on [{$this->class}].");
+        }
+    }
+
+    /**
      * Get name of class object
-     * 
+     *
      * @param object $object Instance of object
      * @return string
      */
@@ -176,7 +203,7 @@ class Reflector
 
     /**
      * Resolve a class checking wheter it exists and set namespace
-     * 
+     *
      * @param string $class Class complete namespace with class
      * @return void
      */
@@ -189,12 +216,12 @@ class Reflector
 
     /**
      * Resolve an object instance
-     * 
-     * @param object $object Object to resolve namespace 
+     *
+     * @param object $object Object to resolve namespace
      * @return void
      */
     private function resolveObject($object)
-    {   
+    {
         $class = $this->getName($object);
         $this->namespace = (new ReflectionClass($class))->getNamespaceName();
         $this->class = $this->splitNamespace($class);
@@ -202,7 +229,7 @@ class Reflector
 
     /**
      * Create reflector for each class methods
-     * 
+     *
      * @return void
      */
     private function reflectMethods()
@@ -216,7 +243,7 @@ class Reflector
 
     /**
      * Get a full namespace and get only namespace withou class
-     * 
+     *
      * @param string $class Class name
      * @return string
      */
@@ -227,7 +254,7 @@ class Reflector
 
     /**
      * Create reflector by class
-     * 
+     *
      * @return void
      */
     private function reflect()
@@ -249,14 +276,19 @@ class Reflector
         }
     }
 
+    /**
+     * Return an object of instance
+     *
+     * @return object
+     */
     private function resolveInstance()
     {
-        
+        return new $this->class;
     }
 
     /**
      * Create reflector of class
-     * 
+     *
      * @return ReflectionClass
      */
     private function createClass()
@@ -266,20 +298,20 @@ class Reflector
 
     /**
      * Create reflector of closure
-     * 
+     *
      * @return ReflectionFunction
      */
-    private function createFunction()   
+    private function createFunction()
     {
         return new ReflectionFunction($this->closure);
     }
 
     /**
      * Create reflector of closure
-     * 
+     *
      * @return ReflectionMethod
      */
-    private function createMethod(string $name)   
+    private function createMethod(string $name)
     {
         return new ReflectionMethod($this->class, $name);
     }

@@ -5,6 +5,7 @@ namespace Core\Routing;
 use Core\Http\Request;
 use Core\Routing\RouteMatcher;
 use Core\Routing\ControllerDispatcher;
+use Core\Files\FileHandler;
 use Core\Exceptions\Http\MethodNotAllowedException;
 
 class Route
@@ -44,8 +45,9 @@ class Route
      */
     private $request;
 
-    public function __construct(string $method, string $uri, $action)
+    public function __construct(FileHandler $fileHandler, string $method, string $uri, $action)
     {
+        $this->fileHandler = $fileHandler;
         $this->method = $method;
         $this->uri = $uri;
         $this->action = $this->parseAction($action);
@@ -80,7 +82,7 @@ class Route
     {
         if ( $this->isCallable() ) {
             return $this->action;
-        }  
+        }
 
         return $this->getController() .'@'. $this->getAction();
     }
@@ -143,7 +145,7 @@ class Route
 
         // Run controller action
         return (new ControllerDispatcher(
-            $request, $this->getController(), $this->getAction())
+            $this->fileHandler, $request, $this->getController(), $this->getAction())
         )->dispatch();
     }
 
