@@ -14,6 +14,7 @@
 
     <div>
         <h1>MINI FRAMEWORK</h1>
+        <a href="/login">Login</a>
     </div>
 
 </body>

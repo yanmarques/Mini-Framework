@@ -4,6 +4,7 @@ namespace Core\Views;
 
 use Core\Bootstrapers\Application;
 use Core\Exceptions\Files\FileNotFoundException;
+use Core\Http\Response;
 
 class View
 {
@@ -55,6 +56,13 @@ class View
      * @var array
      */
     protected $params = [];
+
+    /**
+     * View response status
+     * 
+     * @var int
+     */
+    protected $status = 200;    
 
     /**
      * Constructor of class
@@ -114,6 +122,32 @@ class View
     public function with(array $params)
     {
         $this->params = array_merge($this->params, $params);
+        return $this;
+    }
+
+    /**
+     * Get view response status code
+     * 
+     * @return int
+     */
+    public function getStatus()
+    {
+        return $this->status;
+    }
+
+    /**
+     * Set response Http status
+     * 
+     * @param int $status Http success status
+     * @return Core\Views\View
+     */
+    public function status(int $status)
+    {
+        if ( ! Response::isSuccessfull($status) ) {
+            throw new \RuntimeException("Invalid status [$status] for successfull response.");
+        }
+
+        $this->status = $status;
         return $this;
     }
 

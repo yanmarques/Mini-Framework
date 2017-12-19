@@ -209,7 +209,7 @@ class Response implements ResponseInterface
         if ( $this->headers->has('Location') ) {
             $location = $this->headers->pull('Location');
         }
-
+        
          // Send response headers
         $this->headers->each(function ($value, $key) {
             header($key .": " . $value, false, $this->statusCode);
@@ -299,6 +299,7 @@ class Response implements ResponseInterface
             $this->resolveRedirect($response);
         } elseif ( $response instanceof View ) {
             $this->view = $response;
+            $this->statusCode = $response->getStatus();
         } else {
             $this->content = (string) $response;
         }
