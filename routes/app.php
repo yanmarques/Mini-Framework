@@ -15,6 +15,10 @@ namespace Routes;
 |
 */
 
+$route->middleware(['auth'], function ($route) {
+    $route->get('/users', 'AuthController@user');
+});
+
 $route->get('/', 'HomeController@index');
 $route->get('/login', 'AuthController@login');
 $route->post('/auth', 'AuthController@auth');

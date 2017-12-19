@@ -45,11 +45,19 @@ class Route
      */
     private $request;
 
-    public function __construct(string $method, string $uri, $action)
+    /**
+     * Route middleware
+     *
+     * @var array
+     */
+    private $middlewares;
+
+    public function __construct(string $method, string $uri, $action, array $middlewares = [])
     {
         $this->method = $method;
         $this->uri = $uri;
         $this->action = $this->parseAction($action);
+        $this->middlewares = $middlewares;
     }
 
     /**
@@ -141,11 +149,23 @@ class Route
         if ( $this->isCallable() ) {
             return $this->runCallable($request);
         }
-
+       
+        $request = $this->runMiddlewares($app, $request);
+        
         // Run controller action
         return (new ControllerDispatcher(
-            $app, $request, $this->getController(), $this->getAction())
+            $app, $request, $this->getController(), $this->getAction(), $this->middlewares)
         )->dispatch();
+    }
+
+    /**
+     * Run global middlewares from configuration
+     *
+     * @return void
+     */
+    private function runMiddlewares(Application $app, Request $request)
+    {
+        return Middleware::boot($app, $request)->run($this->middlewares);
     }
 
     /**

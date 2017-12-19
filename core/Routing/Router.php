@@ -6,13 +6,28 @@ use Core\Routing\RouteManager;
 use Core\Routing\Route;
 
 class Router extends RouteManager
-{
+{   
+    /**
+     * Middleware to be registered with route
+     * 
+     * @var array
+     */
+    private $middlewares;
+
     /**
      * Constructor of class
      */
-    public function __construct()
+    public function __construct(array $middlewares = [])
     {
         parent::__construct();
+        $this->middlewares = $middlewares;
+    }
+
+    public function middleware(array $middlewares, \Closure $function)
+    {
+        $router = new self($middlewares);
+        $function($router);
+        $this->merge($router->getRoutes()->all());
     }
 
     /**
@@ -79,6 +94,6 @@ class Router extends RouteManager
     */
     private function add(string $method, string $url, $action)
     {
-        $this->addRoute(new Route($method, $url, $action));
+        $this->addRoute(new Route($method, $url, $action, $this->middlewares));
     }
 }

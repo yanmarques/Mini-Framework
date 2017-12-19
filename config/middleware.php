@@ -25,7 +25,7 @@ return [
     |
     */
     'web' => [
-        //
+        'auth' => null
     ]
 
 ];

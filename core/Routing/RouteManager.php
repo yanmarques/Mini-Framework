@@ -77,8 +77,25 @@ class RouteManager
         ];
     }
 
+    /**
+     * Get all registered routes
+     * 
+     * @return Core\Stack\Stack
+     */
     public function getRoutes()
     {
         return $this->routes;
+    }
+
+    /**
+     * Merge routes
+     * 
+     * @param array $routes Routes to merge
+     * @return Core\Routing\RouteManager
+     */
+    public function merge(array $routes)
+    {
+        $this->routes = $this->routes->merge($routes);
+        return $this;
     }
 }
