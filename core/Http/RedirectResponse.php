@@ -29,14 +29,14 @@ class RedirectResponse
 
     /**
      * View to redirect
-     * 
+     *
      * @var Core\Views\View
      */
     private $view;
 
     /**
-     * Check wheter is a redirect to view 
-     * 
+     * Check wheter is a redirect to view
+     *
      * @var bool
      */
     protected $viewRedirect = false;
@@ -85,7 +85,7 @@ class RedirectResponse
 
     /**
      * Check wheter is a redirect to view
-     * 
+     *
      * @return bool
      */
     public function isView()
@@ -95,10 +95,10 @@ class RedirectResponse
 
     /**
      * Get redirect view
-     * 
+     *
      * @return Core\Views\View
      */
-    public function getView()  
+    public function getView()
     {
         return $this->view;
     }
@@ -143,7 +143,7 @@ class RedirectResponse
      */
     public function status(int $status)
     {
-        if ( ! Response::isRedirect($status) ) {
+        if ( ! $this->viewRedirect && ! Response::isRedirect($status) ) {
             throw new \RuntimeException("Invalid redirect status.");
         }
 

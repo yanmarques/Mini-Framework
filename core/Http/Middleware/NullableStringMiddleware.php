@@ -15,6 +15,16 @@ class NullableStringMiddleware implements MiddlewareInterface
      */
     public function apply(Request $request)
     {
-        return $request;
+        $params = [];
+
+        foreach ($request->all() as $key => $value) {
+            if ( $value == "" ) {
+                $value = null;
+            }
+
+            $params[$key] = $value;
+        }
+
+        return $request->merge($params);
     }
 }

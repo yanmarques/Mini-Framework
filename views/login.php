@@ -17,6 +17,7 @@
         <h1>LOGIN</h1>
 
         <form action="/auth" method="POST">
+            <?= csrf_field() ?>
             <input type="text" name="name" value="" autofocus>
             <input type="password" name="password" value="">
             <input type="submit" value="Login">

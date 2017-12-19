@@ -100,6 +100,16 @@ class Request extends RequestKernel
     }
 
     /**
+     * Verify wheter request method is show type
+     *
+     * @return bool
+     */
+    public function isShow()
+    {
+        return in_array(strtoupper($this->method), ['GET', 'HEAD', 'OPTIONS']);
+    }
+
+    /**
      * Get all request parameters
      *
      * @return array

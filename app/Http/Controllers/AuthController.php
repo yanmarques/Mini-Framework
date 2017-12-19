@@ -16,6 +16,6 @@ class AuthController
         return redirect()->toView('home', [
             'name' => $request->name,
             'password' => hcrypt($request->password)
-        ]);
+        ])->status(201);
     }
 }

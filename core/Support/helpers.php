@@ -106,3 +106,16 @@ if ( ! function_exists('view') ) {
         return View::make($path)->with($params);
     }
 }
+
+if ( ! function_exists('csrf_field') ) {
+    /**
+     * CSRF form input with token
+     *
+     * @return string
+     */
+     function csrf_field()
+     {
+         $token = app()->services()->session()->CSRFToken;
+         return "<input type='hidden' name='csrf_token' value='$token'>";
+     }
+}

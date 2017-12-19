@@ -140,14 +140,14 @@ class Response implements ResponseInterface
 
     /**
      * View to render
-     * 
+     *
      * @var Core\Views\View
      */
     private $view;
 
     /**
      * Redirect response
-     * 
+     *
      * @var Core\Http\RedirectResponse
      */
     private $redirect;
@@ -317,18 +317,19 @@ class Response implements ResponseInterface
 
     /**
      * Resolve redirect response
-     * 
+     *
      * @param Core\Http\RedirectResponse $response
      * @return void
      */
     private function resolveRedirect(RedirectResponse $response)
     {
         $this->redirect = $response;
-        
+
         if ( $response->isView() ) {
             $this->view = $response->getView();
         }
 
+        $this->setStatusCode($response->getStatus());
         $this->headers->merge($response->getHeaders());
     }
 
