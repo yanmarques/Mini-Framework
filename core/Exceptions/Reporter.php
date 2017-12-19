@@ -5,6 +5,7 @@ namespace Core\Exceptions;
 use Core\Bootstrapers\Application;
 use Core\Http\Response;
 use Core\Views\View;
+use Core\Reflector\Reflector;
 
 class Reporter
 {
@@ -73,7 +74,13 @@ class Reporter
         if ( ! $this->shouldReport() ) {
             return $this->response($e)->send();
         }
-
+        
+        $class = (new Reflector($this->app->fileHandler()))->bind($e);
+        
+        if ( $class->extends("Core\Exceptions\Http\HttpResponseException") ) {
+            return (new Response($this->buildView($e), $e->getStatus()))->send();
+        }
+        
         return $this->render($e);
     } 
 
@@ -110,7 +117,7 @@ class Reporter
      */
     private function buildView($e)
     {
-        $status = in_array($e->getStatus(), [404, 500, 503, 429]) ? $e->getStatus() : 500;
+        $status = (string) in_array($e->getStatus(), [404, 500, 503, 429]) ? $e->getStatus() : 500;
         return View::make($status, $this->viewsPath());
     }
 

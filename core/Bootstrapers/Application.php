@@ -6,6 +6,7 @@ use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Services\Stack\ServicesStack;
 use Core\Files\FileHandler;
 use Core\Http\Request;
+use Core\Http\Response;
 use Core\Exceptions\Reporter;
 
 class Application implements ApplicationInterface

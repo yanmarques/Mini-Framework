@@ -157,7 +157,8 @@ class Reflector
      */
     public function extends(string $name)
     {
-        return $this->reflector->getParentClass() == $name;
+        $parent = $this->reflector->getParentClass();
+        return ! $parent ? $parent : $parent->getName() == $name;
     }
 
     /**
@@ -179,7 +180,7 @@ class Reflector
     private function resolveBinding($class)
     {
         if ( gettype($class) == 'object' ) {
-            $this->resolveObject();
+            $this->resolveObject($class);
         } elseif ( gettype($class) == 'string' ) {
             $this->resolveClass($class);
         } elseif ( $class instanceof Closure ) {
@@ -247,6 +248,7 @@ class Reflector
         $class = $this->getName($object);
         $this->namespace = (new ReflectionClass($class))->getNamespaceName();
         $this->class = $this->splitNamespace($class);
+        $this->object = $object;
     }
 
     /**
@@ -294,7 +296,7 @@ class Reflector
 
             // Create a new reflector class object
             $this->reflector = $this->createClass();
-            $this->object = $this->resolveInstance();
+            $this->object = $this->object ?: $this->resolveInstance();
         }
     }
 
@@ -305,7 +307,7 @@ class Reflector
      */
     private function resolveInstance()
     {
-        return $this->reflector->newInstance();
+        return new $this->class;
     }
 
     /**

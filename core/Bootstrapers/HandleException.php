@@ -45,6 +45,6 @@ class HandleException
      */
     public function handleError($e)
     {
-        $this->app->reporter()->report($e);
+        var_dump($e);die;
     }
 }

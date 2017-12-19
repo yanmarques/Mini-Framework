@@ -13,7 +13,7 @@ class HttpResponseException extends Exception
      */
     protected $status;
 
-    public function __construct($message, int $status)
+    public function __construct($message, $status)
     {
         parent::__construct($message, 0, null);
         $this->status = $status;
@@ -26,6 +26,6 @@ class HttpResponseException extends Exception
      */
     public function getStatus()
     {
-        return $status;
+        return $this->status;
     }
 }
