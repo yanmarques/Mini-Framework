@@ -16,5 +16,5 @@ return [
     */
     Core\Services\RoutingService::class,
     Core\Services\SessionsService::class,
-    Core\Services\ViewService::class
+    Core\Services\ViewService::class,
 ];

@@ -30,9 +30,9 @@ class ViewMatcher
      * @param string $path Path to view
      * @return string|false
      */
-    public function get(string $path)
+    public function get(string $path, string $customPath = null)
     {
         $path = str_replace('.', DIRECTORY_SEPARATOR, $path) . '.php';
-        return $this->app->viewsDir() . $path;
+        return ($customPath ?: $this->app->viewsDir()) . $path;
     }
 }

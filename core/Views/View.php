@@ -43,6 +43,13 @@ class View
     private $path;
 
     /**
+     * Use a custom base path to views
+     * 
+     * @var string
+     */
+    private $customBasePath;
+
+    /**
      * View params
      * 
      * @var array
@@ -80,12 +87,13 @@ class View
      * Make view path
      * 
      * @param string $path Realtive path to view
+     * @param string $customPath Custom path to view
      * @return void
      */
-    static function make(string $path)
+    static function make(string $path, string $customPath = null)
     {
         $instance = static::$instance;
-        $absolutePath = $instance->matcher->get($path);
+        $absolutePath = $instance->matcher->get($path, $customPath);
         
         // View was not found
         if ( ! $instance->app->fileHandler()->isFile($absolutePath) ) {

@@ -6,9 +6,7 @@ use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Services\Stack\ServicesStack;
 use Core\Files\FileHandler;
 use Core\Http\Request;
-use Core\Http\RedirectResponse;
-use Core\Http\Response;
-use Core\Views\View;
+use Core\Exceptions\Reporter;
 
 class Application implements ApplicationInterface
 {
@@ -55,6 +53,13 @@ class Application implements ApplicationInterface
     private $fileHandler;
 
      /**
+     * Exception reporter
+     *
+     * @var Core\Exceptions\Reporter
+     */
+    private $exceptionReporter;
+
+     /**
      * Constructor of class
      *
      * @param string $baseDir Application directory
@@ -69,6 +74,7 @@ class Application implements ApplicationInterface
         // Include some helper functions to boot system
         $this->fileHandler->include('core/Support/baseFunctions.php');
 
+        $this->bootExceptionHandler();
         $this->bootEncryption();
         $this->bootEnvironment();
         $this->bootMiddleware();
@@ -128,6 +134,16 @@ class Application implements ApplicationInterface
     public function fileHandler()
     {
         return $this->fileHandler;
+    }
+
+    /**
+     * Return exception reporter
+     *
+     * @return Core\Exceptions\Reporter
+     */
+    public function reporter()
+    {
+        return $this->exceptionReporter;
     }
 
     /**
@@ -250,6 +266,17 @@ class Application implements ApplicationInterface
         $this->middleware = stack($this->fileHandler->getRequiredContent(
                 $this->middlewareConfigPath()
             ));
+    }
+
+    /**
+     * Boot exceptions handler
+     * 
+     * @return void
+     */
+    protected function bootExceptionHandler()
+    {
+        $this->exceptionReporter = Reporter::boot($this);
+        (new HandleException)->boot($this);
     }
 
     /**
