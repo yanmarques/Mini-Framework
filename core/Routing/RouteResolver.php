@@ -50,6 +50,6 @@ class RouteResolver
             throw new NotFoundException('Not found');
         }
 
-        return $route->bind($request);
+        return $route->bind($this->app, $request);
     }
 }

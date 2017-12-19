@@ -120,7 +120,7 @@ class Reflector
     public function callMethod(string $name, array $arguments = [])
     {
         $this->resolveCall($name);
-
+        
         return $this->reflector->getMethod($name)->invoke($this->object, ...$arguments);
     }
 
@@ -136,6 +136,17 @@ class Reflector
         $this->resolveCall($name);
 
         return $this->reflector->getMethod($name)->invoke(null, ...$arguments);
+    }
+
+    /**
+     * Verify wheter class implements given interface
+     *
+     * @param string $name Interface name
+     * @return bool
+     */
+    public function implementsInterface(string $name)
+    {
+        return $this->reflector->implementsInterface($name);
     }
 
     /**

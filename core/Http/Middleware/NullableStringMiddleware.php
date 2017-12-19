@@ -2,8 +2,8 @@
 
 namespace Core\Http\Middleware;
 
-use Core\Http\Middleware;
 use Core\Http\Request;
+use Core\Interfaces\Http\MiddlewareInterface;
 
 class NullableStringMiddleware implements MiddlewareInterface
 {
@@ -15,6 +15,6 @@ class NullableStringMiddleware implements MiddlewareInterface
      */
     public function apply(Request $request)
     {
-
+        return $request;
     }
 }

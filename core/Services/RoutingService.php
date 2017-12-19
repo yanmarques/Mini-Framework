@@ -24,7 +24,7 @@ class RoutingService extends Service
      */
     public static function boot(Application $app)
     {
-        $route = new Router($app->fileHandler());
+        $route = new Router;
 
         include $app->routesDir().'app.php';
 

@@ -12,7 +12,7 @@ return [
     |
     */
     'global' => [
-        Core\Http\Middleware\NullableString::class,
+        Core\Http\Middleware\NullableStringMiddleware::class,
         Core\Http\Middleware\CSRFMiddleware::class
     ],
 

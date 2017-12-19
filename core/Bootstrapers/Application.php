@@ -27,18 +27,25 @@ class Application implements ApplicationInterface
     private $baseDir;
 
     /**
-     * Services collection
+     * Services stack
      *
-     * @var Core\Services\ServiceCollection
+     * @var Core\Services\ServiceStack
      */
     private $services;
 
     /**
-     * Encryption collection
+     * Encryption stack
      *
      * @var array
      */
     private $encryption;
+
+    /**
+     * MIddleware stack
+     *
+     * @var Core\Stack\Stack
+     */
+    private $middleware;
 
     /**
      * Handle file actions
@@ -64,6 +71,7 @@ class Application implements ApplicationInterface
 
         $this->bootEncryption();
         $this->bootEnvironment();
+        $this->bootMiddleware();
         $this->bootServices();
 
         static::$instance = $this;
@@ -83,7 +91,7 @@ class Application implements ApplicationInterface
     }
 
     /**
-     * Return services collection class
+     * Return services stack class
      *
      * @return Core\Stack\Stack
      */
@@ -93,13 +101,23 @@ class Application implements ApplicationInterface
     }
 
     /**
-     * Return encryption collection class
+     * Return encryption stack class
      *
      * @return Core\Stack\Stack
      */
     public function encryption()
     {
         return $this->encryption;
+    }
+
+    /**
+     * Return middleware stack class
+     *
+     * @return Core\Stack\Stack
+     */
+    public function middleware()
+    {
+        return $this->middleware;
     }
 
     /**
@@ -212,7 +230,7 @@ class Application implements ApplicationInterface
     /**
      * Initialize environment configuration
      *
-     * @param Core\Bootstrapers\Application
+     * @return void
      */
     protected function bootEnvironment()
     {
@@ -220,6 +238,18 @@ class Application implements ApplicationInterface
             ServiceDispatcher::dispatch($this, \Core\Services\ConfigService::class),
             'config'
         );
+    }
+
+    /**
+     * Initialize middleware configuration
+     *
+     * @return void
+     */
+    protected function bootMiddleware()
+    {
+        $this->middleware = stack($this->fileHandler->getRequiredContent(
+                $this->middlewareConfigPath()
+            ));
     }
 
     /**
@@ -240,5 +270,15 @@ class Application implements ApplicationInterface
     private function encryptionConfigPath()
     {
         return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'encryption.php';
+    }
+
+    /**
+     * Get path to encryption configuration
+     *
+     * @return string
+     */
+    private function middlewareConfigPath()
+    {
+        return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'middleware.php';
     }
 }

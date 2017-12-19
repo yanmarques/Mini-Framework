@@ -2,19 +2,19 @@
 
 namespace Core\Http\Middleware;
 
-use Core\Http\Middleware;
 use Core\Http\Request;
+use Core\Interfaces\Http\MiddlewareInterface;
 
 class CSRFMiddleware implements MiddlewareInterface
 {
     /**
      * Apply middleware to request
-     * 
+     *
      * @param App\Http\Request $request
-     * @return 
+     * @return
      */
-    public function apply(Request $request, MiddlewareInterface $next)
+    public function apply(Request $request)
     {
-        
+        return $request;
     }
 }

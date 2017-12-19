@@ -2,9 +2,10 @@
 
 namespace Core\Routing;
 
-use Core\Files\FileHandler;
+use Core\Bootstrapers\Application;
 use Core\Http\Request;
 use Core\Reflector\Reflector;
+use Core\Contracts\Http\MiddlewareInterface;
 
 class ControllerDispatcher
 {
@@ -21,6 +22,13 @@ class ControllerDispatcher
      * @var string
      */
     private $controller;
+
+    /**
+     * Application
+     *
+     * @var Core\Bootstrapers\Application
+     */
+    private $app;
 
     /**
      * Reflector class to dinamically access classes
@@ -43,12 +51,13 @@ class ControllerDispatcher
      */
     private $request;
 
-    public function __construct(FileHandler $fileHandler, Request $request, string $controller, string $action)
+    public function __construct(Application $app, Request $request, string $controller, string $action)
     {
         $this->request = $request;
         $this->controller = $this->controllersPath . $controller;
         $this->action = $action;
-        $this->reflector = new Reflector($fileHandler);
+        $this->app = $app;
+        $this->reflector = new Reflector($app->fileHandler());
     }
 
     /**
@@ -58,7 +67,33 @@ class ControllerDispatcher
      */
     public function dispatch()
     {
+        $this->runMiddlewares();
+
         return $this->reflector->bind($this->controller)
             ->callMethod($this->action, [$this->request]);
+    }
+
+    /**
+     * Run global middlewares from configuration
+     *
+     * @return void
+     */
+    private function runMiddlewares()
+    {
+        $interface = "Core\\Interfaces\\Http\\MiddlewareInterface";
+        $request = $this->request;
+
+        $global = $this->app->middleware()->global;
+        $global->each(function ($value) use (&$request, $interface) {
+            $class = (new Reflector($this->app->fileHandler()))->bind($value);
+
+            if ( ! $class->implementsInterface($interface) ) {
+                throw new \RuntimeException("Middleware [$value] must implements [$interface]");
+            }
+
+            $request = $class->callMethod("apply", [$request]);
+        });
+
+        $this->request = $request;
     }
 }

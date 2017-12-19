@@ -4,24 +4,15 @@ namespace Core\Routing;
 
 use Core\Routing\RouteManager;
 use Core\Routing\Route;
-use Core\Files\FileHandler;
 
 class Router extends RouteManager
 {
     /**
-     * Application fileHandler
-     *
-     * @var Core\Files\FileHandler
-     */
-    private $fileHandler;
-
-    /**
      * Constructor of class
      */
-    public function __construct(FileHandler $fileHandler)
+    public function __construct()
     {
         parent::__construct();
-        $this->fileHandler = $fileHandler;
     }
 
     /**
@@ -88,6 +79,6 @@ class Router extends RouteManager
     */
     private function add(string $method, string $url, $action)
     {
-        $this->addRoute(new Route($this->fileHandler, $method, $url, $action));
+        $this->addRoute(new Route($method, $url, $action));
     }
 }
