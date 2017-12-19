@@ -335,16 +335,16 @@ class Stack implements StackInterface
 
                 // Value is an array
                 elseif ( is_array($value) ) {
-                    $this->itens[$key] = $this->internalMerge($args, $caseSensitive, $value);
+                    $args[$key] = $this->internalMerge($args, $caseSensitive, $value);
                 } else {
-                    $this->itens[$mergeKey] = $mergeValue;
+                    $args[$mergeKey] = $mergeValue;
                 }
 
             }, $stack ?: null);
 
         }
 
-        return $stack ? $args : $this;
+        return $stack ? $args : new self($args);
     }
 
     /**

@@ -32,6 +32,18 @@ if ( ! function_exists('config') ) {
     }
 }
 
+if ( ! function_exists('session') ) {
+    /**
+     * Get application session manager
+     *
+     * @return Core\Sessions\SessionManager
+     */
+    function session()
+    {
+        return app()->services()->session()->stack();
+    }
+}
+
 if ( ! function_exists('encrypt') ) {
     /**
      * Hash a given value using php password_hash with crypt algorithm

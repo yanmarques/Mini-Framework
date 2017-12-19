@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use Core\Http\Request;
+use Core\Support\Hash;
 
 class AuthController
 {
@@ -13,7 +14,7 @@ class AuthController
 
     public function auth(Request $request)
     {
-        // Salva usuario
+        // Make your login logic...
 
         return redirect('/');
     }

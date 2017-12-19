@@ -13,18 +13,7 @@
     </title>
 
     <div>
-
         <h1>MINI FRAMEWORK</h1>
-
-        <?php
-            if ( isset($name) && isset($password) ) {
-                echo "<p>Usuario: $name </p>
-                     <p>Password: $password </p>";
-            } else {
-                echo "<a href='/login'>Login</a>";
-            }
-        ?>
-
     </div>
 
 </body>

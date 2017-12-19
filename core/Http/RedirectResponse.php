@@ -110,8 +110,7 @@ class RedirectResponse
      */
     public function getHeaders()
     {
-        return $this->headers->merge($this->redirectHeader())
-            ->all();
+        return $this->headers->merge($this->redirectHeader())->all();
     }
 
      /**
@@ -191,8 +190,8 @@ class RedirectResponse
             throw new \RuntimeException("Redirect url must not be null.");
         }
 
-        return stack([
+        return [
             'Location' => $this->url
-        ]);
+        ];
     }
 }

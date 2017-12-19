@@ -243,17 +243,6 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Flash session to response
-     *
-     * @return Core\Http\Response
-     */
-    private function flashSession()
-    {
-        app()->services()->session()->flash();
-        return $this;
-    }
-
-    /**
      * Set response status
      *
      * @param int $statusCode
@@ -330,7 +319,7 @@ class Response implements ResponseInterface
         }
 
         $this->setStatusCode($response->getStatus());
-        $this->headers->merge($response->getHeaders());
+        $this->headers = $this->headers->merge($response->getHeaders());
     }
 
     /**
