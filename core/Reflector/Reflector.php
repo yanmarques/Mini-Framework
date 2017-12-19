@@ -150,6 +150,17 @@ class Reflector
     }
 
     /**
+     * Verify wheter class extends given parent class
+     *
+     * @param string $name Parent name
+     * @return bool
+     */
+    public function extends(string $name)
+    {
+        return $this->reflector->getParentClass() == $name;
+    }
+
+    /**
      * Check wheter reflector is a closure
      *
      * @return bool
@@ -294,7 +305,7 @@ class Reflector
      */
     private function resolveInstance()
     {
-        return new $this->class;
+        return $this->reflector->newInstance();
     }
 
     /**
