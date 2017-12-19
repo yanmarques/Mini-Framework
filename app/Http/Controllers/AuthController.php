@@ -13,9 +13,8 @@ class AuthController
 
     public function auth(Request $request)
     {
-        return redirect()->toView('home', [
-            'name' => $request->name,
-            'password' => hcrypt($request->password)
-        ])->status(201);
+        // Salva usuario
+
+        return redirect('/');
     }
 }

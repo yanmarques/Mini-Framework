@@ -5,7 +5,6 @@ namespace Core\Exceptions;
 use Core\Bootstrapers\Application;
 use Core\Http\Response;
 use Core\Views\View;
-use Core\Reflector\Reflector;
 
 class Reporter
 {
@@ -75,12 +74,10 @@ class Reporter
             return $this->response($e)->send();
         }
         
-        $class = (new Reflector($this->app->fileHandler()))->bind($e);
-        
-        if ( $class->extends("Core\Exceptions\Http\HttpResponseException") ) {
+        if ( $this->isHttp($e) ) {
             return (new Response($this->buildView($e), $e->getStatus()))->send();
         }
-        
+
         return $this->render($e);
     } 
 
@@ -95,13 +92,25 @@ class Reporter
     }
 
     /**
+     * Verify wheter exception is Http Exception
+     * 
+     * @param mixed $e Exception
+     * @return bool
+     */
+    private function isHttp($e)
+    {
+        return is_object($e) && ( $e instanceof HttpResponseException || 
+            get_parent_class($e) == 'Core\Exceptions\Http\HttpResponseException' );
+    }
+
+    /**
      * Send exception response in case of production environment
      * 
      * @return Core\Http\Response
      */
     private function response($e)
     {
-        if ( $e instanceof HttpResponseException ) {
+        if ( $this->isHttp($e) ) {
             $view = $this->buildView($e);
             return new Response($view, $e->getStatus());
         }
