@@ -49,6 +49,13 @@ class Application implements ApplicationInterface
     private $middleware;
 
     /**
+     * Database configuration
+     * 
+     * @var Core\Stack\Stack
+     */
+    private $database;
+
+    /**
      * Handle file actions
      *
      * @var Core\Files\FileHandler
@@ -80,6 +87,7 @@ class Application implements ApplicationInterface
         $this->bootExceptionHandler();
         $this->bootEncryption();
         $this->bootEnvironment();
+        $this->bootDatabase();
         $this->bootMiddleware();
         $this->bootServices();
 
@@ -147,6 +155,16 @@ class Application implements ApplicationInterface
     public function reporter()
     {
         return $this->exceptionReporter;
+    }
+
+    /**
+     * Return database configuration
+     *
+     * @return Core\Stack\Stack
+     */
+    public function database()
+    {
+        return $this->database;
     }
 
     /**
@@ -265,6 +283,23 @@ class Application implements ApplicationInterface
         );
     }
 
+     /**
+     * Initialize environment configuration
+     *
+     * @return void
+     */
+    protected function bootDatabase()
+    {
+        $this->database = stack($this->fileHandler->getRequiredContent(
+            $this->databaseConfigPath()
+        ));
+
+        $this->services->add(
+            ServiceDispatcher::dispatch($this, \Core\Services\DatabaseService::class),
+            'config'
+        );
+    }
+
     /**
      * Initialize middleware configuration
      *
@@ -316,5 +351,15 @@ class Application implements ApplicationInterface
     private function middlewareConfigPath()
     {
         return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'middleware.php';
+    }
+
+     /**
+     * Get path to encryption configuration
+     *
+     * @return string
+     */
+    private function databaseConfigPath()
+    {
+        return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'database.php';
     }
 }
