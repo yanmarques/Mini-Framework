@@ -117,7 +117,7 @@ class Reflector
      */
     static function bind($class)
     {
-        $instance = static::$instance;
+        $instance = new self(static::$instance->fileHandler);
         $instance->resolveBinding($class);
         return $instance;
     }
@@ -337,7 +337,13 @@ class Reflector
      */
     private function resolveInstance()
     {
-        return new $this->class;
+        try {
+            return new $this->class;
+        } catch(\ArgumentCountError $e) {
+            
+            // TODO Implement resolveDependencies of class
+            return null;
+        }
     }
 
     /**
