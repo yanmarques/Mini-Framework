@@ -10,7 +10,9 @@
         }
     ],
     "require": {
-        "nesbot/carbon": "^1.22"
+        "nesbot/carbon": "^1.22",
+        "doctrine/dbal": "^2.6",
+        "robmorgan/phinx": "^0.9.1"
     },
     "autoload": {
         "psr-0": {
