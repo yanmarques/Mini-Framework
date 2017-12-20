@@ -126,7 +126,7 @@ class Reporter
      */
     private function buildView($e)
     {
-        $status = (string) in_array($e->getStatus(), [404, 500, 503, 429]) ? $e->getStatus() : 500;
+        $status = (string) in_array($e->getStatus(), [404, 415, 500, 503, 429]) ? $e->getStatus() : 500;
         return View::make($status, $this->viewsPath());
     }
 
