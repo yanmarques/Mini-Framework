@@ -16,7 +16,7 @@ class ServiceDispatcher implements Dispachable
      */
     public static function dispatch(Application $app, $service)
     {
-        $reflectorService = (new Reflector($app->fileHandler()))->bind($service);
+        $reflectorService = Reflector::bind($service);
 
         return [
             $reflectorService->getProperty('name') => $reflectorService->callStaticMethod('boot', [$app])

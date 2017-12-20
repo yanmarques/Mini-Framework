@@ -10,6 +10,7 @@ use Core\Http\Response;
 use Core\Http\RedirectResponse;
 use Core\Views\View;
 use Core\Exceptions\Reporter;
+use Core\Reflector\Reflector;
 
 class Application implements ApplicationInterface
 {
@@ -84,6 +85,7 @@ class Application implements ApplicationInterface
         // Include some helper functions to boot system
         $this->fileHandler->include('core/Support/baseFunctions.php');
 
+        $this->registerSingletons();
         $this->bootExceptionHandler();
         $this->bootEncryption();
         $this->bootEnvironment();
@@ -233,6 +235,16 @@ class Application implements ApplicationInterface
         }
 
         return new Response($response);
+    }
+
+    /**
+     * Register initial singleton classes
+     * 
+     * @return void
+     */
+    private function registerSingletons()
+    {
+        Reflector::boot($this->fileHandler);
     }
 
     /**

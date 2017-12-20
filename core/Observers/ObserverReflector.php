@@ -66,10 +66,7 @@ class ObserverReflector extends ObserverHandler
      */
     public static function handle($class, ...$params)
     {   
-        $reflector = (new Reflector(
-                self::$instance->getApplication()->fileHandler()
-            )
-        )->bind($class);
+        $reflector = Reflector::bind($class);
 
         return $reflector->callMethod('');
     }

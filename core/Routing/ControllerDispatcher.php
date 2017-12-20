@@ -24,13 +24,6 @@ class ControllerDispatcher
     private $controller;
 
     /**
-     * Reflector class to dinamically access classes
-     *
-     * @var Core\Reflector\Reflector
-     */
-    private $reflector;
-
-    /**
      * Path to controllers
      *
      * @var string
@@ -49,7 +42,6 @@ class ControllerDispatcher
         $this->request = $request;
         $this->controller = $this->controllersPath . $controller;
         $this->action = $action;
-        $this->reflector = new Reflector($app->fileHandler());
     }
 
     /**
@@ -59,7 +51,7 @@ class ControllerDispatcher
      */
     public function dispatch()
     {
-        return $this->reflector->bind($this->controller)
+        return Reflector::bind($this->controller)
             ->callMethod($this->action, [$this->request]);
     }
 }

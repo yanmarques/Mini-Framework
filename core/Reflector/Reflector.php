@@ -15,6 +15,20 @@ class Reflector
     use CanGetProperties;
 
     /**
+     * Reflector is booted
+     * 
+     * @var bool
+     */
+    private static $booted; 
+
+    /**
+     * FileHandler singleton instance
+     * 
+     * @var Core\Reflector\Reflector
+     */
+    private static $instance;
+
+    /**
      * Class to reflect
      *
      * @var mixed
@@ -81,15 +95,31 @@ class Reflector
     }
 
     /**
+     * Boot singleton fileHandler class
+     * 
+     * @param Core\Files\FileHandler
+     * @return Core\Reflector\Reflector
+     */
+    static function boot(FileHandler $fileHandler)
+    {
+        if ( ! static::$booted ) {
+            static::$instance = new self($fileHandler);
+        }
+
+        return static::$instance;
+    }
+
+    /**
      * Bind container to given class
      *
      * @param mixed $class
      * @return $this
      */
-    public function bind($class)
+    static function bind($class)
     {
-        $this->resolveBinding($class);
-        return $this;
+        $instance = static::$instance;
+        $instance->resolveBinding($class);
+        return $instance;
     }
 
     /**

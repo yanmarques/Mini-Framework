@@ -126,7 +126,7 @@ class Middleware
      */
     private function apply($middleware)
     {
-        $class = (new Reflector($this->app->fileHandler()))->bind($middleware);
+        $class = Reflector::bind($middleware);
 
         if ( ! $class->implementsInterface($this->interface) ) {
             throw new \RuntimeException("Middleware [$middleware] must implements [$this->interface]");

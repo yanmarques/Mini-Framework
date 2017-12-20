@@ -92,7 +92,7 @@ class Connection
     private function connect()
     {
         $connection = static::drivers()[$this->driver];
-        $connection = (new Reflector($this->app->fileHandler()))->bind($connection);
+        $connection = Reflector::bind($connection);
 
         if ( ! $connection->implementsInterface('Core\Interfaces\Database\ConnectionInterface') ) {
             throw new \RuntimeException("Connection class [{$connection->getName()}]");
