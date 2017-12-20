@@ -3,8 +3,9 @@
 namespace Core\Http;
 
 use Core\Views\View;
+use Core\Interfaces\Http\ResponseStatusInterface;
 
-class RedirectResponse
+class RedirectResponse implements ResponseStatusInterface
 {
     /**
      * Url to redirect

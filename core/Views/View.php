@@ -5,8 +5,9 @@ namespace Core\Views;
 use Core\Bootstrapers\Application;
 use Core\Exceptions\Files\FileNotFoundException;
 use Core\Http\Response;
+use Core\Interfaces\Http\ResponseStatusInterface;
 
-class View
+class View implements ResponseStatusInterface
 {
     /**
      * View is booted

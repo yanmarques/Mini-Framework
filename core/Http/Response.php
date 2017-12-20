@@ -299,7 +299,6 @@ class Response implements ResponseInterface
             $this->resolveRedirect($response);
         } elseif ( $response instanceof View ) {
             $this->view = $response;
-            $this->statusCode = $response->getStatus();
         } else {
             $this->content = (string) $response;
         }
@@ -319,7 +318,6 @@ class Response implements ResponseInterface
             $this->view = $response->getView();
         }
 
-        $this->setStatusCode($response->getStatus());
         $this->headers = $this->headers->merge($response->getHeaders());
     }
 

@@ -7,6 +7,8 @@ use Core\Services\Stack\ServicesStack;
 use Core\Files\FileHandler;
 use Core\Http\Request;
 use Core\Http\Response;
+use Core\Http\RedirectResponse;
+use Core\Views\View;
 use Core\Exceptions\Reporter;
 
 class Application implements ApplicationInterface
@@ -206,6 +208,12 @@ class Application implements ApplicationInterface
     public function handle(Request $request)
     {
         $response = $this->services()->routing()->dispatch($request);
+
+        // Set response status
+        if ( $response instanceof RedirectResponse || $response instanceof View ) {
+            return new Response($response, $response->getStatus());
+        }
+
         return new Response($response);
     }
 
