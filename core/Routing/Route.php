@@ -3,6 +3,7 @@
 namespace Core\Routing;
 
 use Core\Http\Request;
+use Core\Http\RedirectResponse;
 use Core\Routing\RouteMatcher;
 use Core\Routing\ControllerDispatcher;
 use Core\Exceptions\Http\MethodNotAllowedException;
@@ -138,6 +139,7 @@ class Route
     /**
      * Bind request to route
      *
+     * @param Core\Bootstrapers\Application $app Application
      * @param Core\Http\Request $request Request to bind route
      * @return void
      */
@@ -145,22 +147,16 @@ class Route
     {
         $this->matchRequestMethod($request);
 
-        // Run anonymous function
-        if ( $this->isCallable() ) {
-            return $this->runCallable($request);
-        }
-       
-        $request = $this->runMiddlewares($app, $request);
-        
-        // Run controller action
-        return (new ControllerDispatcher(
-            $app, $request, $this->getController(), $this->getAction(), $this->middlewares)
-        )->dispatch();
+        $response = $this->runMiddlewares($app, $request);
+
+        return $this->resolveMiddlewareResponse($app, $response);
     }
 
     /**
      * Run global middlewares from configuration
      *
+     * @param Core\Bootstrapers\Application $app Application
+     * @param Core\Http\Request $request Request to run middlewares
      * @return void
      */
     private function runMiddlewares(Application $app, Request $request)
@@ -183,6 +179,32 @@ class Route
         }
 
         return $this;
+    }
+
+    /**
+     * Resolve response from middleware
+     * Response can be a request to be dispached or can be a redirect response
+     * 
+     * @param Core\Bootstrapers\Application $app Application
+     * @param Core\Http\Request|Core\Http\RedirectResponse $response Response to resolve
+     * @return mixed
+     */
+    private function resolveMiddlewareResponse(Application $app, $response)
+    {
+        // Redirect to route
+        if ( $response instanceof RedirectResponse ) {
+            return $response;
+        }
+
+        // Run anonymous function
+        if ( $this->isCallable() ) {
+            return $this->runCallable($response);
+        }
+
+        // Run controller action
+        return (new ControllerDispatcher(
+            $app, $response, $this->getController(), $this->getAction(), $this->middlewares)
+        )->dispatch();
     }
 
     /**

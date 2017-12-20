@@ -87,11 +87,11 @@ class Middleware
     {
         // Global middlewares
         $global = $this->app->middleware()->global;
-
+        
         // Iterate into each middleware and call apply method
         // Middlewares must implements Core\Interfaces\Http\MiddlewareInterface 
         $global->each(function ($middleware) {
-            $this->apply($value);
+            $this->apply($middleware);
         });
     }
 
@@ -105,16 +105,16 @@ class Middleware
     {
         // Web middlewares
         $web = $this->app->middleware()->web;
-
+    
         // Iterate on each route an apply middleware if registered on middlewares configuration
-        foreach($middlewares as $name => $middleware) {
+        foreach($middlewares as $middleware) {
 
             // Middleware name was not found
-            if ( ! $web->get($name) ) {
-                throw new \RuntimeException("Invalid middleware [$name]");
+            if ( ! $web->get($middleware) ) {
+                throw new \RuntimeException("Invalid middleware [$middleware]");
             }
             
-            $this->apply($middleware);
+            $this->apply($web->get($middleware));
         }
     }
 
@@ -124,7 +124,7 @@ class Middleware
      * @param Core\Interfaces\Http\MiddlewareInterface $middleware Middleware to apply
      * @return void
      */
-    private function apply(Core\Interfaces\Http\MiddlewareInterface $middleware)
+    private function apply($middleware)
     {
         $class = (new Reflector($this->app->fileHandler()))->bind($middleware);
 

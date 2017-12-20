@@ -21,11 +21,11 @@ return [
     | Register HTTP Middlewares
     |********************************************************************
     |
-    | Here you can register all your Middlewares to use on routes group.
+    | Here you can register all your Middlewares to use on routes middleware.
     |
     */
     'web' => [
-        'auth' => null
+        //
     ]
 
 ];

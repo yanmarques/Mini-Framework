@@ -15,6 +15,7 @@ class AuthController
     public function auth(Request $request)
     {
         // Make your login logic...
+        // Authenticate user
 
         return redirect('/');
     }
