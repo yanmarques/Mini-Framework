@@ -76,11 +76,11 @@ class Mysql implements ConnectionInterface
     public function __construct(Application $app)
     {
         $this->app = $app;
-        $this->dbname = $this->app->database()->configurations->get('dbname');
-        $this->host = $this->app->database()->configurations->get('host');
-        $this->port = $this->app->database()->configurations->get('port');
-        $this->user = $this->app->database()->configurations->get('user');
-        $this->password = $this->app->database()->configurations->get('password');
+        $this->dbname = $this->app->database()->get('dbname');
+        $this->host = $this->app->database()->get('host');
+        $this->port = $this->app->database()->get('port');
+        $this->user = $this->app->database()->get('user');
+        $this->password = $this->app->database()->get('password');
         $this->connection = $this->resolveConnection();
     }
 
