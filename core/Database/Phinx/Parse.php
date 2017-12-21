@@ -47,8 +47,8 @@ class Parse
         $config = $this->app->database();
 
         return [
-            'DummyPathMigrations'     => $config->paths->get('migrations'),
-            'DummyPathSeeds'          => $config->paths->get('seeds'),
+            'DummyPathMigrations'     => '%%PHINX_CONFIG_DIR%%'.DIRECTORY_SEPARATOR.$config->paths->get('migrations'),
+            'DummyPathSeeds'          => '%%PHINX_CONFIG_DIR%%'.DIRECTORY_SEPARATOR.$config->paths->get('seeds'),
             'DummyEnvDefaultDatabase' => $this->app->services()->config()->env == 'production' ? 'production' : 'development',
             'DummyDriver'             => $config->driver,
             'DummyHost'               => $config->host,
