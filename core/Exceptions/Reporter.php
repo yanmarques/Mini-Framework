@@ -115,7 +115,7 @@ class Reporter
             return new Response($view, $e->getStatus());
         }
 
-        return new Response(View::make('500', $this->viewsPath()));
+        return new Response(\file_get_contents($this->viewsPath() . '500.php'), 500);
     }
 
     /**
