@@ -122,7 +122,26 @@ class FileHandler
     }
 
     /**
-     * Write data to file and create file if not exists
+     * Append data to file and create file if not exists
+     *
+     * @param string $file Absolute path to file
+     * @param string $data Data to write on file
+     * @return void
+     */
+    public function append(string $file, string $data)
+    {
+        $handler = fopen($file, 'a');
+
+        try {
+            fwrite($handler, $data);
+        } catch ( \Exception $e ) {}
+        finally {
+            fclose($handler);
+        }
+    }
+
+    /**
+     * Clear file content and write data to file
      *
      * @param string $file Absolute path to file
      * @param string $data Data to write on file
@@ -130,7 +149,7 @@ class FileHandler
      */
     public function write(string $file, string $data)
     {
-        $handler = fopen($file, 'a');
+        $handler = fopen($file, 'w');
 
         try {
             fwrite($handler, $data);
