@@ -187,8 +187,12 @@ class Response implements ResponseInterface
      */
     public function send()
     {
-        $this->sendContent()
-            ->sendHeaders();
+        ob_start();
+
+        $this->sendHeaders()
+            ->sendContent();
+
+        ob_end_flush();
 
         exit();
     }
