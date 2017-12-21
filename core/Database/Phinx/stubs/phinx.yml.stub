@@ -1,0 +1,35 @@
+paths:
+    migrations: DummyPathMigrations
+    seeds: DummyPathSeeds
+
+environments:
+    default_migration_table: phinxlog
+    default_database: DummyEnvDefaultDatabase
+    production:
+        adapter: DummyDriver
+        host: DummyHost
+        name: DummyDbname
+        user: DummyUser
+        pass: DummyPassword
+        port: DummyPort
+        charset: utf8
+
+    development:
+        adapter: DummyDriver
+        host: DummyHost
+        name: DummyDbname
+        user: DummyUser
+        pass: DummyPassword
+        port: DummyPort
+        charset: utf8
+
+    testing:
+        adapter: DummyDriver
+        host: DummyHost
+        name: DummyDbname
+        user: DummyUser
+        pass: DummyPassword
+        port: DummyPort
+        charset: utf8
+
+version_order: creation

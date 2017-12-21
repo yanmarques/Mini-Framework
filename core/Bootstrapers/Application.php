@@ -11,6 +11,7 @@ use Core\Http\RedirectResponse;
 use Core\Views\View;
 use Core\Exceptions\Reporter;
 use Core\Reflector\Reflector;
+use Core\Support\Creator;
 
 class Application implements ApplicationInterface
 {
@@ -245,6 +246,7 @@ class Application implements ApplicationInterface
     private function registerSingletons()
     {
         Reflector::boot($this->fileHandler);
+        Creator::boot($this);
     }
 
     /**
