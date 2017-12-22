@@ -5,6 +5,7 @@ namespace Core\Bootstrapers;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Services\Stack\ServicesStack;
 use Core\Files\FileHandler;
+use Core\Files\BasePath;
 use Core\Http\Request;
 use Core\Http\Response;
 use Core\Http\RedirectResponse;
@@ -15,6 +16,8 @@ use Core\Support\Creator;
 
 class Application implements ApplicationInterface
 {
+    use BasePath;
+
     /**
      * ApplicationInterface instance
      *
@@ -172,46 +175,6 @@ class Application implements ApplicationInterface
     }
 
     /**
-     * Return application app directory
-     *
-     * @return string
-     */
-    public function appDir()
-    {
-        return $this->baseDir .DIRECTORY_SEPARATOR. 'app' .DIRECTORY_SEPARATOR;
-    }
-
-    /**
-     * Return application core directory
-     *
-     * @return string
-     */
-    public function coreDir()
-    {
-        return $this->baseDir .DIRECTORY_SEPARATOR. 'core' .DIRECTORY_SEPARATOR;
-    }
-
-    /**
-     * Return application routes directory
-     *
-     * @return string
-     */
-    public function routesDir()
-    {
-        return $this->baseDir .DIRECTORY_SEPARATOR. 'routes' .DIRECTORY_SEPARATOR;
-    }
-
-    /**
-     * Return application views directory
-     *
-     * @return string
-     */
-    public function viewsDir()
-    {
-        return $this->baseDir .DIRECTORY_SEPARATOR. 'views' .DIRECTORY_SEPARATOR;
-    }
-
-    /**
      * Handle an an $input argument
      *
      * @param mixed
@@ -334,47 +297,13 @@ class Application implements ApplicationInterface
             );
         });
     }
-
+    
     /**
-     * Get path to services configuration
-     *
-     * @return string
+     * Get configuration services to run before application boots
+     * Configuration services are needed for application to boots
+     * 
+     * @return array
      */
-    private function servicesConfigPath()
-    {
-        return $this->baseDir .DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'services.php';
-    }
-
-    /**
-     * Get path to encryption configuration
-     *
-     * @return string
-     */
-    private function encryptionConfigPath()
-    {
-        return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'encryption.php';
-    }
-
-    /**
-     * Get path to encryption configuration
-     *
-     * @return string
-     */
-    private function middlewareConfigPath()
-    {
-        return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'middleware.php';
-    }
-
-     /**
-     * Get path to encryption configuration
-     *
-     * @return string
-     */
-    private function databaseConfigPath()
-    {
-        return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'database.php';
-    }
-
     private function configurationServices()
     {
         return [
