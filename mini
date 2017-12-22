@@ -1,0 +1,33 @@
+#!/usr/bin/php
+<?php
+
+/*
+|********************************************************************
+| Register Composer Autoloader
+|********************************************************************
+|
+| Here the autoload from composer is required to resolve namespaces,
+| classes and files through composer.json configurations
+|
+*/
+
+require __DIR__ . '/vendor/autoload.php';
+
+/*
+|********************************************************************
+| Console 
+|********************************************************************
+|
+| Here the console application is initialized. The kernel then handles
+| the Input and Output interfaces to start the interactive console.
+|
+*/
+
+$kernel = new \Core\Console\Application(
+    __DIR__
+);
+
+$kernel->handle(
+    new Symfony\Component\Console\Input\ArgvInput,
+    new Symfony\Component\Console\Output\ConsoleOutput
+);

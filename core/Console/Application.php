@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Bootstrapers;
+namespace Core\Console;
 
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Services\Stack\ServicesStack;
@@ -14,8 +14,12 @@ use Core\Views\View;
 use Core\Exceptions\Reporter;
 use Core\Reflector\Reflector;
 use Core\Support\Creator;
+use Core\Bootstrapers\HandleException;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Output\OutputInterface;
+use Symfony\Component\Console\Application as SymfonyApplication;
 
-class Application implements ApplicationInterface
+class Application extends SymfonyApplication implements ApplicationInterface
 {
     use BasePath;
 
@@ -83,15 +87,16 @@ class Application implements ApplicationInterface
      */
     public function __construct(string $baseDir)
     {
+        parent::__construct('Mini Framework', null);
         $this->baseDir = $baseDir;
 
         // Before application boot
         $this->booting();
-
+        
         // Boot aplication
         $this->boot();
-
-        // Run callbacks
+        
+        // // Run callbacks
         $this->booted();
     }
 
@@ -183,14 +188,8 @@ class Application implements ApplicationInterface
      */
     public function handle($input, $secondary = null)
     {
-        $response = $this->services()->routing()->dispatch($input);
-
-        // Set response status
-        if ( $response instanceof RedirectResponse || $response instanceof View ) {
-            return new Response($response, $response->getStatus());
-        }
-
-        return new Response($response);
+        $status = parent::run($input, $secondary);
+        dd($status);
     }
 
     /**
@@ -251,8 +250,8 @@ class Application implements ApplicationInterface
     private function bootServices()
     {
         $services = stack($this->fileHandler->getRequiredContent(
-                            $this->servicesConfigPath()
-                    ));
+            $this->servicesConfigPath()
+        ));
 
         $services = $services->map(function ($service) {
             return ServiceDispatcher::dispatch($this, $service);
@@ -267,14 +266,7 @@ class Application implements ApplicationInterface
      * @return void
      */
     private function bootConfiguration()
-    {
-        // Initialize exception report
-        $this->exceptionReporter = Reporter::boot($this);
-
-        // Php exception handler
-        // Use exception reporter 
-        HandleException::boot($this);
-
+    {    
         // Get encryption configuration from file
         $this->encryption = stack($this->fileHandler->getRequiredContent(
             $this->encryptionConfigPath()
@@ -284,12 +276,7 @@ class Application implements ApplicationInterface
         $this->database = stack($this->fileHandler->getRequiredContent(
             $this->databaseConfigPath()
         ));
-
-        // Get middleware configuration from file
-        $this->middleware = stack($this->fileHandler->getRequiredContent(
-            $this->middlewareConfigPath()
-        ));
-
+    
         // Initialize configurations services 
         stack($this->configurationServices())->each(function ($value, $key) {
             $this->services->add(
@@ -297,6 +284,13 @@ class Application implements ApplicationInterface
                 $key
             );
         });
+
+        // Initialize exception report
+        $this->exceptionReporter = Reporter::boot($this)->setOnConsole();
+        
+        // Php exception handler
+        // Use exception reporter 
+        HandleException::boot($this);
     }
     
     /**

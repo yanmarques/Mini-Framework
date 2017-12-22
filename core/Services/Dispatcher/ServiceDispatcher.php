@@ -1,6 +1,6 @@
 <?php
 
-namespace Core\Bootstrapers;
+namespace Core\Services\Dispatcher;
 
 use Core\Interfaces\Services\Dispachable;
 use Core\Reflector\Reflector;
