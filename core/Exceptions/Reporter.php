@@ -5,6 +5,7 @@ namespace Core\Exceptions;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Http\Response;
 use Core\Views\View;
+use Symfony\Component\Console\Output\ConsoleOutput;
 
 class Reporter
 {
@@ -37,6 +38,13 @@ class Reporter
     private $app;
 
     /**
+     * Application is running on console mode
+     * 
+     * @var bool
+     */
+    private $console = false;
+
+    /**
      * Constructor of class
      * 
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
@@ -64,12 +72,27 @@ class Reporter
     }
 
     /**
+     * Set reporter to console mode
+     * 
+     * @return Core\Exceptions\Reporter
+     */
+    public function setOnConsole()
+    {
+        $this->console = true;
+        return $this;
+    }
+
+    /**
      * Report exception
      * 
      * @param mixed $e Exception to report
      */
     public function report($e)
     {
+        if ( $this->console ) {
+            return $this->app->renderException($e, new ConsoleOutput);
+        }
+
         if ( ! $this->shouldReport() ) {
             return $this->response($e)->send();
         }

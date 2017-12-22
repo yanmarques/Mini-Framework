@@ -266,7 +266,14 @@ class Application extends SymfonyApplication implements ApplicationInterface
      * @return void
      */
     private function bootConfiguration()
-    {    
+    {   
+        // Initialize exception report
+        $this->exceptionReporter = Reporter::boot($this)->setOnConsole();
+        
+        // Php exception handler
+        // Use exception reporter 
+        HandleException::boot($this); 
+
         // Get encryption configuration from file
         $this->encryption = stack($this->fileHandler->getRequiredContent(
             $this->encryptionConfigPath()
@@ -284,13 +291,6 @@ class Application extends SymfonyApplication implements ApplicationInterface
                 $key
             );
         });
-
-        // Initialize exception report
-        $this->exceptionReporter = Reporter::boot($this)->setOnConsole();
-        
-        // Php exception handler
-        // Use exception reporter 
-        HandleException::boot($this);
     }
     
     /**
