@@ -229,6 +229,10 @@ class Application extends SymfonyApplication implements ApplicationInterface
 
         // Include all application helper functions
         $this->fileHandler->include('core/Support/helpers.php');
+
+        foreach($this->commands() as $command) {
+            $this->add(new $command($this));
+        }
     }
 
     /**
@@ -306,5 +310,12 @@ class Application extends SymfonyApplication implements ApplicationInterface
             'config' => \Core\Services\ConfigService::class,
             'database' => \Core\Services\DatabaseService::class
         ];
+    }
+
+    private function commands()
+    {
+        return [
+            \Core\Console\Commands\ControllerCommand::class
+        ];  
     }
 }
