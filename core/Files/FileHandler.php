@@ -2,25 +2,25 @@
 
 namespace Core\Files;
 
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Exceptions\Files\FileNotFoundException;
 
 class FileHandler
 {
     /**
-     * Application instance
+     * ApplicationInterface instance
      *
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $application;
 
     /**
      * Constructor of class
      *
-     * @param Core\Bootstrapers\Application
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return Core\Files\FileHandler
      */
-    public function __construct(Application $application)
+    public function __construct(ApplicationInterface $application)
     {
         $this->application = $application;
     }

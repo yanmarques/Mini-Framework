@@ -2,7 +2,7 @@
 
 namespace Core\Support;
 
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Exceptions\Files\FileNotFoundException;
 
 class Creator
@@ -22,13 +22,13 @@ class Creator
     private static $instance;
 
     /**
-     * Application to handle dependencies
+     * ApplicationInterface to handle dependencies
      * 
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
-    public function __construct(Application $app)
+    public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
     }
@@ -36,10 +36,10 @@ class Creator
     /**
      * Boot creator singleton instance with application
      * 
-     * @param Core\Bootstrapers\Application $app Handle dependencies
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app Handle dependencies
      * @return Core\Support\Creator
      */
-    static function boot(Application $app)
+    static function boot(ApplicationInterface $app)
     {
         if ( ! static::$booted ) {
             static::$instance = new self($app);

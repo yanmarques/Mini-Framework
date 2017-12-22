@@ -2,22 +2,18 @@
 
 namespace Core\Bootstrapers;
 
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
+
 class HandleException
 {   
     /**
-     * Application
+     * ApplicationInterface
      * 
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
-    /**
-     * Boot handler
-     * 
-     * @param Core\Bootstrapers\Application $app
-     * @return void
-     */
-    public function boot(Application $app)
+    public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
 
@@ -26,6 +22,17 @@ class HandleException
         // set_error_handler([$this, "handleError"]);
 
         \set_exception_handler([$this, "handleException"]);
+    }
+
+    /**
+     * Boot handler
+     * 
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
+     * @return void
+     */
+    static function boot(ApplicationInterface $app)
+    {
+        return new self($app);
     }
 
     /**

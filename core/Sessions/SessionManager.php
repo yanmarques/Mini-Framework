@@ -3,7 +3,7 @@
 namespace Core\Sessions;
 
 use Core\Crypt\Crypter;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class SessionManager
 {
@@ -29,19 +29,19 @@ class SessionManager
     private $session;
 
     /**
-     * Application class
+     * ApplicationInterface class
      *
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
     /**
      * Constructor of class
      *
-     * @param Core\Bootstrapers\Application
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface
      * @return Core\Sessions\SessionManager
      */
-    public function __construct(Application $app)
+    public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
         $this->bootSession();
@@ -51,10 +51,10 @@ class SessionManager
     /**
      * Boot session manager
      *
-     * @param Core\Bootstrapers\Application
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface
      * @return Core\Sessions\SessionManager
      */
-    public static function boot(Application $app)
+    public static function boot(ApplicationInterface $app)
     {
         if ( ! self::$booted ) {
             self::$instance = new self($app);

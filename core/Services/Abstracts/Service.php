@@ -2,7 +2,7 @@
 
 namespace Core\Services\Abstracts;
 
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 abstract class Service
 {
@@ -23,10 +23,10 @@ abstract class Service
     /**
      * Boot the aplication service
      *
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return mixed
      */
-    abstract public static function boot(Application $app);
+    abstract public static function boot(ApplicationInterface $app);
 
     /**
      * Get service class

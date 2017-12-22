@@ -2,7 +2,7 @@
 
 namespace Core\Database;
 
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Reflector\Reflector;
 
 class Connection 
@@ -36,13 +36,13 @@ class Connection
     private $connection;
 
     /**
-     * Application
+     * ApplicationInterface
      * 
-     * @var Core\Bootstrapers\Application $app
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface $app
      */
     private $app;   
 
-    public function __construct(Application $app)
+    public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
         
@@ -60,10 +60,10 @@ class Connection
     /**
      * Boot database singleton instance
      * 
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return Core\Database\Connection
      */
-    static function boot(Application $app)
+    static function boot(ApplicationInterface $app)
     {
         // Database not booted
         if ( ! static::$booted ) {

@@ -2,7 +2,7 @@
 
 namespace Core\Exceptions;
 
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Http\Response;
 use Core\Views\View;
 
@@ -30,19 +30,19 @@ class Reporter
     private $exceptions;
 
     /**
-     * Application
+     * ApplicationInterface
      * 
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
     /**
      * Constructor of class
      * 
-     * @param Core\Bootstrapers\Application
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return Core\Exceptions\Reporter
      */
-    public function __construct(Application $app)
+    public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
         $this->exceptions = stack();
@@ -51,10 +51,10 @@ class Reporter
     /**
      * Boot Handler singleton
      * 
-     * @param Core\Bootstrapers\Application
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return Core\Exceptions\Reporter
      */
-    static function boot(Application $app)
+    static function boot(ApplicationInterface $app)
     {
         if ( ! static::$booted ) {
             static::$instance = new self($app);

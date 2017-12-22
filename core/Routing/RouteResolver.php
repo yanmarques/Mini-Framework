@@ -4,7 +4,7 @@ namespace Core\Routing;
 
 use Core\Http\Request;
 use Core\Exceptions\Http\NotFoundException;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class RouteResolver
 {
@@ -16,9 +16,9 @@ class RouteResolver
     private $router;
 
     /**
-     * Application
+     * ApplicationInterface
      *
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
@@ -28,7 +28,7 @@ class RouteResolver
      * @param Core\Routing\Router $router
      * @return Core\Routing\RouterResolver
      */
-    public function __construct(Application $app, Router $router)
+    public function __construct(ApplicationInterface $app, Router $router)
     {
         $this->app = $app;
         $this->router = $router;

@@ -16,9 +16,9 @@ use Core\Support\Creator;
 class Application implements ApplicationInterface
 {
     /**
-     * Application instance
+     * ApplicationInterface instance
      *
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private static $instance;
 
@@ -74,36 +74,27 @@ class Application implements ApplicationInterface
      /**
      * Constructor of class
      *
-     * @param string $baseDir Application directory
-     * @return Core\Bootstrapers\Application
+     * @param string $baseDir ApplicationInterface directory
+     * @return Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     public function __construct(string $baseDir)
     {
         $this->baseDir = $baseDir;
-        $this->fileHandler = new FileHandler($this);
-        $this->services = new ServicesStack;
 
-        // Include some helper functions to boot system
-        $this->fileHandler->include('core/Support/baseFunctions.php');
+        // Before application boot
+        $this->booting();
 
-        $this->registerSingletons();
-        $this->bootExceptionHandler();
-        $this->bootEncryption();
-        $this->bootEnvironment();
-        $this->bootDatabase();
-        $this->bootMiddleware();
-        $this->bootServices();
+        // Boot aplication
+        $this->boot();
 
-        static::$instance = $this;
-
-        // Include all application helper functions
-        $this->fileHandler->include('core/Support/helpers.php');
+        // Run callbacks
+        $this->booted();
     }
 
     /**
      * Get an instance of application
      *
-     * @return Core\Bootstrapers\Application
+     * @return Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     static function instance()
     {
@@ -221,14 +212,14 @@ class Application implements ApplicationInterface
     }
 
     /**
-     * Handle an incomming request
+     * Handle an an $input argument
      *
-     * @param Core\Http\Request $request Incomming request
-     * @return Core\Http\Response
+     * @param mixed
+     * @return mixed
      */
-    public function handle(Request $request)
+    public function handle($input, $secondary = null)
     {
-        $response = $this->services()->routing()->dispatch($request);
+        $response = $this->services()->routing()->dispatch($input);
 
         // Set response status
         if ( $response instanceof RedirectResponse || $response instanceof View ) {
@@ -236,6 +227,45 @@ class Application implements ApplicationInterface
         }
 
         return new Response($response);
+    }
+
+    /**
+     * Executed before application boot services
+     * 
+     * @return void
+     */
+    public function booting()
+    {
+        $this->fileHandler = new FileHandler($this);
+        $this->services = new ServicesStack;
+
+        // Include some helper functions to boot system
+        $this->fileHandler->include('core/Support/baseFunctions.php');
+    }
+
+    /**
+     * Boot application
+     * 
+     * @return void
+     */
+    public function boot()
+    {
+        $this->registerSingletons();
+        $this->bootConfiguration();
+        $this->bootServices();
+    }
+
+    /**
+     * Executed after application has been booted
+     * 
+     * @return void
+     */
+    public function booted()
+    {
+        static::$instance = $this;
+
+        // Include all application helper functions
+        $this->fileHandler->include('core/Support/helpers.php');
     }
 
     /**
@@ -272,69 +302,37 @@ class Application implements ApplicationInterface
      *
      * @return void
      */
-    private function bootEncryption()
+    private function bootConfiguration()
     {
+        // Initialize exception report
+        $this->exceptionReporter = Reporter::boot($this);
+
+        // Php exception handler
+        // Use exception reporter 
+        HandleException::boot($this);
+
+        // Get encryption configuration from file
         $this->encryption = stack($this->fileHandler->getRequiredContent(
             $this->encryptionConfigPath()
         ));
 
-        $this->services->add(
-            ServiceDispatcher::dispatch($this, \Core\Services\CrypterService::class),
-            'crypter'
-        );
-    }
-
-    /**
-     * Initialize environment configuration
-     *
-     * @return void
-     */
-    protected function bootEnvironment()
-    {
-        $this->services->add(
-            ServiceDispatcher::dispatch($this, \Core\Services\ConfigService::class),
-            'config'
-        );
-    }
-
-     /**
-     * Initialize environment configuration
-     *
-     * @return void
-     */
-    protected function bootDatabase()
-    {
+        // Get database configuration from file
         $this->database = stack($this->fileHandler->getRequiredContent(
             $this->databaseConfigPath()
         ));
 
-        $this->services->add(
-            ServiceDispatcher::dispatch($this, \Core\Services\DatabaseService::class),
-            'config'
-        );
-    }
-
-    /**
-     * Initialize middleware configuration
-     *
-     * @return void
-     */
-    protected function bootMiddleware()
-    {
+        // Get middleware configuration from file
         $this->middleware = stack($this->fileHandler->getRequiredContent(
-                $this->middlewareConfigPath()
-            ));
-    }
+            $this->middlewareConfigPath()
+        ));
 
-    /**
-     * Boot exceptions handler
-     * 
-     * @return void
-     */
-    protected function bootExceptionHandler()
-    {
-        $this->exceptionReporter = Reporter::boot($this);
-        (new HandleException)->boot($this);
+        // Initialize configurations services 
+        stack($this->configurationServices())->each(function ($value, $key) {
+            $this->services->add(
+                ServiceDispatcher::dispatch($this, $value),
+                $key
+            );
+        });
     }
 
     /**
@@ -375,5 +373,14 @@ class Application implements ApplicationInterface
     private function databaseConfigPath()
     {
         return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'database.php';
+    }
+
+    private function configurationServices()
+    {
+        return [
+            'crypter' => \Core\Services\CrypterService::class,
+            'config' => \Core\Services\ConfigService::class,
+            'database' => \Core\Services\DatabaseService::class
+        ];
     }
 }

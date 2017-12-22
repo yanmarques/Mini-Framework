@@ -3,14 +3,14 @@
 namespace Core\Database\Phinx;
 
 use Core\Support\Creator;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class Parse
 {
     /**
-     * Application
+     * ApplicationInterface
      * 
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
@@ -21,7 +21,7 @@ class Parse
      */
     private $phinxStub = __DIR__ .DIRECTORY_SEPARATOR. 'stubs' .DIRECTORY_SEPARATOR. 'phinx.yml.stub'; 
 
-    public function __construct(Application $app)
+    public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
     }

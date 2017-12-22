@@ -2,24 +2,24 @@
 
 namespace Core\Views;
 
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class ViewMatcher
 {
     /**
-     * Application
+     * ApplicationInterface
      *
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
     /**
      * Constructor of class
      *
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return Core\Views\ViewMatcher
      */
-    public function __construct(Application $app)
+    public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
     }

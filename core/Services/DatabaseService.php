@@ -3,7 +3,7 @@
 namespace Core\Services;
 
 use Core\Services\Abstracts\Service;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Database\Connection;
 
 class DatabaseService extends Service
@@ -18,10 +18,10 @@ class DatabaseService extends Service
     /**
      * Boot the database service
      *
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return mixed
      */
-    public static function boot(Application $app)
+    public static function boot(ApplicationInterface $app)
     {
         return Connection::boot($app);
     }

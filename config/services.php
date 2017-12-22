@@ -4,7 +4,7 @@ return [
 
     /*
     |********************************************************************
-    | Register Application Services
+    | Register ApplicationInterface Services
     |********************************************************************
     |
     | Here you can register all the application services. Services are

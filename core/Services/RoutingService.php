@@ -5,7 +5,7 @@ namespace Core\Services;
 use Core\Services\Abstracts\Service;
 use Core\Routing\Router;
 use Core\Routing\RouteResolver;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class RoutingService extends Service
 {
@@ -19,10 +19,10 @@ class RoutingService extends Service
     /**
      * Boot the aplication service
      *
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return mixed
      */
-    public static function boot(Application $app)
+    public static function boot(ApplicationInterface $app)
     {
         $route = new Router;
 

@@ -2,7 +2,6 @@
 
 namespace Core\Routing;
 
-use Core\Bootstrapers\Application;
 use Core\Http\Request;
 use Core\Reflector\Reflector;
 use Core\Contracts\Http\MiddlewareInterface;
@@ -37,7 +36,7 @@ class ControllerDispatcher
      */
     private $request;
 
-    public function __construct(Application $app, Request $request, string $controller, string $action)
+    public function __construct(Request $request, string $controller, string $action)
     {
         $this->request = $request;
         $this->controller = $this->controllersPath . $controller;

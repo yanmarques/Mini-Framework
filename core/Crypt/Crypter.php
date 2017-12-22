@@ -35,7 +35,7 @@ class Crypter
     private $length;
 
     /**
-     * Application key
+     * ApplicationInterface key
      *
      * @var string
      */
@@ -44,7 +44,7 @@ class Crypter
     /**
      * Constructor of cryptographic class
      *
-     * @param Core\Bootstrapers\Application
+     * @param string $cipher Cipher name to use
      * @return Core\Crypt\Crypter
      */
     public function __construct(string $cipher)

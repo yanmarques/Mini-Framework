@@ -3,7 +3,7 @@
 namespace Core\Observers;
 
 use Core\Reflector\Reflector;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class ObserverReflector extends ObserverHandler
 {
@@ -24,10 +24,10 @@ class ObserverReflector extends ObserverHandler
     /**
      * Constructor of class
      * 
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * 
      */
-    public function __construct(Application $app)
+    public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
     }
@@ -35,10 +35,10 @@ class ObserverReflector extends ObserverHandler
     /**
      * Boot observer
      * 
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return Core\Observers\ObserverReflector
      */
-    public static function boot(Application $app)
+    public static function boot(ApplicationInterface $app)
     {
         if ( ! self::$booted ) {
             self::$instance = new self($app);
@@ -50,7 +50,7 @@ class ObserverReflector extends ObserverHandler
     /**
      * Get current appplication
      * 
-     * @return Core\Bootstrapers\Application
+     * @return Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     public function getApplication()
     {

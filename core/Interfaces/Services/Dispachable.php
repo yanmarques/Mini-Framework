@@ -2,7 +2,7 @@
 
 namespace Core\Interfaces\Services;
 
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 interface Dispachable
 {
@@ -12,5 +12,5 @@ interface Dispachable
      * @param $service Service to dispatch
      * @return mixed
      */
-    public static function dispatch(Application $app, $service);
+    public static function dispatch(ApplicationInterface $app, $service);
 }

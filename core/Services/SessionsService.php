@@ -4,7 +4,7 @@ namespace Core\Services;
 
 use Core\Services\Abstracts\Service;
 use Core\Sessions\SessionManager;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class SessionsService extends Service
 {   
@@ -18,10 +18,10 @@ class SessionsService extends Service
     /**
      * Boot the aplication service
      *
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return mixed
      */
-    public static function boot(Application $app)
+    public static function boot(ApplicationInterface $app)
     {
         return SessionManager::boot($app);
     }

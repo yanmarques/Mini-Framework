@@ -2,7 +2,7 @@
 
 namespace Core\Routing;
 
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Http\Request;
 use Core\Reflector\Reflector;
 
@@ -23,9 +23,9 @@ class Middleware
     private static $instance;
 
     /**
-     * Application
+     * ApplicationInterface
      * 
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
@@ -43,7 +43,7 @@ class Middleware
      */
     private $interface = "Core\\Interfaces\\Http\\MiddlewareInterface";
 
-    public function __construct(Application $app, Request $request)
+    public function __construct(ApplicationInterface $app, Request $request)
     {
         $this->app = $app;
         $this->request = $request;
@@ -52,11 +52,11 @@ class Middleware
     /**
      * Boot middleware on request
      * 
-     * @param Core\Bootstrapers\Application $app Application
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app ApplicationInterface
      * @param Core\Http\Request $request
      * @return Core\Routing\Middleware
      */
-    static function boot(Application $app, Request $request)
+    static function boot(ApplicationInterface $app, Request $request)
     {   
         if ( ! static::$booted ) {
             static::$instance = new self($app, $request);

@@ -7,7 +7,7 @@ use Core\Http\RedirectResponse;
 use Core\Routing\RouteMatcher;
 use Core\Routing\ControllerDispatcher;
 use Core\Exceptions\Http\MethodNotAllowedException;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class Route
 {
@@ -139,11 +139,11 @@ class Route
     /**
      * Bind request to route
      *
-     * @param Core\Bootstrapers\Application $app Application
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app ApplicationInterface
      * @param Core\Http\Request $request Request to bind route
      * @return void
      */
-    public function bind(Application $app, Request $request)
+    public function bind(ApplicationInterface $app, Request $request)
     {
         $this->matchRequestMethod($request);
 
@@ -155,11 +155,11 @@ class Route
     /**
      * Run global middlewares from configuration
      *
-     * @param Core\Bootstrapers\Application $app Application
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app ApplicationInterface
      * @param Core\Http\Request $request Request to run middlewares
      * @return void
      */
-    private function runMiddlewares(Application $app, Request $request)
+    private function runMiddlewares(ApplicationInterface $app, Request $request)
     {
         return Middleware::boot($app, $request)->run($this->middlewares);
     }
@@ -185,11 +185,11 @@ class Route
      * Resolve response from middleware
      * Response can be a request to be dispached or can be a redirect response
      * 
-     * @param Core\Bootstrapers\Application $app Application
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app ApplicationInterface
      * @param Core\Http\Request|Core\Http\RedirectResponse $response Response to resolve
      * @return mixed
      */
-    private function resolveMiddlewareResponse(Application $app, $response)
+    private function resolveMiddlewareResponse(ApplicationInterface $app, $response)
     {
         // Redirect to route
         if ( $response instanceof RedirectResponse ) {

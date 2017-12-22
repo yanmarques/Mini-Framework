@@ -3,7 +3,6 @@
 namespace Core\Http;
 
 use Core\Interfaces\Http\ResponseInterface;
-use Core\Bootstrapers\Application;
 use Core\Http\Request;
 use Core\Http\HeadersStack;
 use Core\Views\View;
@@ -111,7 +110,7 @@ class Response implements ResponseInterface
     ];
 
     /**
-     * Application request
+     * ApplicationInterface request
      *
      * @var Core\Http\Request
      */

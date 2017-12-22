@@ -4,7 +4,7 @@ namespace Core\Services;
 
 use Core\Services\Abstracts\Service;
 use Core\Support\Config;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class ConfigService extends Service
 {   
@@ -18,10 +18,10 @@ class ConfigService extends Service
     /**
      * Boot the aplication service
      *
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return mixed
      */
-    public static function boot(Application $app)
+    public static function boot(ApplicationInterface $app)
     {
         return Config::boot($app);
     }

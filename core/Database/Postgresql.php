@@ -3,7 +3,7 @@
 namespace Core\Database;
 
 use Core\Interfaces\Database\ConnectionInterface;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Database\Traits\PDODriver;
 
 class Postgresql implements ConnectionInterface
@@ -25,9 +25,9 @@ class Postgresql implements ConnectionInterface
     private static $instance; 
 
     /**
-     * Application
+     * ApplicationInterface
      * 
-     * @var Core\Bootstrapers\Application $app
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;   
 
@@ -73,7 +73,7 @@ class Postgresql implements ConnectionInterface
      */
     protected $password;
 
-    public function __construct(Application $app)
+    public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
         $this->dbname = $this->app->database()->get('dbname');
@@ -87,10 +87,10 @@ class Postgresql implements ConnectionInterface
     /**
      * Boot postresql connection singleton instance
      * 
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return Core\Database\Connection
      */
-    static function boot(Application $app)
+    static function boot(ApplicationInterface $app)
     {
         // Database not booted
         if ( ! static::$booted ) {

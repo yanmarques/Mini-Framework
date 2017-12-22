@@ -4,7 +4,7 @@ namespace Core\Bootstrapers;
 
 use Core\Interfaces\Services\Dispachable;
 use Core\Reflector\Reflector;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class ServiceDispatcher implements Dispachable
 {
@@ -14,7 +14,7 @@ class ServiceDispatcher implements Dispachable
      * @param mixed $service Service class to dispatch
      * @return mixed
      */
-    public static function dispatch(Application $app, $service)
+    public static function dispatch(ApplicationInterface $app, $service)
     {
         $reflectorService = Reflector::bind($service);
 

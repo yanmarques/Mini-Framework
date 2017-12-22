@@ -3,7 +3,7 @@
 namespace Core\Support;
 
 use Core\Exceptions\Files\FileNotFoundException;
-use Core\Bootstrapers\Application;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Crypt\Crypter;
 
 class Config
@@ -23,9 +23,9 @@ class Config
     private static $instance;
 
     /**
-     * Application
+     * ApplicationInterface
      *
-     * @var Core\Bootstrapers\Application
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
@@ -49,7 +49,7 @@ class Config
      * @param Core\Files\FileHandler $app
      * @return Core\Support\Config
      */
-    public function __construct(Application $app)
+    public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
         $this->fileHandler = $app->fileHandler();
@@ -59,10 +59,10 @@ class Config
     /**
      * Boot config class
      *
-     * @param Core\Bootstrapers\Application $app
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
      * @return Core\Support\Config
      */
-    public static function boot(Application $app)
+    public static function boot(ApplicationInterface $app)
     {
         if ( ! self::$booted ) {
             self::$instance = new self($app);
