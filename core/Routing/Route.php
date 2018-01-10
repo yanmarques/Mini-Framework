@@ -203,7 +203,7 @@ class Route
 
         // Run controller action
         return (new ControllerDispatcher(
-            $app, $response, $this->getController(), $this->getAction(), $this->middlewares)
+            $response, $this->getController(), $this->getAction(), $this->middlewares)
         )->dispatch();
     }
 
