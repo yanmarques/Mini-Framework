@@ -28,17 +28,6 @@ class CSRFMiddleware implements MiddlewareInterface
     }
 
     /**
-     * Request is not show methods : GET, HEAD, OPTIONS
-     *
-     * @param Core\Http\Request
-     * @return bool
-     */
-    private function isNotShow(Request $request)
-    {
-        return in_array($request->method(), ['GET', 'HEAD', 'OPTIONS']);
-    }
-
-    /**
      * Verify wheter token from request matchs CSRFToken from session
      *
      * @param Core\Http\Request $request Request
