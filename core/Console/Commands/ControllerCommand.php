@@ -78,6 +78,6 @@ class ControllerCommand extends Command
     public function run(InputInterface $input, OutputInterface $output)
     {
         $name = $input->getArguments('name');
-        new Process('composer dumpautoload -o -a');
+        observe('autoload');
     }
 }

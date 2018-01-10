@@ -62,6 +62,13 @@ class Application implements ApplicationInterface
     private $database;
 
     /**
+     * Observers configuration
+     * 
+     * @var Core\Stack\Stack
+     */
+    private $observers;
+
+    /**
      * Handle file actions
      *
      * @var Core\Files\FileHandler
@@ -163,6 +170,16 @@ class Application implements ApplicationInterface
     public function database()
     {
         return $this->database;
+    }
+
+    /**
+     * Return observers configuration
+     * 
+     * @return Core\Stack\Stack
+     */
+    public function observers()
+    {
+        return $this->observers;
     }
 
     /**
@@ -285,6 +302,10 @@ class Application implements ApplicationInterface
             $this->databaseConfigPath()
         ));
 
+        $this->observers = stack($this->fileHandler->getRequiredContent(
+            $this->observerConfigPath()
+        ));
+
         // Get middleware configuration from file
         $this->middleware = stack($this->fileHandler->getRequiredContent(
             $this->middlewareConfigPath()
@@ -308,9 +329,10 @@ class Application implements ApplicationInterface
     private function configurationServices()
     {
         return [
-            'crypter' => \Core\Services\CrypterService::class,
-            'config' => \Core\Services\ConfigService::class,
-            'database' => \Core\Services\DatabaseService::class
+            \Core\Services\CrypterService::class,
+            \Core\Services\ConfigService::class,
+            \Core\Services\DatabaseService::class,
+            \Core\Services\ObserverService::class
         ];
     }
 }

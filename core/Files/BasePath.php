@@ -25,6 +25,16 @@ trait BasePath
     }
 
     /**
+     * Get path to observer configuration
+     *
+     * @return string
+     */
+    public function observerConfigPath()
+    {
+        return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'observed.php';
+    }
+
+    /**
      * Get path to encryption configuration
      *
      * @return string

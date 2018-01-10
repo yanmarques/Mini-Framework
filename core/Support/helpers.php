@@ -132,3 +132,15 @@ if ( ! function_exists('csrf_field') ) {
          return "<input type='hidden' name='csrf_token' value='$token'>";
      }
 }
+
+if ( ! function_exists('observe') ) {
+    /**
+     * Call global observer
+     *
+     * @return string
+     */
+     function observe($name)
+     {
+        app()->services()->observer->call($name);
+     }
+}

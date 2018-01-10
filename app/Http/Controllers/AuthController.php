@@ -16,7 +16,7 @@ class AuthController
     {
         // Make your login logic...
         // Authenticate user
-
+        
         return redirect('/');
     }
 }

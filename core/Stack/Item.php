@@ -4,6 +4,7 @@ namespace Core\Stack;
 
 use Core\Interfaces\Stack\ItemInterface;
 use Core\Stack\Traits\MagicStack;
+use Core\Reflector\Reflector;
 
 class Item implements ItemInterface
 {
@@ -36,5 +37,11 @@ class Item implements ItemInterface
     public function __toString()
     {
         return $this->value;
+    }
+
+    public function __call($name, $params)
+    {
+        $reflector = Reflector::bind($this->value);
+        $reflector->callMethod($name, $params);
     }
 }

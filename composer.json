@@ -12,7 +12,8 @@
     "require": {
         "nesbot/carbon": "^1.22",
         "doctrine/dbal": "^2.6",
-        "robmorgan/phinx": "^0.9.1"
+        "robmorgan/phinx": "^0.9.1",
+        "symfony/process": "^4.0"
     },
     "autoload": {
         "psr-0": {

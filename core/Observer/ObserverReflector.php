@@ -1,11 +1,11 @@
 <?php
 
-namespace Core\Observers;
+namespace Core\Observer;
 
 use Core\Reflector\Reflector;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
-class ObserverReflector extends ObserverHandler
+class ObserverReflector extends AbstractObserver
 {
     /**
      * Observer is booted
@@ -22,6 +22,13 @@ class ObserverReflector extends ObserverHandler
     private static $instance;
 
     /**
+     * Observers stack
+     * 
+     * @var Core\Stack\Stack
+     */
+    private $observers;
+
+    /**
      * Constructor of class
      * 
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
@@ -30,6 +37,7 @@ class ObserverReflector extends ObserverHandler
     public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
+        $this->observers = $app->observers();
     }
 
     /**
@@ -57,17 +65,25 @@ class ObserverReflector extends ObserverHandler
         return $this->app;
     }
 
-     /**
-     * Handle an Observer call
+    /**
+     * Call observer by it's name
      * 
-     * @param mixed $class Observer class
-     * @param array $params Params to pass on Observer 
+     * @param string $name Observer name
      * @return void
      */
-    public static function handle($class, ...$params)
-    {   
-        $reflector = Reflector::bind($class);
+    public function call($name)
+    {
+        if ( ! $this->observers->get($name) ) {
+            throw new \Exception('Observer does not exist.');
+        }
 
-        return $reflector->callMethod('');
+        $reflector = Reflector::bind($this->observers->get($name));
+
+        // Observer usa interface
+        if ( ! $reflector->implementsInterface(\Core\Interfaces\Observer\ObserverInterface::class) ) {
+            throw new \Exception("Observer must implement {\Core\Interfaces\Observer\ObserverInterface::class}");
+        }
+
+        $reflector->callMethod('handle');
     }
 }
