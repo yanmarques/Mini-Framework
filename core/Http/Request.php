@@ -127,7 +127,7 @@ class Request extends RequestKernel
      */
     public function merge(array $params)
     {
-        $this->parameters->merge($params);
+        $this->parameters = $this->parameters->merge($params);
         return $this;
     }
 
