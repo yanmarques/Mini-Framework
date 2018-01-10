@@ -184,7 +184,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
      *
      * @var array|null
      */
-    protected $cookie;
+    protected $cookies;
 
     /**
      * SESSION parameters
@@ -194,7 +194,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     protected $session;
 
     private function __construct($interface, $address, $hostname, $protocol, $headers, $server, $method, $timestamp, $queryString, $requestUri, $pathInfo,
-        $root, $httpHost, $httpReferer, $userAgent, $https, $remoteAddress, $remoteHost, $remotePort, $serverPort, $get, $post, $cookie, $session)
+        $root, $httpHost, $httpReferer, $userAgent, $https, $remoteAddress, $remoteHost, $remotePort, $serverPort, $get, $post, $cookies, $session)
     {
         $this->interface = $interface;
         $this->address = $address;
@@ -218,7 +218,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
         $this->remotePort = $remotePort;
         $this->get = $get;
         $this->post = $post;
-        $this->cookie = $cookie;
+        $this->cookies = $cookies;
         $this->session = $session;
     }
 

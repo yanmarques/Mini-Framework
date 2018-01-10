@@ -269,7 +269,7 @@ class Request extends RequestKernel
      */
     public function cookies()
     {
-        return $this->cookie->all();
+        return $this->cookies->all();
     }
 
      /**
@@ -356,7 +356,7 @@ class Request extends RequestKernel
      */
     private function resolveCookies()
     {
-        return new CookiesStack($this->cookie);
+        return new CookiesStack($this->cookies);
     }
 
     /**

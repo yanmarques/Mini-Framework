@@ -4,6 +4,7 @@ use Core\Support\Config;
 use Core\Crypt\Crypter;
 use Core\Bootstrapers\Application;
 use Core\Http\RedirectResponse;
+use Core\Http\Request;
 use Core\Views\View;
 
 if ( ! function_exists('app') ) {
