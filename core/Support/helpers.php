@@ -2,7 +2,7 @@
 
 use Core\Support\Config;
 use Core\Crypt\Crypter;
-use Core\Interfaces\Bootstrapers\ApplicationInterface;
+use Core\Bootstrapers\Application;
 use Core\Http\RedirectResponse;
 use Core\Views\View;
 
@@ -15,7 +15,7 @@ if ( ! function_exists('app') ) {
      */
     function app()
     {
-        return ApplicationInterface::instance();
+        return Application::instance();
     }
 }
 

@@ -54,7 +54,6 @@ class Connection
         }
 
         $this->driver = $driver;
-        $this->connect();
     }
 
     /**
@@ -89,7 +88,7 @@ class Connection
      * 
      * @return void
      */
-    private function connect()
+    public function connect()
     {
         $connection = static::drivers()[$this->driver];
         $connection = Reflector::bind($connection);
