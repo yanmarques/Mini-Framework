@@ -141,6 +141,6 @@ if ( ! function_exists('observe') ) {
      */
      function observe($name)
      {
-        app()->services()->observer->call($name);
+        app()->services()->observer->dispatch($name);
      }
 }

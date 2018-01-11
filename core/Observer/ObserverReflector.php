@@ -66,12 +66,12 @@ class ObserverReflector extends AbstractObserver
     }
 
     /**
-     * Call observer by it's name
+     * Dispatcher observer by it's name
      * 
      * @param string $name Observer name
      * @return void
      */
-    public function call($name)
+    public function dispatch($name)
     {
         if ( ! $this->observers->get($name) ) {
             throw new \Exception('Observer does not exist.');
@@ -79,7 +79,7 @@ class ObserverReflector extends AbstractObserver
 
         $reflector = Reflector::bind($this->observers->get($name));
 
-        // Observer usa interface
+        // Observer uses interface
         if ( ! $reflector->implementsInterface(\Core\Interfaces\Observer\ObserverInterface::class) ) {
             throw new \Exception("Observer must implement {\Core\Interfaces\Observer\ObserverInterface::class}");
         }
