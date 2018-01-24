@@ -26,6 +26,17 @@ class FileHandler
     }
 
     /**
+     * Get file content
+     * 
+     * @param string $file File path
+     * @return string
+     */
+    public function get(string $file)
+    {
+        return file_get_contents($file);
+    }
+
+    /**
      * Check wheter class exists
      *
      * @throws Core\Exceptions\Files\FileException
@@ -130,14 +141,23 @@ class FileHandler
      */
     public function append(string $file, string $data)
     {
-        $handler = fopen($file, 'a');
+        return file_put_contents($file, $data, FILE_APPEND);
+    }
 
-        try {
-            fwrite($handler, $data);
-        } catch ( \Exception $e ) {}
-        finally {
-            fclose($handler);
+    /**
+     * Preppend data to file and create file if not exists
+     *
+     * @param string $file Absolute path to file
+     * @param string $data Data to write on file
+     * @return void
+     */
+    public function prepend(string $file, string $data)
+    {
+        if ( $this->isFile($file) ) {
+            return file_put_contents($file, $data.$this->get($file));
         }
+
+        return file_put_contents($file, $data, FILE_APPEND);
     }
 
     /**
@@ -147,16 +167,39 @@ class FileHandler
      * @param string $data Data to write on file
      * @return void
      */
-    public function write(string $file, string $data)
+    public function write(string $file, string $data, $recursively=false)
     {
-        $handler = fopen($file, 'w');
+        if ( $recursively ) {
+            $paths = stack(explode(DIRECTORY_SEPARATOR, $file));
 
-        try {
-            fwrite($handler, $data);
-        } catch ( \Exception $e ) {}
-        finally {
-            fclose($handler);
+            // Parse array
+            if ( $paths->first() == '' ) {
+                $paths->shift();
+            }
+
+            // Remove file
+            $paths->pop();
+
+            $paths->eachSpread(function ($path) {
+                $path = DIRECTORY_SEPARATOR . $path;
+                if ( ! $this->isDirectory($path) ) {
+                    mkdir($path);
+                } 
+            }, DIRECTORY_SEPARATOR, true);
         }
+
+        return file_put_contents($file, $data, FILE_APPEND);
+    }
+
+    /**
+     * Verify wheter given directory is a valid directory
+     * 
+     * @param string $directory Directory path
+     * @return bool
+     */
+    public function isDirectory(string $directory)
+    {
+        return is_dir($directory);
     }
 
      /**

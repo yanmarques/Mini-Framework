@@ -127,6 +127,17 @@ class Stack implements StackInterface
     }
 
     /**
+     * Iterate into each item concatenating the actual item with the last item by a separator
+     * On inverse mode, the concatenation is inversed too, so it starts with all values concatenated
+     *
+     * @return Core\Stack\Stack
+     */
+    public function eachSpread(callable $callback, string $separator=',', $inverse=False)
+    {
+        return $this->internalEachSpread($callback, $separator, $inverse);
+    }
+
+    /**
      * Iterate recursivaly into stack and execute a function on each row
      * return a new stack with values
      *
@@ -310,7 +321,7 @@ class Stack implements StackInterface
      * @param array|null $stack Use to deep on array
      * @return array|Core\Stack\Stack
      */
-    public function internalMerge(array $args, bool $caseSensitive, array $stack = null)
+    private function internalMerge(array $args, bool $caseSensitive, array $stack = null)
     {
         $args = $stack ?: $args;
 
@@ -348,6 +359,48 @@ class Stack implements StackInterface
     }
 
     /**
+     * Iterate into each item concatenating the actual item with the last item by a separator
+     * On inverse mode, the concatenation is inversed too, so it starts with all values concatenated
+     * 
+     * @param callable $callback Function to execute
+     * @param string $separator Separator 
+     * @param bool $inverse Inverse mode
+     * @param mixed|null $recursivelyStack Used to go deep on array
+     */
+    private function internalEachSpread(callable $callback, string $separator, $inverse=False, $recursivelyStack=null, $acumulated=null, $counter=null)
+    {
+        $acumulated = $acumulated ?: '';
+        $counter = $counter ?: 0;
+
+         // Iterate into stack
+         $this->iterator(function ($value, $key) use (&$acumulated, &$counter, $callback, $separator, $inverse) {
+
+            // $value is an array
+            if ( is_array($value) ) {
+
+                // New stack receives the result of the new call to function
+                // passing the array $value as $stack parameter
+                $this->internalEachSpread($callback, $separator, $inverse, $value, $acumulated, $counter);
+            }
+
+            // Just execute the callback
+            else {
+                // Concatenate values
+                if ( $inverse ) {
+                    $acumulated = $this->implode($separator, $counter);
+                    $counter -= 1;
+                } else {
+                    $acumulated .= $value . $separator;
+                }
+
+                $callback($acumulated, $key);
+            }
+        }, $recursivelyStack ?: null);
+
+        return $recursivelyStack ?: null;
+    }
+
+    /**
      * Remove an element from stack with it`s key
      *
      * @param string|int $key Key of element to remove
@@ -364,6 +417,53 @@ class Stack implements StackInterface
 
         // Return element
         return $element;
+    }
+
+    /**
+     * Concatenate stack itens by it separator
+     * 
+     * @param string $separator Concatenation separator
+     * @param null|int $offset Position to stop concatenating
+     * @return string
+     */
+    public function implode(string $separator, int $offset=null)
+    {
+        $itens = $this->itens;
+        
+        // Take a piece of array by offset
+        if ( $offset ) {
+            if ( $offset >= 0 ) {
+                $itens = array_slice($this->itens, $offset);
+            } else {
+                $counter = 0;
+                while ( abs($offset) > $counter ) {
+                    array_pop($itens);
+                    $counter++;
+                }
+            }
+        }
+        
+        return implode($separator, $itens);
+    }
+
+    /**
+     * Remove and return first element of itens
+     * 
+     * @return mixed
+     */
+    public function shift()
+    {
+        return array_shift($this->itens);
+    }
+
+    /**
+     * Remove and return first element of itens
+     * 
+     * @return mixed
+     */
+    public function pop()
+    {
+        return array_pop($this->itens);
     }
 
     /**
@@ -444,6 +544,16 @@ class Stack implements StackInterface
     public function empty()
     {
         return empty($this->itens);
+    }
+
+    /**
+     * Inverse itens order
+     * 
+     * @return Core\Stack\Stack
+     */
+    public function inverse()
+    {
+        return new static(array_reverse($this->itens));
     }
 
     /**

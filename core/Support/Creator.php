@@ -91,6 +91,6 @@ class Creator
             $content = str_replace($dummy, $value, $content);
         }
 
-        $fileHandler->write($path, $content);
+        $fileHandler->write($path, $content, true);
     }
 }
