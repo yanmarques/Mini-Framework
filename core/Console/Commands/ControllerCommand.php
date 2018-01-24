@@ -2,35 +2,54 @@
 
 namespace Core\Console\Commands;
 
-use Symfony\Component\Console\Command\Command;
+use Core\Console\Command;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Process\Process;
+use Core\Support\Creator;
 
 class ControllerCommand extends Command
 {
+    /**
+     * Controller namespace
+     * 
+     * @var string
+     */
+    private $namespace = 'App\Http\Controllers';
+
     /**
      * Command name
      * 
      * @var string
      */
-    private $name = 'build.controller';
+    protected $name = 'build.controller';
 
     /**
-     * Symfony InputInterface
+     * Stub name
      * 
-     * @var Symfony\Component\Console\Input\InputInterface
+     * @var string
      */
-    private $input;
+    protected $stub = 'controller.stub';
 
     /**
-     * Symfony OuputInterface
+     * Command arguments
      * 
-     * @var Symfony\Component\Console\Output\OutputInterface
+     * @var array
      */
-    private $output;
+    protected $arguments = [
+        [
+            'name', InputArgument::REQUIRED, 'Controller name'
+        ]
+    ];
+
+    /**
+     * Command description
+     * 
+     * @var string
+     */
+    protected $description = 'Build an controller class.';
 
     /**
      * Class constructor
@@ -40,44 +59,52 @@ class ControllerCommand extends Command
      */
     public function __construct(ApplicationInterface $app)
     {
-        parent::__construct($this->name);
-        $this->setApplication($app);
-        $this->addArguments();
-        $this->setDescription('Build a Controller class.');
+        parent::__construct($app);
     }
 
     /**
-     * Execute the console command.
-     *
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
-     * @return mixed
-     */
-    protected function execute(InputInterface $input, OutputInterface $output)
-    {
-        $this->run($this->input = $input, $this->output = $output);
-    }
-
-    /**
-     * Add command arguments
+     * Handle console commands input
      * 
-     * @return void
-     */
-    private function addArguments()
-    {
-        $this->addArgument('name', InputArgument::REQUIRED, 'Controller name');
-    }
-
-    /**
-     * Run the the command function.
-     *
      * @param  \Symfony\Component\Console\Input\InputInterface  $input
      * @param  \Symfony\Component\Console\Output\OutputInterface  $output
      * @return mixed
      */
-    public function run(InputInterface $input, OutputInterface $output)
+    public function handle(InputInterface $input, OutputInterface $output)
     {
-        $name = $input->getArguments('name');
+        // Class name
+        $name = $input->getArgument('name');
+
+        // Stub path
+        $stub =  $this->stubPath() . $this->stub;
+
+        // Path to file
+        $path = $this->getApplication()->appDir() . implode(DIRECTORY_SEPARATOR, ['Http', 'Controllers', $name . '.php']);
+
+        // Verify wheter file already exists
+        if ( $this->getApplication()->fileHandler()->isFile($path) ) {
+            throw new \RuntimeException("File [$path] already exists");
+        }
+        
+        // Use creator singleton to create a file from stubs configuration
+        Creator::parse($path, $stub, $this->dummies($name));
+
+        $this->info('Controller created successfully.');
+
+        // Dispatch autoload event
         observe('autoload');
+    }
+
+    /**
+     * Get command dummies
+     * 
+     * @param string $class 
+     * @return array
+     */
+    private function dummies(string $class)
+    {
+        return [
+            'DummyNamespace' => $this->namespace,
+            'DummyClass' => $class
+        ];
     }
 }

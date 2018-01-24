@@ -302,6 +302,7 @@ class Application implements ApplicationInterface
             $this->databaseConfigPath()
         ));
 
+        // Global observers
         $this->observers = stack($this->fileHandler->getRequiredContent(
             $this->observerConfigPath()
         ));

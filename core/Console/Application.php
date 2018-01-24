@@ -72,6 +72,13 @@ class Application extends SymfonyApplication implements ApplicationInterface
      */
     private $fileHandler;
 
+    /**
+     * Observers configuration
+     * 
+     * @var Core\Stack\Stack
+     */
+    private $observers;
+
      /**
      * Exception reporter
      *
@@ -171,6 +178,16 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
+     * Return observers configuration
+     * 
+     * @return Core\Stack\Stack
+     */
+    public function observers()
+    {
+        return $this->observers;
+    }
+
+    /**
      * Return application base directory
      *
      * @return string
@@ -228,7 +245,7 @@ class Application extends SymfonyApplication implements ApplicationInterface
         static::$instance = $this;
 
         // Include all application helper functions
-        $this->fileHandler->include('core/Support/helpers.php');
+        $this->fileHandler->include('core/Console/helpers.php');
 
         foreach($this->commands() as $command) {
             $this->add(new $command($this));
@@ -283,16 +300,20 @@ class Application extends SymfonyApplication implements ApplicationInterface
             $this->encryptionConfigPath()
         ));
 
+        // Global observers
+        $this->observers = stack($this->fileHandler->getRequiredContent(
+            $this->observerConfigPath()
+        ));
+
         // Get database configuration from file
         $this->database = stack($this->fileHandler->getRequiredContent(
             $this->databaseConfigPath()
         ));
     
         // Initialize configurations services 
-        stack($this->configurationServices())->each(function ($value, $key) {
+        stack($this->configurationServices())->each(function ($value) {
             $this->services->add(
-                ServiceDispatcher::dispatch($this, $value),
-                $key
+                ServiceDispatcher::dispatch($this, $value)
             );
         });
     }
@@ -306,9 +327,10 @@ class Application extends SymfonyApplication implements ApplicationInterface
     private function configurationServices()
     {
         return [
-            'crypter' => \Core\Services\CrypterService::class,
-            'config' => \Core\Services\ConfigService::class,
-            'database' => \Core\Services\DatabaseService::class
+            \Core\Services\CrypterService::class,
+            \Core\Services\ConfigService::class,
+            \Core\Services\DatabaseService::class,
+            \Core\Services\ObserverService::class
         ];
     }
 

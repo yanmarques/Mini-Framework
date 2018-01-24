@@ -19,7 +19,7 @@ class HandleException
 
         \error_reporting(-1);
 
-        // set_error_handler([$this, "handleError"]);
+        \set_error_handler([$this, "handleError"]);
 
         \set_exception_handler([$this, "handleException"]);
     }
@@ -50,8 +50,8 @@ class HandleException
      * 
      * @param mixed $e Errors
      */
-    public function handleError($e)
+    public function handleError($errno, $errstr, $errfile, $errline)
     {
-        var_dump($e);die;
+        echo "Error: {$errstr}. File: {$errfile}. Line: {$errline}\n";die;
     }
 }

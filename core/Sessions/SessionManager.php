@@ -91,7 +91,7 @@ class SessionManager
      */
     private function setCSRFToken()
     {
-        if ( in_array($_SERVER['SERVER_PROTOCOL'], ['GET', 'HEAD', 'OPTIONS']) ) {
+        if ( isset($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], ['GET', 'HEAD', 'OPTIONS']) ) {
             $this->session->set('CSRFToken', Crypter::random(64));
         }
     }
