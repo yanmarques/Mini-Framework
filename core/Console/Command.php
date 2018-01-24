@@ -150,6 +150,41 @@ abstract class Command extends SymfonyCommand
     }
 
     /**
+     * Parse a path argument and return a StdClass with class name, file path and custom path
+     * 
+     * @param string $name Argument name
+     * @param array $path Path to file
+     * @return \StdClass
+     */
+    public function parsePathArgument(string $name, $path=[])
+    {
+        // Argument stack
+        $argument = stack(explode(DIRECTORY_SEPARATOR, $this->input->getArgument($name)));
+
+        // Add argument path to default path
+        $argument->each(function ($customPath) use(&$path) {
+            $path[] = $customPath;
+        });
+
+        $class = $argument->pop();
+        $path[count($path) - 1] .= '.php';  
+
+        // Create and StdClass to pack path data
+        $pathClass = new \StdClass;
+
+        // Class name
+        $pathClass->class = $class;
+
+        // Absolute path to create file
+        // No really directory verification is made, so when creating file, use recursive mode to create left directories
+        $pathClass->path = DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $path);
+
+        // Custom path on user argument
+        $pathClass->customPath = $argument->all();
+        return $pathClass;
+    }
+
+    /**
      * Handle console commands input
      * 
      * @param  \Symfony\Component\Console\Input\InputInterface  $input

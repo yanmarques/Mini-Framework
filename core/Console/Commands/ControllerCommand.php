@@ -72,21 +72,21 @@ class ControllerCommand extends Command
     public function handle(InputInterface $input, OutputInterface $output)
     {
         // Class name
-        $name = $input->getArgument('name');
+        $argument = $this->parsePathArgument('name', ['Http', 'Controllers']);
 
         // Stub path
         $stub =  $this->stubPath() . $this->stub;
 
-        // Path to file
-        $path = $this->getApplication()->appDir() . implode(DIRECTORY_SEPARATOR, ['Http', 'Controllers', $name . '.php']);
-
+        // Path to create file
+        $path = $this->getApplication()->appDir() . $argument->path;
+        
         // Verify wheter file already exists
         if ( $this->getApplication()->fileHandler()->isFile($path) ) {
             throw new \RuntimeException("File [$path] already exists");
         }
         
         // Use creator singleton to create a file from stubs configuration
-        Creator::parse($path, $stub, $this->dummies($name));
+        Creator::parse($path, $stub, $this->dummies($argument->class, $argument->customPath));
 
         $this->info('Controller created successfully.');
 
@@ -100,10 +100,11 @@ class ControllerCommand extends Command
      * @param string $class 
      * @return array
      */
-    private function dummies(string $class)
+    private function dummies(string $class, array $args=[])
     {
+        $namespace = empty($args) ? $this->namespace : $this->namespace .'\\'. implode('\\', $args);
         return [
-            'DummyNamespace' => $this->namespace,
+            'DummyNamespace' => $namespace,
             'DummyClass' => $class
         ];
     }

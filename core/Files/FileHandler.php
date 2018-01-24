@@ -185,7 +185,7 @@ class FileHandler
                 if ( ! $this->isDirectory($path) ) {
                     mkdir($path);
                 } 
-            }, DIRECTORY_SEPARATOR, true);
+            }, DIRECTORY_SEPARATOR);
         }
 
         return file_put_contents($file, $data, FILE_APPEND);
