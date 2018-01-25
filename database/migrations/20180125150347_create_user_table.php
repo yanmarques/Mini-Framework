@@ -10,10 +10,8 @@ class CreateUserTable extends AbstractMigration
      */
     public function up()
     {
+        // Create table from name
         Table::createFrom('user', function (Table $table) {
-            $table->string('name');
-            $table->string('email');
-            $table->string('password');
             $table->timestamps();
         });
     }
@@ -23,6 +21,7 @@ class CreateUserTable extends AbstractMigration
      */
     public function down()
     {
+        // Drop table from name if it exists
         Table::dropIfExists('user');
     }
 }

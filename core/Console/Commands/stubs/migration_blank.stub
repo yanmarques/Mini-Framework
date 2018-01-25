@@ -10,10 +10,7 @@ class DummyClass extends AbstractMigration
      */
     public function up()
     {
-        // Create table from name
-        Table::createFrom(DummyTable, function (Table $table) {
-            $table->timestamps();
-        });
+        //
     }
 
     /**
@@ -21,7 +18,6 @@ class DummyClass extends AbstractMigration
      */
     public function down()
     {
-        // Drop table from name if it exists
-        Table::dropIfExists(DummyTable);
+        //
     }
 }

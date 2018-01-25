@@ -73,9 +73,6 @@ class BuildMigrationCommand extends Command
         
         $path[count($path) - 1] = (string) Util::getCurrentTimestamp().'_'.$path[count($path) - 1]. '.php';  
 
-        // Stub path
-        $stub =  $this->stubPath() . $this->stub;
-
         // Path to create file
         $path = $this->getApplication()->baseDir() . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $path);
         
@@ -84,8 +81,20 @@ class BuildMigrationCommand extends Command
             throw new \RuntimeException("File [$path] already exists");
         }
 
+        $table = $input->getOption('table');
+
+        // Stub path
+        $stub =  $this->stubPath();
+
+        // Parse table configuration
+        if ( $table == null ) {
+            $stub .= 'migration_blank.stub';
+        } else {
+            $stub .= $this->stub;
+        }
+
         // Use creator singleton to create a file from stubs configuration
-        Creator::parse($path, $stub, $this->dummies($class));
+        Creator::parse($path, $stub, $this->dummies($class, $table));
 
         $this->info('Migration created successfully.');
 
@@ -107,15 +116,35 @@ class BuildMigrationCommand extends Command
     }
 
     /**
+     * Command options
+     * 
+     * @var array
+     */
+    protected function getOptions() {
+        return [
+            [
+                'table', null, InputOption::VALUE_REQUIRED, 'Table name'
+            ]
+        ];
+    }
+
+    /**
      * Get command dummies
      * 
      * @param string $class 
      * @return array
      */
-    private function dummies(string $class)
+    private function dummies(string $class, $table)
     {
+        if ( $table == null ) {
+            return [
+                'DummyClass' => $class,
+            ];
+        } 
+
         return [
-            'DummyClass' => $class
+            'DummyClass' => $class,
+            'DummyTable' => "'".$table."'"
         ];
     }
 }
