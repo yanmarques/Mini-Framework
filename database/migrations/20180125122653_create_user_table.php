@@ -1,6 +1,7 @@
 <?php
 
 use Core\Database\Migrations\Migration as AbstractMigration;
+use Core\Database\Migrations\Table;
 
 class CreateUserTable extends AbstractMigration
 {
@@ -9,11 +10,12 @@ class CreateUserTable extends AbstractMigration
      */
     public function up()
     {
-        $users = $this->table('users.user');
-        $users->string('name');
-        $users->string('email');
-        $users->string('password');
-        $users->save();
+        Table::createFrom('user', function (Table $table) {
+            $table->string('name');
+            $table->string('email');
+            $table->string('password');
+            $table->timestamps();
+        });
     }
 
     /**
@@ -21,6 +23,6 @@ class CreateUserTable extends AbstractMigration
      */
     public function down()
     {
-        //
+        Table::dropIfExists('user');
     }
 }

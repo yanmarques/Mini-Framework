@@ -70,10 +70,30 @@ abstract class Migration extends AbstractMigration
     }
 
     /**
+     * Initialize method.
+     *
+     * @return void
+     */
+    protected function init()
+    {
+        Table::boot();
+    }
+
+    /**
+     * {@inheritdoc}
+     */
+    public function setAdapter(AdapterInterface $adapter)
+    {
+        $this->adapter = $adapter;
+        Table::setAdapterOnCurrent($adapter);
+        return $this;
+    }
+
+    /**
      * {@inheritdoc}
      */
     public function table($tableName, $options = array())
     {
-        return new Table($tableName, $options, $this->getAdapter());
+        return Table::boot()->setName($name)->setOptions($options);
     }
 }
