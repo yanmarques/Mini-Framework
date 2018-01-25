@@ -7,38 +7,33 @@ use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
 use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputOption;
 use Symfony\Component\Process\Process;
+use Phinx\Util\Util;
 use Core\Support\Creator;
 
-class ControllerCommand extends Command
+class BuildMigrationCommand extends Command
 {
-    /**
-     * Controller namespace
-     * 
-     * @var string
-     */
-    private $namespace = 'App\Http\Controllers';
-
     /**
      * Command name
      * 
      * @var string
      */
-    protected $name = 'build:controller';
+    protected $name = 'build:migration';
 
     /**
      * Stub name
      * 
      * @var string
      */
-    protected $stub = 'controller.stub';
+    protected $stub = 'migration.stub';
 
     /**
      * Command description
      * 
      * @var string
      */
-    protected $description = 'Build an controller class.';
+    protected $description = 'Build an migration class.';
 
     /**
      * Class constructor
@@ -60,29 +55,44 @@ class ControllerCommand extends Command
      */
     public function handle(InputInterface $input, OutputInterface $output)
     {
-        // Class name
-        $argument = $this->parsePathArgument('name', ['Http', 'Controllers']);
+        // Argument stack
+        $argument = stack(explode(DIRECTORY_SEPARATOR, $this->input->getArgument('name')));
+
+        // Directory to file
+        $path = ['database', 'migrations'];
+
+        // Add argument path to default path
+        $argument->each(function ($customPath) use(&$path) {
+            $path[] = $customPath;
+        });
+
+        $class = stack(explode('_', $argument->pop()));
+        $class = $class->implode('', null, function ($item) {
+            return ucfirst($item);
+        });
+        
+        $path[count($path) - 1] = (string) Util::getCurrentTimestamp().'_'.$path[count($path) - 1]. '.php';  
 
         // Stub path
         $stub =  $this->stubPath() . $this->stub;
 
         // Path to create file
-        $path = $this->getApplication()->appDir() . $argument->path;
+        $path = $this->getApplication()->baseDir() . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $path);
         
         // Verify wheter file already exists
         if ( $this->getApplication()->fileHandler()->isFile($path) ) {
             throw new \RuntimeException("File [$path] already exists");
         }
-        
-        // Use creator singleton to create a file from stubs configuration
-        Creator::parse($path, $stub, $this->dummies($argument->class, $argument->customPath));
 
-        $this->info('Controller created successfully.');
+        // Use creator singleton to create a file from stubs configuration
+        Creator::parse($path, $stub, $this->dummies($class));
+
+        $this->info('Migration created successfully.');
 
         // Dispatch autoload event
         observe('autoload');
     }
-
+    
     /**
      * Command arguments
      * 
@@ -102,11 +112,9 @@ class ControllerCommand extends Command
      * @param string $class 
      * @return array
      */
-    private function dummies(string $class, array $args=[])
+    private function dummies(string $class)
     {
-        $namespace = empty($args) ? $this->namespace : $this->namespace .'\\'. implode('\\', $args);
         return [
-            'DummyNamespace' => $namespace,
             'DummyClass' => $class
         ];
     }

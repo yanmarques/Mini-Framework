@@ -426,7 +426,7 @@ class Stack implements StackInterface
      * @param null|int $offset Position to stop concatenating
      * @return string
      */
-    public function implode(string $separator, int $offset=null)
+    public function implode(string $separator, int $offset=null, callable $formatter=null)
     {
         $itens = $this->itens;
         
@@ -440,6 +440,13 @@ class Stack implements StackInterface
                     array_pop($itens);
                     $counter++;
                 }
+            }
+        }
+
+        // Execute formatter
+        if ( $formatter ) {
+            foreach($itens as $key => $item) {
+                $itens[$key] = call_user_func_array($formatter, [$item]);
             }
         }
         

@@ -337,7 +337,9 @@ class Application extends SymfonyApplication implements ApplicationInterface
     private function commands()
     {
         return [
-            \Core\Console\Commands\ControllerCommand::class
+            \Core\Console\Commands\ControllerCommand::class,
+            \Core\Console\Commands\BuildMigrationCommand::class,
+            \Core\Console\Commands\MigrateCommand::class
         ];  
     }
 }

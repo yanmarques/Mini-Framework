@@ -188,7 +188,7 @@ class FileHandler
             }, DIRECTORY_SEPARATOR);
         }
 
-        return file_put_contents($file, $data, FILE_APPEND);
+        return file_put_contents($file, $data);
     }
 
     /**

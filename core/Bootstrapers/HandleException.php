@@ -42,6 +42,7 @@ class HandleException
      */
     public function handleException($e)
     {
+        dd($e->getMessage());
         $this->app->reporter()->report($e);
     }
 

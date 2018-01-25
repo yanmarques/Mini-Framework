@@ -3,19 +3,20 @@
 namespace Core\Database\Migrations;
 
 use Phinx\Db\Table as PhinxTable;
+use Phinx\Db\Adapter\AdapterInterface;
 
-class Table
+class Table extends PhinxTable
 {   
     /**
-     * Phinx database table
+     * Class constructor
      * 
-     * @var Phinx\Db\Table
+     * @param string $name Table name
+     * @param array $options Table options
+     * @param Phinx\Db\Adapter\AdapterInterface $adapter Database adapter 
      */
-    private $table;
-
-    public function __construct(string $name, array $options, $adapter)
+    public function __construct(string $name, array $options, AdapterInterface $adapter)
     {
-        $this->table = new PhinxTable($name, $options, $adapter);
+       parent::__construct($name, $options, $adapter);
     }
 
     /**
@@ -26,7 +27,7 @@ class Table
      */
     public function integer(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'integer', $options);
+        $this->addColumn($column, 'integer', $options);
     }
 
     /**
@@ -37,7 +38,7 @@ class Table
      */
     public function string(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'string', $options);
+        $this->addColumn($column, 'string', $options);
     }
 
     /**
@@ -48,7 +49,7 @@ class Table
      */
     public function biginteger(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'biginteger', $options);
+        $this->addColumn($column, 'biginteger', $options);
     }
 
     /**
@@ -59,7 +60,7 @@ class Table
      */
     public function binary(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'binary', $options);
+        $this->addColumn($column, 'binary', $options);
     }
 
     /**
@@ -70,7 +71,7 @@ class Table
      */
     public function boolean(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'boolean', $options);
+        $this->addColumn($column, 'boolean', $options);
     }
 
     
@@ -82,7 +83,7 @@ class Table
      */
     public function date(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'date', $options);
+        $this->addColumn($column, 'date', $options);
     }
     
     /**
@@ -93,7 +94,7 @@ class Table
      */
     public function datetime(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'datetime', $options);
+        $this->addColumn($column, 'datetime', $options);
     }
     
     /**
@@ -104,7 +105,7 @@ class Table
      */
     public function decimal(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'decimal', $options);
+        $this->addColumn($column, 'decimal', $options);
     }
     
     /**
@@ -115,7 +116,7 @@ class Table
      */
     public function float(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'float', $options);
+        $this->addColumn($column, 'float', $options);
     }
     
     /**
@@ -126,7 +127,7 @@ class Table
      */
     public function text(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'text', $options);
+        $this->addColumn($column, 'text', $options);
     }
     
     /**
@@ -137,7 +138,7 @@ class Table
      */
     public function time(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'time', $options);
+        $this->addColumn($column, 'time', $options);
     }
     
     /**
@@ -148,7 +149,7 @@ class Table
      */
     public function timestamp(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'timestamp', $options);
+        $this->addColumn($column, 'timestamp', $options);
     }
     
     /**
@@ -159,6 +160,6 @@ class Table
      */
     public function uuid(string $column, array $options = [])
     {
-        $this->table->addColumn($column, 'uuid', $options);
+        $this->addColumn($column, 'uuid', $options);
     }
 }

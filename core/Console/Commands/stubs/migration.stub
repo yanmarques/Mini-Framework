@@ -1,0 +1,22 @@
+<?php
+
+use Core\Database\Migrations\Migration as AbstractMigration;
+
+class DummyClass extends AbstractMigration
+{
+    /**
+     * Migrate Up.
+     */
+    public function up()
+    {
+        //
+    }
+
+    /**
+     * Migrate Down.
+     */
+    public function down()
+    {
+        //
+    }
+}

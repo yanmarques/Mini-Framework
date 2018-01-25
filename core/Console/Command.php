@@ -25,13 +25,6 @@ abstract class Command extends SymfonyCommand
      * @var string
      */
     protected $description;
-
-    /**
-     * Command arguments
-     * 
-     * @var array
-     */
-    protected $arguments;
     
     /**
      * The input interface implementation.
@@ -59,6 +52,7 @@ abstract class Command extends SymfonyCommand
         $this->setApplication($app);
         $this->setDescription($this->description);
         $this->addArguments();
+        $this->addOptions();
     }
 
     /**
@@ -206,6 +200,26 @@ abstract class Command extends SymfonyCommand
         $this->output = $output;
         return $this->handle($input, $output);
     }
+    
+    /**
+     * Get command arguments as an array
+     * 
+     * @return array
+     */
+    protected function getArguments()
+    {
+        return [];
+    }
+
+    /**
+     * Get command options as an array
+     * 
+     * @return array
+     */
+    protected function getOptions()
+    {
+        return [];
+    }
 
     /**
      * Add command arguments
@@ -214,8 +228,20 @@ abstract class Command extends SymfonyCommand
      */
     private function addArguments()
     {
-        foreach($this->arguments as $arguments) {
+        foreach($this->getArguments() as $arguments) {
             $this->addArgument(...$arguments);
+        }
+    }
+
+    /**
+     * Add command options
+     * 
+     * @return void
+     */
+    private function addOptions()
+    {
+        foreach($this->getOptions() as $options) {
+            $this->addOption(...$options);
         }
     }
 }
