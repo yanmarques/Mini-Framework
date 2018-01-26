@@ -23,6 +23,6 @@ class DatabaseService extends Service
      */
     public static function boot(ApplicationInterface $app)
     {
-        return Connection::boot($app);
+        return Connection::boot($app)->connect();
     }
 }

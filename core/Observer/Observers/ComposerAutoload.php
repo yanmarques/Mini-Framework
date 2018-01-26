@@ -21,7 +21,7 @@ class ComposerAutoload implements ObserverInterface
      */
     public function handle()
     {
-        new Process('composer dumpautoload -o -a');
+        (new Process('composer dumpautoload -o -a'))->run();
     }
 
     /**

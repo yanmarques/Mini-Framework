@@ -5,9 +5,9 @@ namespace Core\Interfaces\Database;
 interface ConnectionInterface
 {
      /**
-     * Get singleton connection from instance
+     * Get connection instance
      * 
-     * @return resource
+     * @return mixed
      */
     public function getConnection();
 
@@ -28,19 +28,36 @@ interface ConnectionInterface
     /**
      * Get database port
      * 
-     * @return int
+     * @return string
      */
     public function getPort();
 
     /**
-     * Build connection string from configuration
+     * Get connection user
      * 
-     * @param string $host Database host
-     * @param int $port Port where database is connected
-     * @param string $dbname Dababase name
-     * @param string $user User name
-     * @param string $password Password to dabatase
      * @return string
      */
-    public function buildString();
+    public function getUser();
+
+    /**
+     * Get connectio password
+     * 
+     * @return string
+     */
+    public function getPassword();
+
+    /**
+     * Set connection manager
+     * 
+     * @param Core\Interfaces\Database\ManagerInterface $manager Manager to create connections
+     * @return void
+     */
+    public function setManager(ManagerInterface $manager);
+
+    /**
+     * Get connection manager
+     * 
+     * @return Core\Interfaces\Database\ManagerInterface
+     */
+    public function getManager();
 }

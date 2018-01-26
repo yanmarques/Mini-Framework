@@ -11,7 +11,16 @@ return [
     | Database drivers are the database technology that you will use for
     | your project.
     |
-    | Drivers: pgsql, mysql
+    | Drivers: pdo_mysql, pdo_sqlite
+         'pdo_pgsql
+         'pdo_oci           
+         'oci8               
+         'ibm_db2            
+         'pdo_sqlsrv         
+         'mysqli          
+         'drizzle_pdo_mysql  
+         'sqlanywhere   
+         'sqlsrv
     |
     | Please check your database driver documentation before configurating.
     |
@@ -28,7 +37,7 @@ return [
     | Please check your database driver documentation before configurating.
     | 
     */
-    'dbname' => 'test',
+    'dbname' => 'users',
 
     /*
     |********************************************************************
@@ -80,7 +89,7 @@ return [
     | Please check your database driver documentation before configurating.
     | 
     */
-    'password' => 'changeme',
+    'password' => 'password',
 
     /*
     |********************************************************************
