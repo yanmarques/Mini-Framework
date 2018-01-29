@@ -18,7 +18,7 @@ trait MagicStack
         // Value exists on collection
         if ( $value = $this->get($value) ) {
             return is_array($value) ?
-                    new Stack($value) : new Item($value);
+                    new Stack($value) : $value;
         }
 
         return null;
