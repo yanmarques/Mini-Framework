@@ -8,6 +8,13 @@ use Core\Interfaces\Database\ConnectionInterface;
 class QueryBuilder
 {
     /**
+     * Marker to replace bindings values
+     * 
+     * @var string
+     */
+    const MARKER = '?';
+
+    /**
      * The connection class
      * 
      * @var Core\Interfaces\Database\ConnectionInterface
@@ -19,7 +26,14 @@ class QueryBuilder
      * 
      * @var Core\Stack\Stack
      */
-    protected $queries;
+    protected $queries = [
+        'select' => [],
+        'from' => [],
+        'where' => [],
+        'orWhere' => [],
+        'insert' => [],
+        'update' => []
+    ];
 
     /**
      * Array with bindings values
@@ -29,18 +43,11 @@ class QueryBuilder
     protected $bindings;
 
     /**
-     * The table to select
+     * Compiler to use queries
      * 
-     * @var array
+     * @var Core\Interfaces\Database\CompilerInterface
      */
-    protected $from;
-
-    /**
-     * The columns to select
-     * 
-     * @var array
-     */
-    protected $select;
+    protected $compiler;
 
     /**
      * Class constructor
@@ -51,7 +58,6 @@ class QueryBuilder
     public function __construct(ConnectionInterface $connection)
     {
         $this->connection = $connection;
-        $this->queries = stack();
         $this->bindings = stack();
     }
 
@@ -63,11 +69,11 @@ class QueryBuilder
      */
     public function select($columns=['*'])
     {
-        if ( is_string($columns) ) {
-            $columns = (array) $columns;
+        if ( is_array($columns) ) {
+            $columns = implode(', ', $columns);
         }
-
-        $this->select = $columns;
+        
+        $this->queries['select'][] = $this->wrap($columns);
         return $this;
     }
 
@@ -79,11 +85,11 @@ class QueryBuilder
      */
     public function from($columns)
     {
-        if ( is_string($columns) ) {
-            $columns = (array) $columns;
+        if ( is_array($columns) ) {
+            $columns = implode(', ', $columns);
         }
 
-        $this->from = $columns;
+        $this->queries['from'][] = $this->wrap($columns);
         return $this;
     }
 
@@ -95,9 +101,7 @@ class QueryBuilder
      */
     public function where(string $column, $operator=null, $comparedColumn=null)
     {
-        $querie = [];
-        $querie[] = '?';
-        $this->bindings->add($column);
+        $queries = [$this->wrap($column)];
 
         if ( func_num_args() == 1 ) {
             throw new \InvalidArgumentException('Not enough arguments passed to function.');
@@ -106,31 +110,31 @@ class QueryBuilder
         if ( func_num_args() == 2 ) {
 
             // Use default equals symbol
-            $querie[] = '=';
+            $queries[] = '=';
 
             // Handle closure
             if ( is_callable($operator) ) {
                 $builder = new static($this->connection);
                 call_user_func_array($operator, [&$builder]);
-                $querie[] = '(' . $builder->toSql() . ')';
+                $queries[] = '(' . $builder->toSql() . ')';
             } 
             
             // Handle string
             elseif ( is_string($operator) ) {
-                $querie[] = '?';
+                $queries[] = static::MARKER;
                 $this->bindings->add($operator);
             } else {
                 throw new QueryException('Invalid argument to WHERE clause.');
             }
         } else {
-            $querie[] = $operator;
-            $querie[] = '?';
+            $queries[] = $operator;
+            $queries[] = static::MARKER;
             $this->bindings->add($comparedColumn);
         }
 
-        $querie = implode(' ', $querie);
+        $queries = implode(' ', $queries);
 
-        $this->queries->add("where $querie");
+        $this->queries['where'][] = $queries;
         return $this;
     }
 
@@ -143,7 +147,7 @@ class QueryBuilder
     public function whereNull(string $column)
     {
         $bindings = $this->resolveBindings($column);
-        $this->queries->add("where $bindings = null");
+        $this->queries['where'][] =  "$bindings = null";
         return $this;
     }
 
@@ -156,7 +160,7 @@ class QueryBuilder
     public function whereNotNull(string $column)
     {
         $bindings = $this->resolveBindings($column);
-        $this->queries->add("where $bindings not null");
+        $this->queries['where'][] = "$bindings not null";
         return $this;
     }
 
@@ -167,7 +171,24 @@ class QueryBuilder
      */
     public function get()
     {
-        return $this->prepareSql();
+        return stack($this->prepareSql()->fetchAll());
+    }
+
+    /**
+     * Fetch the first result from dabatase
+     * 
+     * @return 
+     */
+    public function first()
+    {
+        $result = $this->prepareSql()->fetch();
+
+        // No results was found on fetch
+        if ( ! $result ) {
+            return null;
+        }
+
+        return stack($result);
     }
 
     /**
@@ -191,15 +212,53 @@ class QueryBuilder
 
         if ( is_array($bindings) ) {
             foreach($bindings as $value) {
-                $options .= ' ?';
+                $options .= ' '. static::MARKER;
                 $this->bindings->add($value);
             }
         } else {
-            $options .= ' ?';
+            $options .= ' '. static::MARKER;
             $this->bindings->add($bindings);
         }
 
         return trim($options);
+    }
+
+    /**
+     * Wrap marker placeholder to escape sql
+     * 
+     * @param string $value Value to wrap
+     * @return string
+     */
+    private function wrap(string $value)
+    {
+        return '`'.$value.'`';
+    }
+
+    /**
+     * Build query from array configuration
+     * 
+     * @return string
+     */
+    private function compileQueries()
+    {
+        $query = [];
+
+        if ( ! empty($this->queries['select']) ) {
+            $query[] = 'select '. implode(', ', $this->queries['select']);
+            $query[] = 'from ' . implode(', ', $this->queries['from']);
+        } elseif ( ! empty($this->queries['insert']) ) {
+            $query[] = 'insert '. implode(', ', $this->queries['insert']);
+        }
+
+        if ( ! empty($this->queries['where']) ) {
+            $query[] = 'where ' . implode(' and ', $this->queries['where']);
+        }
+
+        if ( ! empty($this->queries['orWhere']) ) {
+            $query[] = 'or where ' . implode(' or ', $this->queries['orWhere']);
+        }
+
+        return implode(' ', $query);
     }
 
     /**
@@ -209,7 +268,7 @@ class QueryBuilder
      */
     private function prepareSql()
     {
-        $compiled = (new Compiler($this->select, $this->from, $this->queries))->compileToSql();
+        $compiled = $this->compileQueries();
         return $this->connection->prepare($compiled, $this->bindings->all());
     }
 }
