@@ -6,6 +6,7 @@ use Core\Http\RequestKernel;
 use Core\Http\Traits\InteractsWithParam;
 use Core\Http\Traits\QueryString;
 use Core\Sessions\SessionStack;
+use Core\Exceptions\Http\MethodNotAllowedException;
 
 class Request extends RequestKernel
 {
@@ -66,6 +67,14 @@ class Request extends RequestKernel
      */
     public function method()
     {
+        if ( $this->method == RequestKernel::POST && $this->parameters->has('_method') ) {
+            if ( in_array($this->parameters->_method, [RequestKernel::PUT, RequestKernel::PATCH, RequestKernel::DELETE]) ) {
+                return $this->parameters->_method;
+            }
+            
+            throw new MethodNotAllowedException("Invalid method [$this->parameters->_method]");
+        }
+
         return $this->method;
     }
 

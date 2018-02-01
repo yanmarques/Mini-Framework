@@ -32,7 +32,9 @@ class QueryBuilder
         'where' => [],
         'orWhere' => [],
         'insert' => [],
-        'update' => []
+        'update' => [],
+        'set' => [],
+        'values' => []
     ];
 
     /**
@@ -48,6 +50,13 @@ class QueryBuilder
      * @var Core\Interfaces\Database\CompilerInterface
      */
     protected $compiler;
+
+    /**
+     * Model class
+     * 
+     * @var Core\Database\Model
+     */
+    protected $model;
 
     /**
      * Class constructor
@@ -101,38 +110,26 @@ class QueryBuilder
      */
     public function where(string $column, $operator=null, $comparedColumn=null)
     {
-        $queries = [$this->wrap($column)];
-
         if ( func_num_args() == 1 ) {
             throw new \InvalidArgumentException('Not enough arguments passed to function.');
         }
 
         if ( func_num_args() == 2 ) {
 
-            // Use default equals symbol
-            $queries[] = '=';
-
             // Handle closure
             if ( is_callable($operator) ) {
                 $builder = new static($this->connection);
                 call_user_func_array($operator, [&$builder]);
-                $queries[] = '(' . $builder->toSql() . ')';
+                $queries = $this->resolveBindings([$column => '(' . $builder->toSql() . ')']);
             } 
             
             // Handle string
-            elseif ( is_string($operator) ) {
-                $queries[] = static::MARKER;
-                $this->bindings->add($operator);
-            } else {
-                throw new QueryException('Invalid argument to WHERE clause.');
-            }
+            else {
+                $queries = $this->resolveBindings([$column => $operator]);
+            } 
         } else {
-            $queries[] = $operator;
-            $queries[] = static::MARKER;
-            $this->bindings->add($comparedColumn);
+            $queries = $this->resolveBindings([$column => $comparedColumn], $operator);
         }
-
-        $queries = implode(' ', $queries);
 
         $this->queries['where'][] = $queries;
         return $this;
@@ -146,8 +143,7 @@ class QueryBuilder
      */
     public function whereNull(string $column)
     {
-        $bindings = $this->resolveBindings($column);
-        $this->queries['where'][] =  "$bindings = null";
+        $this->queries['where'][] =  "$column = null";
         return $this;
     }
 
@@ -165,30 +161,128 @@ class QueryBuilder
     }
 
     /**
+     * Add UPDATE query to query options 
+     * 
+     * @param mixed $columns Column to update
+     * @return Core\Database\QueryBuilder
+     */
+    public function update($columns)
+    {
+        if ( is_array($columns) ) {
+            $columns = implode(', ', $columns);
+        }
+
+        $this->queries['update'][] = $columns;
+        return $this;
+    }
+
+    /**
+     * Add SET query when UPDATE query 
+     * 
+     * @param mixed $column
+     * @param mixed|null $value
+     * @return Core\Database\QueryBuilder
+     */
+    public function set($column, $value=null)
+    {
+        $query = [];
+        
+        if ( func_num_args() == 1 ) {
+            if ( ! is_array($column) ) {
+                throw new QueryException('Invalid argument "column".');
+            }
+            
+            $query = $column;
+        } elseif ( func_num_args() == 2 ) {
+            $query[$column] = $value;
+        } else {
+            throw new QueryException('Invalid arguments.');
+        }
+
+        $bindings = $this->resolveBindings($query);
+        
+        $this->queries['set'][] = $bindings;
+        return $this;
+    }
+
+    /**
+     * Add INSERT query to options indicating the column to insert
+     * 
+     * @param string $column Column name
+     * @return Core\Database\QueryBuilder
+     */
+    public function insert(string $column)
+    {
+        $this->queries['insert'][] = $this->wrap($column);
+        return $this;
+    }
+
+    /**
+     * Add VALUES query when INSERT query
+     * 
+     * @param array $values Values to insert
+     * @return Core\Database\QueryBuilder
+     */
+    public function values(array $values)
+    {
+        $fields = array_keys($values);
+        $fields = $this->wrap($fields);
+        
+        // Resolve value bindings
+        foreach($values as $value) {
+            $this->queries['values'][] = $this->resolveBindings($value);
+        }
+
+        $this->queries['insert'][] = '(' .implode(', ', $fields). ')';
+        return $this;
+    }
+
+    /**
+     * Set builder model
+     * 
+     * @param Core\Database\Model $model
+     * @return Core\Database\QueryBuilder
+     */
+    public function setModel(Model $model)
+    {
+        $this->model = $model;
+        return $this;
+    }
+
+    /**
      * Fetch all rows
      * 
      * @return Core\Stack\Stack
      */
     public function get()
     {
-        return stack($this->prepareSql()->fetchAll());
+        // Models stack class
+        $models = stack();
+
+        foreach($this->prepareSql()->executeQuery() as $row) {
+
+            // Add a created model to models list
+            $models->add($this->createFromModel($row));
+        }
+
+        return $models;
     }
 
     /**
      * Fetch the first result from dabatase
      * 
-     * @return 
+     * @return mixed
      */
     public function first()
     {
-        $result = $this->prepareSql()->fetch();
+        $result = $this->prepareSql()->executeFetch();
 
         // No results was found on fetch
         if ( ! $result ) {
             return null;
         }
-
-        return stack($result);
+    
+        return $this->createFromModel($result);
     }
 
     /**
@@ -202,36 +296,102 @@ class QueryBuilder
     }
 
     /**
+     * Create a new instance of model and save it
+     * 
+     * @param array $attributes Attributes to save
+     * @return Core\Database\Model
+     */
+    public function store(array $attributes)
+    {
+        return $this->model->newInstance($attributes)
+            ->save();
+    }
+
+    /**
+     * Execute INSERT, UPADTE, DELETE query on prepared statement
+     * 
+     * @throws \Exception
+     * 
+     * @return bool
+     */
+    public function save()
+    {
+        // Create a statement from query options
+        $statement = $this->prepareSql();
+
+        // Actually executes the query and return the affected rows
+        $statement->executeUpdate();
+        return true;
+    }
+
+    /**
+     * Find a row in database by model primary key
+     * 
+     * @param mixed $identifier Model identifier
+     * @return null|Core\Database\Model
+     */
+    public function find($identifier)
+    {
+        return $this->model->newQuery()->where($this->model->getPrimaryKey(), $identifier)
+            ->first();
+    }
+
+    /**
      * Resolve all SQL bindings
      * 
      * @param mixed $bindings
      */
-    private function resolveBindings($bindings)
+    private function resolveBindings($bindings, $operator='=')
     {
-        $options = '';
+        $options = [];
 
         if ( is_array($bindings) ) {
-            foreach($bindings as $value) {
-                $options .= ' '. static::MARKER;
+            foreach($bindings as $key => $value) {
+                $options[$this->wrap($key)] = static::MARKER;
                 $this->bindings->add($value);
             }
         } else {
-            $options .= ' '. static::MARKER;
             $this->bindings->add($bindings);
+            return static::MARKER;
         }
 
-        return trim($options);
+        $query = '';
+
+        foreach($options as $key => $value) {
+            $query .= implode(' ', [$key, $operator, $value]);
+        }
+
+        return $query;
     }
 
     /**
      * Wrap marker placeholder to escape sql
      * 
-     * @param string $value Value to wrap
-     * @return string
+     * @param mixed $value Value to wrap
+     * @return mixed
      */
-    private function wrap(string $value)
+    private function wrap($value)
     {
+        if ( is_array($value) ) {
+            foreach($value as $key => $data) {
+                $value[$key] = $this->wrap($data);
+            }
+
+            return $value;
+        }
+
         return '`'.$value.'`';
+    }
+
+    /**
+     * Create a new model instance with datas
+     * 
+     * @param array $data Model attributes
+     * @return Core\Database\Model
+     */
+    private function createFromModel(array $data)
+    {
+        return $this->model->newInstance($data);
     }
 
     /**
@@ -244,21 +404,58 @@ class QueryBuilder
         $query = [];
 
         if ( ! empty($this->queries['select']) ) {
-            $query[] = 'select '. implode(', ', $this->queries['select']);
-            $query[] = 'from ' . implode(', ', $this->queries['from']);
+            $query[] = $this->compileSelect(); 
         } elseif ( ! empty($this->queries['insert']) ) {
-            $query[] = 'insert '. implode(', ', $this->queries['insert']);
+            $query[] = $this->compileInsert();
+        } elseif ( ! empty('update') ) {
+            $query[] = $this->compileUpdate();
         }
 
         if ( ! empty($this->queries['where']) ) {
-            $query[] = 'where ' . implode(' and ', $this->queries['where']);
+            $query[] = 'WHERE ' . implode(' AND ', $this->queries['where']);
         }
 
         if ( ! empty($this->queries['orWhere']) ) {
-            $query[] = 'or where ' . implode(' or ', $this->queries['orWhere']);
+            $query[] = 'OR WHERE ' . implode(' OR ', $this->queries['orWhere']);
         }
 
         return implode(' ', $query);
+    }
+
+    /**
+     * Compile SELECT query
+     * 
+     * @return string
+     */
+    private function compileSelect()
+    {
+        $query = "SELECT ". implode(', ', $this->queries['select']);
+        $query .= " FROM ". implode(', ', $this->queries['from']);
+        return $query;
+    }
+
+    /**
+     * Compile INSERT query
+     * 
+     * @return string
+     */
+    private function compileInsert()
+    {
+        $query = "INSERT INTO ". implode(' ', $this->queries['insert']);
+        $query .= " VALUES (". implode(', ', $this->queries['values']) .")";
+        return $query;
+    }
+
+    /**
+     * Compile UPDATE query
+     * 
+     * @return string
+     */
+    private function comileUpdate()
+    {
+        $query = "UPDATE " . implode(', ', $this->queries['update']);
+        $query .= " SET " . implode(', ', $this->queries['set']); 
+        return $query;
     }
 
     /**

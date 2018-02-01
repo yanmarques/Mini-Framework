@@ -174,7 +174,7 @@ class Route
      */
     private function matchRequestMethod(Request $request)
     {
-        if ( $this->method != $request->method() ) {
+        if ( strcasecmp($this->method, $request->method()) != 0 ) {
             throw new MethodNotAllowedException("Method not allowed");
         }
 

@@ -62,7 +62,6 @@ class Statement extends DoctrineStatement
 
         $this->resolveBindings();
         $this->useDefaultFetchMode();
-        $this->execute();
     }
 
     /**
@@ -85,7 +84,34 @@ class Statement extends DoctrineStatement
      */
     public function toSql()
     {
-        return $this->boundSql;
+        return $this->sql;
+    }
+
+    /**
+     * Return query parameters
+     * 
+     * @return array
+     */
+    public function getParams()
+    {
+        return $this->bindings;
+    }
+
+    public function executeQuery()
+    {
+        $this->execute();
+        return $this->connection->getConnection()->executeQuery($this->sql, $this->bindings);
+    }
+
+    public function executeFetch()
+    {
+        $this->execute();
+        return $this->fetch();
+    }
+
+    public function executeUpdate()
+    {
+        return $this->connection->getConnection()->executeUpdate($this->sql, $this->bindings);
     }
 
     /**
@@ -113,7 +139,7 @@ class Statement extends DoctrineStatement
             }
 
             $this->bindValue($index, $value, $mode);
-            $this->boundSql = preg_replace('/\?/', '`'.$value.'`', $this->boundSql, 1);
+            $this->boundSql = preg_replace('/\?/', $value, $this->boundSql, 1);
         }
     }
 
