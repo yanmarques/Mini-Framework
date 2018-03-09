@@ -13,7 +13,8 @@
         "nesbot/carbon": "^1.22",
         "doctrine/dbal": "^2.6",
         "robmorgan/phinx": "^0.9.1",
-        "symfony/process": "^4.0"
+        "symfony/process": "^4.0",
+        "filp/whoops": "^2.1"
     },
     "autoload": {
         "psr-0": {

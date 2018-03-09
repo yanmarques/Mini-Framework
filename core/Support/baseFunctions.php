@@ -3,6 +3,8 @@
 use Core\Stack\Stack;
 use Core\Http\Request;
 use Core\Support\Hash;
+use Core\Crypt\Crypter;
+use Core\Bootstrapers\Application;
 
 /**
  * Thanks to ralouphie!
@@ -48,6 +50,33 @@ if ( ! function_exists('getallheaders') ) {
     }
 }
 
+if ( ! function_exists('app') ) {
+    /**
+     * Decrypt a payload with Crypter
+     *
+     * @param string $value Value to hash
+     * @return string
+     */
+    function app()
+    {
+        return Application::instance();
+    }
+}
+
+if ( ! function_exists('base_dir') ) {
+    /**
+     * Decrypt a payload with Crypter
+     *
+     * @param string $value Value to hash
+     * @return string
+     */
+    function base_dir($file=null)
+    {
+        $base_dir = app()->baseDir();
+        return $file ? $base_dir . $file : $base_dir;
+    }
+}
+
 if ( ! function_exists('stack') ) {
     /**
      * Create a new stack from array with data
@@ -85,5 +114,18 @@ if ( ! function_exists('hcrypt') ) {
     function hcrypt(string $value)
     {
         return Hash::make($value);
+    }
+}
+
+if ( ! function_exists('str_random') ) {
+    /**
+     * Generate a cryptographically secure random bytes
+     * 
+     * @param int $length Bytes length
+     * @return string
+     */
+    function str_random(int $length=16) 
+    {
+        return Crypter::random($length);
     }
 }

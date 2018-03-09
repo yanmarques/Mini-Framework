@@ -7,19 +7,6 @@ use Core\Http\RedirectResponse;
 use Core\Http\Request;
 use Core\Views\View;
 
-if ( ! function_exists('app') ) {
-    /**
-     * Decrypt a payload with Crypter
-     *
-     * @param string $value Value to hash
-     * @return string
-     */
-    function app()
-    {
-        return Application::instance();
-    }
-}
-
 if ( ! function_exists('config') ) {
     /**
      * Get application configuration by it key name
@@ -39,9 +26,9 @@ if ( ! function_exists('session') ) {
      *
      * @return Core\Sessions\SessionManager
      */
-    function session()
+    function session($id=null)
     {
-        return app()->services()->session()->stack();
+        return app()->services()->session()->stack()->start($id);
     }
 }
 

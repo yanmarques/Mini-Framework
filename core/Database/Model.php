@@ -262,7 +262,7 @@ abstract class Model
     {
         // No changes were made
         if ( empty($changes) ) {
-            return $this;
+            return;
         }
 
         // Dispatch model updating event

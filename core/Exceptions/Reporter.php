@@ -6,29 +6,19 @@ use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Http\Response;
 use Core\Views\View;
 use Symfony\Component\Console\Output\ConsoleOutput;
+use Core\Support\Traits\Singleton;
+use \Woops\Run;
 
 class Reporter
 {
-    /**
-     * Handler is booted
-     * 
-     * @var bool
-     */
-    private static $booted;
-
-    /**
-     * Singleton instance
-     * 
-     * @var Core\Exceptions\Reporter
-     */
-    private static $instance;
+    use Singleton;
 
     /**
      * Stack with exceptions
      * 
      * @var Core\Stack\Stack
      */
-    private $exceptions;
+    protected $exceptions;
 
     /**
      * ApplicationInterface
@@ -57,21 +47,6 @@ class Reporter
     }
 
     /**
-     * Boot Handler singleton
-     * 
-     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
-     * @return Core\Exceptions\Reporter
-     */
-    static function boot(ApplicationInterface $app)
-    {
-        if ( ! static::$booted ) {
-            static::$instance = new self($app);
-        }
-
-        return static::$instance;
-    }
-
-    /**
      * Set reporter to console mode
      * 
      * @return Core\Exceptions\Reporter
@@ -87,7 +62,7 @@ class Reporter
      * 
      * @param mixed $e Exception to report
      */
-    public function report($e)
+    public function report($e, CatcherInterface $catcher)
     {
         if ( $this->console ) {
             return $this->app->renderException($e, new ConsoleOutput);
@@ -100,7 +75,7 @@ class Reporter
         if ( $this->isHttp($e) ) {
             return (new Response($this->buildView($e), $e->getStatus()))->send();
         }
-
+        
         return $this->render($e);
     } 
 
@@ -109,7 +84,7 @@ class Reporter
      * 
      * @return bool
      */
-    private function shouldReport()
+    protected function shouldReport()
     {
         return $this->app->services()->config()->env == 'dev';
     }
@@ -120,7 +95,7 @@ class Reporter
      * @param mixed $e Exception
      * @return bool
      */
-    private function isHttp($e)
+    protected function isHttp($e)
     {
         return is_object($e) && ( $e instanceof HttpResponseException || 
             get_parent_class($e) == 'Core\Exceptions\Http\HttpResponseException' );
@@ -131,7 +106,7 @@ class Reporter
      * 
      * @return Core\Http\Response
      */
-    private function response($e)
+    protected function response($e)
     {
         if ( $this->isHttp($e) ) {
             $view = $this->buildView($e);
@@ -154,16 +129,6 @@ class Reporter
     }
 
     /**
-     * Path to views
-     * 
-     * @return string
-     */
-    private function viewsPath()
-    {
-        return $this->app->coreDir() . 'Exceptions' .DIRECTORY_SEPARATOR. 'views' .DIRECTORY_SEPARATOR;
-    }
-
-    /**
      * Render uncaught exception
      * 
      * @throws Core\Exceptions\Exception
@@ -173,6 +138,9 @@ class Reporter
      */
     private function render($e)
     {
-        throw new Exception($e);
+        // Let Whoops render a pretty explained response about the exception.
+        $whoops = new \Whoops\Run;
+        $whoops->pushHandler(new \Whoops\Handler\PrettyPageHandler);
+        return $whoops->handleException($e);
     }
 }

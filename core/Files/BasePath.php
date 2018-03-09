@@ -44,6 +44,16 @@ trait BasePath
         return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'middleware.php';
     }
 
+    /**
+     * Get path to session configuration
+     *
+     * @return string
+     */
+    public function sessionConfigPath()
+    {
+        return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'session.php';
+    }
+
      /**
      * Get path to encryption configuration
      *
@@ -52,6 +62,16 @@ trait BasePath
     public function databaseConfigPath()
     {
         return $this->baseDir . DIRECTORY_SEPARATOR.'config'.DIRECTORY_SEPARATOR.'database.php';
+    }
+
+    /**
+     * Get path to exceptions configuration
+     *
+     * @return string
+     */
+    public function exceptionsConfigPath()
+    {
+        return $this->baseDir .DIRECTORY_SEPARATOR. 'config' .DIRECTORY_SEPARATOR. 'exceptions.php';
     }
 
     /**

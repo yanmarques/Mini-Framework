@@ -15,111 +15,132 @@ class Reflector
     use CanGetProperties;
 
     /**
-     * Reflector is booted
-     * 
-     * @var bool
-     */
-    private static $booted; 
-
-    /**
-     * FileHandler singleton instance
-     * 
-     * @var Core\Reflector\Reflector
-     */
-    private static $instance;
-
-    /**
      * Class to reflect
      *
      * @var mixed
      */
-    private $class;
+    protected $class;
 
     /**
      * Class namespace
      *
      * @var string
      */
-    private $namespace;
+    protected $namespace;
 
     /**
      * Instance of the class to reflect
      *
      * @var object
      */
-    private $object;
+    protected $object;
 
     /**
      * Use closure instead of class
      *
      * @var Closure
      */
-    private $closure;
+    protected $closure;
 
     /**
      * Reflector class
      *
      * @var ReflectorClass
      */
-    private $reflector;
+    protected $reflector;
 
     /**
      * Class bindings are resolved
      *
      * @var bool
      */
-    private $resolved;
+    protected $resolved = false;
 
     /**
      * List of reflector methods
      *
      * @var ReflectionMethod
      */
-    private $methods = [];
+    protected $methods = [];
+
+    /**
+     * Instance class dependecies.
+     * 
+     * @var array
+     */
+    protected $dependencies = [];
+
+    /**
+     * Repository instances to resolve object.
+     * 
+     * @var Core\Foundation\Repository
+     */
+    protected $repository;
 
     /**
      * Handles system files
      *
      * @var Core\Files\FileHandler
      */
-    private $fileHandler;
+    protected $fileHandler;
 
     /**
-     * Constructor of class
+     * Reflect classes to access methods and properties.
      *
+     * @param Core\Foundation\Repository $repository Instances repository
      * @param Core\Files\FileHandler $fileHandler Handle files
      */
-    public function __construct(FileHandler $fileHandler)
+    public function __construct(Repository $repository, FileHandler $fileHandler)
     {
         $this->fileHandler = $fileHandler;
+        $this->repository = $repository;
     }
 
     /**
-     * Boot singleton fileHandler class
-     * 
-     * @param Core\Files\FileHandler
-     * @return Core\Reflector\Reflector
-     */
-    static function boot(FileHandler $fileHandler)
-    {
-        if ( ! static::$booted ) {
-            static::$instance = new self($fileHandler);
-        }
-
-        return static::$instance;
-    }
-
-    /**
-     * Bind container to given class
+     * Bind class to reflector resolver.
      *
      * @param mixed $class
      * @return $this
      */
-    static function bind($class)
+    static function bind($class, $dependecies)
     {
-        $instance = new self(static::$instance->fileHandler);
-        $instance->resolveBinding($class);
-        return $instance;
+        return (new static(Repository::boot(), FileHandler::boot()))
+            ->resolve($class)
+            ->depends($dependecies);
+    }
+
+    /**
+     * Class instance depends on array dependencies.
+     * 
+     * @param array $dependecies Class dependencies
+     * @return Core\Reflector\Reflector
+     */
+    public function depends(array $dependecies)
+    {
+        $this->dependecies = $dependecies;
+        return $this;
+    }
+
+    /**
+     * Get resolved object.
+     * 
+     * @return mixed
+     */
+    public function getObject()
+    {
+        $this->reflect();
+        return $this->object;
+    }
+
+    /**
+     * Get resolved closure.
+     * 
+     * @return \Closure
+     */
+    public function getClosure()
+    {
+        $this->reflect();
+        return $this->closure;
     }
 
     /**
@@ -128,7 +149,7 @@ class Reflector
      * @param string $name Property name
      * @return mixed
      */
-    public function getProperty(string $name)
+    public function getStaticProperty(string $name)
     {
         $this->canGetProperty();
 
@@ -141,7 +162,7 @@ class Reflector
     }
 
     /**
-     * Invoke reflector class method with arguments
+     * Invoke reflector class method with arguments.
      *
      * @param string $name Method name
      * @param array $arguments Array with arguments
@@ -155,7 +176,7 @@ class Reflector
     }
 
     /**
-     * Invoke reflector class method with arguments
+     * Invoke reflector class static method with arguments.
      *
      * @param string $name Method name
      * @param array $arguments Array with arguments
@@ -207,7 +228,7 @@ class Reflector
      * @param $class Class to resolve
      * @return string
      */
-    private function resolveBinding($class)
+    public function resolve($class)
     {
         if ( gettype($class) == 'object' ) {
             $this->resolveObject($class);
@@ -219,8 +240,6 @@ class Reflector
             $type = gettype($class);
             throw new ReflectorException("Class must be an object, string or a Closure, not [{$type}]");
         }
-
-        $this->resolved = true;
 
         $this->reflect();
     }
@@ -244,17 +263,6 @@ class Reflector
     }
 
     /**
-     * Get name of class object
-     *
-     * @param object $object Instance of object
-     * @return string
-     */
-    private function getName($object)
-    {
-        return get_class($object);
-    }
-
-    /**
      * Resolve a class checking wheter it exists and set namespace
      *
      * @param string $class Class complete namespace with class
@@ -262,8 +270,11 @@ class Reflector
      */
     private function resolveClass(string $class)
     {
+        if ( ! class_exists($class) ) {
+            throw new \InvalidArgumentException("Class $class does not exists.");
+        }
+
         $this->namespace = $this->splitNamespace($class);
-        // $this->fileHandler->isClass($this->namespace .'\\'. $class);
         $this->class = $class;
     }
 
@@ -275,7 +286,7 @@ class Reflector
      */
     private function resolveObject($object)
     {
-        $class = $this->getName($object);
+        $class = get_class($object);
         $this->namespace = (new ReflectionClass($class))->getNamespaceName();
         $this->class = $this->splitNamespace($class);
         $this->object = $object;
@@ -307,27 +318,49 @@ class Reflector
     }
 
     /**
-     * Create reflector by class
+     * Reflect object instances and classes.
      *
      * @return void
      */
     private function reflect()
     {
         if ( ! $this->resolved ) {
-            throw new \Exception('Class bindings are not resolved. You can not reflect them.');
+
+            // Reflector is a closure
+            if ( $this->isClosure() ) {
+
+                // Create a new reflector function object
+                $this->reflector = $this->createFunction();
+                $this->resolved = true;
+            } else {
+                
+                // Create a new reflector class object
+                $this->reflector = $this->createClass();
+                $this->object = $this->object ?: $this->resolveInstance();
+            }   
+        }
+    }
+
+    /**
+     * Resolve class arguments on constructor.
+     * 
+     * @return array
+     */
+    private function resolveClassArguments()
+    {
+        $parameters =  $this->createMethod('__construct')->getParameters();
+
+        if ( empty($parameters) ) {
+            return [];
         }
 
-        // Reflector is a closure
-        if ( $this->isClosure() ) {
+        $args = [];
 
-            // Create a new reflector function object
-            $this->reflector = $this->createFunction();
-        } else {
-
-            // Create a new reflector class object
-            $this->reflector = $this->createClass();
-            $this->object = $this->object ?: $this->resolveInstance();
+        foreach($parameters as $parameter) {
+            $args[] = $parameter->getClass();
         }
+
+        return $args;
     }
 
     /**
@@ -337,12 +370,39 @@ class Reflector
      */
     private function resolveInstance()
     {
+        // Receive argument type on class constructor to instantiate the class
+        $arguments = $this->resolveClassArguments();
+
         try {
-            return new $this->class;
-        } catch(\ArgumentCountError $e) {
-            
-            // TODO Implement resolveDependencies of class
-            return null;
+            $dependecies = $this->createMethod('__construct');
+            $instance = new $this->class(...$this->dependencies);
+            $this->resolved = true;
+            return $instance;
+        } catch(\Exception $e) {
+
+            // Indicate where has more dependencie objects to resolve.
+            // Probably dependencies are not resolved too, so we will try 
+            // to resolve each instance too using recursive method.
+            foreach($this->dependencies as $key => $dependecy) {
+                if ( $concrete = $this->repository->make($dependecy) ) {
+                    $this->dependencies[$key] = $concrete;    
+                } elseif ( $concrete = static::bind($dependecie)->getObject() ) {
+                    $this->dependencies[$key] = $concrete;
+                } else {
+                    return null;
+                }
+            }
+
+            try {
+                // Try to resolve instance with new dependencies.
+                $instance = new $this->class(...$this->dependencies);
+                $this->resolved = true;
+            } catch (\Exception $e) {
+
+            }
+        
+            // Could not resolve class instance.
+            return $instance;
         }
     }
 

@@ -18,13 +18,19 @@ class CSRFMiddleware implements MiddlewareInterface
     public function apply(Request $request)
     {
         $tokenMatchs = $this->tokenMatchs($request);
-        $request->session()->set('CSRFToken', Crypter::random(64));
+        
+        $this->handleTokenExpiration();
 
         if ( ! $request->isShow() && ! $tokenMatchs ) {
             throw new CSRFException("Cross Site Forgery Request exception.");
         }
 
         return $request;
+    }
+
+    private function handleTokenExpiration()
+    {
+        // Carbonsession()->CSRFToken->expires_in
     }
 
     /**
@@ -36,6 +42,6 @@ class CSRFMiddleware implements MiddlewareInterface
     private function tokenMatchs(Request $request)
     {
         return $request->has('csrf_token') && is_string($request->csrf_token) &&
-            $request->csrf_token == $request->session()->CSRFToken;
+            $request->csrf_token == session()->CSRFToken->token;
     }
 }

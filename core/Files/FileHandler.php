@@ -4,25 +4,28 @@ namespace Core\Files;
 
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Exceptions\Files\FileNotFoundException;
+use Core\Support\Traits\Singleton;
 
 class FileHandler
 {
+    use Singleton;
+
     /**
      * ApplicationInterface instance
      *
      * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
-    private $application;
+    protected $baseDir;
 
     /**
      * Constructor of class
      *
-     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
-     * @return Core\Files\FileHandler
+     * @param string $baseDir Directory where handler will try files.
+     * @return void
      */
-    public function __construct(ApplicationInterface $application)
+    public function __construct(string $baseDir)
     {
-        $this->application = $application;
+        $this->baseDir = $baseDir;
     }
 
     /**
@@ -122,7 +125,7 @@ class FileHandler
         if ( ! file_exists($file) ) {
 
             // Try file with application base uri
-            $file = $this->application->baseDir() . $file;
+            $file = static::baseDir() . $file;
 
             if ( ! file_exists($file) ) {
                 return false;
@@ -234,5 +237,15 @@ class FileHandler
     private function getClassFromName(string $name)
     {
         return substr($name, strrpos('\\', $name));
+    }
+
+    /**
+     * Get singleton base directory.
+     * 
+     * @return string
+     */
+    private static function baseDir()
+    {
+        return static::instance()->baseDir;
     }
 }

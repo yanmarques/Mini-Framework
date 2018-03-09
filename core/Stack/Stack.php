@@ -474,6 +474,20 @@ class Stack implements StackInterface
     }
 
     /**
+     * Forget a key from itens
+     * 
+     * @return Core\Stack\Stack
+     */
+    public function forget($key)
+    {
+        if ( $this->has($key) ) {
+            unset($this->itens[$key]);
+        }
+
+        return $this;
+    }
+
+    /**
      * Stack has a given key
      *
      * @param string|int $key Key to check

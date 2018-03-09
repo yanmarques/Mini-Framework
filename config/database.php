@@ -28,7 +28,7 @@ return [
     | Please check your database driver documentation before configurating.
     | 
     */
-    'dbname' => 'test',
+    'dbname' => 'users',
 
     /*
     |********************************************************************
@@ -80,7 +80,7 @@ return [
     | Please check your database driver documentation before configurating.
     | 
     */
-    'password' => 'changeme',
+    'password' => 'password',
 
     /*
     |********************************************************************

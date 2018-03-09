@@ -7,19 +7,7 @@ use Core\Exceptions\Files\FileNotFoundException;
 
 class Creator
 {
-    /**
-     * Creator have been booted
-     * 
-     * @var bool
-     */
-    private static $booted;
-
-    /**
-     * Singleton instance of creator
-     * 
-     * @var Core\Support\Creator
-     */
-    private static $instance;
+    use Traits\Singleton;
 
     /**
      * ApplicationInterface to handle dependencies
@@ -31,21 +19,6 @@ class Creator
     public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
-    }
-
-    /**
-     * Boot creator singleton instance with application
-     * 
-     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app Handle dependencies
-     * @return Core\Support\Creator
-     */
-    static function boot(ApplicationInterface $app)
-    {
-        if ( ! static::$booted ) {
-            static::$instance = new self($app);
-        }
-
-        return static::$instance;
     }
 
     /**

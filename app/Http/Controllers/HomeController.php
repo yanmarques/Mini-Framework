@@ -10,6 +10,8 @@ class HomeController
 {
     public function index(Request $request)
     {
+        $e = ['s'];
+        $e[2];
         return view('home');
     }
 }

@@ -2,7 +2,6 @@
 
 namespace Core\Sessions;
 
-use Core\Crypt\Crypter;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class SessionManager
@@ -20,6 +19,15 @@ class SessionManager
      * @var Core\Sessions\SessionManager
      */
     private static $instance;
+
+    /**
+     * Supported drivers name
+     * 
+     * @var array
+     */
+    private static $handlers = [
+        'file' => FileSessionHandler::class,
+    ];
 
     /**
      * Session stack with params
@@ -45,7 +53,6 @@ class SessionManager
     {
         $this->app = $app;
         $this->bootSession();
-        $this->setCSRFToken();
     }
 
     /**
@@ -61,6 +68,17 @@ class SessionManager
         }
 
         return self::$instance;
+    }
+
+    /**
+     * Indicates wheter driver name is supported by application
+     * 
+     * @param string $driver Driver name
+     * @return bool
+     */
+    public static function supported(string $driver)
+    {
+        return in_array($driver, array_keys(static::$handlers));
     }
 
     /**
@@ -80,19 +98,42 @@ class SessionManager
      */
     private function bootSession()
     {
-        session_start();
-        $this->session = new SessionStack($_SESSION);
+        $driver = $this->getDriverFromConfiguration();
+        $this->session = Session::boot($driver);
+    }
+
+    /**
+     * Return a handler instance from session configuration file
+     * 
+     * @return \SessionHandlerInterface
+     */
+    protected function getDriverFromConfiguration()
+    {
+        if ( ! static::supported($driver = $this->app->session()->session_driver) ) {
+            throw new \Exception("Session driver [$driver] not supported.");
+        }
+
+        return new static::$handlers[$driver]($this->app->fileHandler(), 
+            base_dir($this->app->session()->path), 
+            $this->app->session()->session_lifetime,
+            $this->app->session()->encrypt);
     }
 
     /**
      * Set Cross Site Request Forgery token for session
      *
-     * @return Core\Sessions\SessionManager
+     * @return void
      */
     private function setCSRFToken()
     {
+        // Token already set
+        if ( $this->session->has('CSRFToken') ) {
+            return;
+        }
+
         if ( isset($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], ['GET', 'HEAD', 'OPTIONS']) ) {
-            $this->session->set('CSRFToken', Crypter::random(64));
+            $token = new CSRFToken;
+            $this->session->set('CSRFToken', $token->serialize());
         }
     }
 

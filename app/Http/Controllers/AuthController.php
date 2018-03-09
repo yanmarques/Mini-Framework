@@ -4,6 +4,7 @@ namespace App\Http\Controllers;
 
 use Core\Http\Request;
 use Core\Support\Hash;
+use App\Models\User;
 
 class AuthController
 {
@@ -14,9 +15,8 @@ class AuthController
 
     public function auth(Request $request)
     {
-        // Make your login logic...
-        // Authenticate user
-        
+        $user = User::store($request->all());
+        session()->set('user', $user->toArray());
         return redirect('/');
     }
 }

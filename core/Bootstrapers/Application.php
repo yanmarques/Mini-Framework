@@ -45,38 +45,52 @@ class Application implements ApplicationInterface
      *
      * @var array
      */
-    private $encryption;
+    private $encryption = [];
 
     /**
-     * MIddleware stack
+     * Middleware stack
      *
-     * @var Core\Stack\Stack
+     * @var array
      */
-    private $middleware;
+    private $middleware = [];
 
     /**
      * Database configuration
      * 
-     * @var Core\Stack\Stack
+     * @var array
      */
-    private $database;
+    private $database = [];
 
     /**
-     * Observers configuration
+     * Observers configuration.
      * 
-     * @var Core\Stack\Stack
+     * @var array
      */
-    private $observers;
+    private $observers = [];
 
     /**
-     * Handle file actions
+     * Session configuration.
+     * 
+     * @var array
+     */
+    private $session = [];
+
+    /**
+     * Repository with class instances.
+     * 
+     * @var Core\Foundation\Repository
+     */
+    private $repository;
+
+    /**
+     * Handle file actions.
      *
      * @var Core\Files\FileHandler
      */
     private $fileHandler;
 
      /**
-     * Exception reporter
+     * Exception reporter class.
      *
      * @var Core\Exceptions\Reporter
      */
@@ -183,6 +197,16 @@ class Application implements ApplicationInterface
     }
 
     /**
+     * Return session configuration
+     * 
+     * @return Core\Stack\Stack
+     */
+    public function session()
+    {
+        return $this->session;
+    }
+
+    /**
      * Return application base directory
      *
      * @return string
@@ -217,11 +241,45 @@ class Application implements ApplicationInterface
      */
     public function booting()
     {
-        $this->fileHandler = new FileHandler($this);
         $this->services = new ServicesStack;
+        $this->addRegister($this->services);
+
+        $this->fileHandler = FileHandler::boot($this->baseDir());
+        $this->addRegister($this->fileHandler);
 
         // Include some helper functions to boot system
         $this->fileHandler->include('core/Support/baseFunctions.php');
+
+        dd($this->resolve(\App\Exceptions\Catcher::class));
+
+        $this->updateInstance();
+    }
+
+    /**
+     * Make an instance of base name classe trying to resolve object with already registered
+     * instances.
+     * 
+     * @param string $name Class name
+     * @param array $dependencies Class dependencies
+     * @return mixed|null
+     */
+    public function resolve(string $name, array $dependencies = [])
+    {
+        // We assume here that the class looked is already instantiated.
+        if ( isset($this->container[$name]) ) {
+            return $this->container[$name];
+        }
+
+        // Try to resolve dependecies from container.
+        foreach($dependencies as $key => $dependencie) {
+            $dependencies[$key] = $this->resolve($name);
+        }
+        
+        // And we assume here that any class was instantiated yet. We will use reflector
+        // tool resolve class instance.
+        return Reflector::bind($name)->depends($dependencies)
+            ->withContainers($this->container)
+            ->getObject();
     }
 
     /**
@@ -243,7 +301,7 @@ class Application implements ApplicationInterface
      */
     public function booted()
     {
-        static::$instance = $this;
+        $this->updateInstance();
 
         // Include all application helper functions
         $this->fileHandler->include('core/Support/helpers.php');
@@ -256,8 +314,20 @@ class Application implements ApplicationInterface
      */
     private function registerSingletons()
     {
-        Reflector::boot($this->fileHandler);
-        Creator::boot($this);
+        Reflector::boot($this);
+        Creator::boot($this->baseDir());
+        FileHandler::boot($this->baseDir());
+    }
+
+    /**
+     * Update application instance
+     * 
+     * @return void
+     */
+    private function updateInstance()
+    {
+        static::$instance = $this;
+        $this->repository->bind(static::class, $this);
     }
 
     /**
@@ -312,6 +382,11 @@ class Application implements ApplicationInterface
             $this->middlewareConfigPath()
         ));
 
+        // Get session configuration from file
+        $this->session = stack($this->fileHandler->getRequiredContent(
+            $this->sessionConfigPath()
+        ));
+
         // Initialize configurations services 
         stack($this->configurationServices())->each(function ($value, $key) {
             $this->services->add(
@@ -335,5 +410,16 @@ class Application implements ApplicationInterface
             \Core\Services\DatabaseService::class,
             \Core\Services\ObserverService::class
         ];
+    }
+
+    /**
+     * Add a registered class to container stack.
+     * 
+     * @param mixed $registered Object registered
+     * @return void
+     */
+    private function addRegister($registered)
+    {
+        $this->container[get_class($registered)] = $registered;
     }
 }
