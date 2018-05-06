@@ -1,7 +1,7 @@
 <?php
 
 return [
-    
+
     /*
     |********************************************************************
     | Database Driver
@@ -26,7 +26,7 @@ return [
     | Here you can configure the database name to connect the socket.
     |
     | Please check your database driver documentation before configurating.
-    | 
+    |
     */
     'dbname' => 'test',
 
@@ -38,7 +38,7 @@ return [
     | Here you can configure the host where database is running.
     |
     | Please check your database driver documentation before configurating.
-    | 
+    |
     */
     'host' => '127.0.0.1',
 
@@ -52,7 +52,7 @@ return [
     | Defaults: pgsql=5432;mysql=3306
     |
     | Please check your database driver documentation before configurating.
-    | 
+    |
     */
     'port' => '3306',
 
@@ -61,11 +61,11 @@ return [
     | Database User
     |********************************************************************
     |
-    | Here you can configure database connection. In way to connect to 
+    | Here you can configure database connection. In way to connect to
     | database, you must pass a username.
     |
     | Please check your database driver documentation before configurating.
-    | 
+    |
     */
     'user' => 'root',
 
@@ -74,11 +74,11 @@ return [
     | Database Password
     |********************************************************************
     |
-    | Here you can configure database connection. In way to connect to 
+    | Here you can configure database connection. In way to connect to
     | database, you must pass a password.
     |
     | Please check your database driver documentation before configurating.
-    | 
+    |
     */
     'password' => 'changeme',
 
@@ -87,37 +87,37 @@ return [
     | Phinx Path
     |********************************************************************
     |
-    | Here you set phinx paths configuration. Phinx is a powerfull easy way to 
-    | handle database migrations. 
-    | 
+    | Here you set phinx paths configuration. Phinx is a powerfull easy way to
+    | handle database migrations.
+    |
     | See https://book.cakephp.org/3.0/en/phinx.html for phinx project.
-    | See https://book.cakephp.org/3.0/en/phinx/configuration.html for 
+    | See https://book.cakephp.org/3.0/en/phinx/configuration.html for
     | configuration details.
-    | 
+    |
     */
     'paths' => [
 
         /*
         |********************************************************************
-        | Migrations Path 
+        | Migrations Path
         |********************************************************************
         |
-        | Here you set the path to migration files. Phinx will create custom 
+        | Here you set the path to migration files. Phinx will create custom
         | migration files on this path. With phinx you can create tables,
         | columns with some line of code.
-        | 
+        |
         */
         'migrations' => 'database/migrations',
 
         /*
         |********************************************************************
-        | Seeds Path 
+        | Seeds Path
         |********************************************************************
         |
         | Here you set the path to seeds files. Seeds are used to create fake
-        | data to your database for development purposes. 
-        | 
+        | data to your database for development purposes.
+        |
         */
-        'seeds' => 'database/seeds'
-    ]
+        'seeds' => 'database/seeds',
+    ],
 ];

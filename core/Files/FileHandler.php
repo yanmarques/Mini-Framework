@@ -2,22 +2,23 @@
 
 namespace Core\Files;
 
-use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Exceptions\Files\FileNotFoundException;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class FileHandler
 {
     /**
-     * ApplicationInterface instance
+     * ApplicationInterface instance.
      *
      * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $application;
 
     /**
-     * Constructor of class
+     * Constructor of class.
      *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
+     *
      * @return Core\Files\FileHandler
      */
     public function __construct(ApplicationInterface $application)
@@ -26,9 +27,10 @@ class FileHandler
     }
 
     /**
-     * Get file content
-     * 
+     * Get file content.
+     *
      * @param string $file File path
+     *
      * @return string
      */
     public function get(string $file)
@@ -37,13 +39,15 @@ class FileHandler
     }
 
     /**
-     * Check wheter class exists
+     * Check wheter class exists.
+     *
+     *
+     * @param string $file  File name
+     * @param string $class Class name
+     * @param bool   $throw Should throw exception if not a class
      *
      * @throws Core\Exceptions\Files\FileException
      *
-     * @param string $file File name
-     * @param string $class Class name
-     * @param bool $throw Should throw exception if not a class
      * @return bool
      */
     public function isClass(string $file, string $class, bool $throw = true)
@@ -51,8 +55,8 @@ class FileHandler
         $this->require($file);
 
         // No class found
-        if ( ! class_exists($this->getClassFromName($class)) ) {
-            if ( $throw ) {
+        if (!class_exists($this->getClassFromName($class))) {
+            if ($throw) {
                 throw new ClassNotFoundException("Class [$class] does not exists on {$file}");
             }
 
@@ -63,15 +67,16 @@ class FileHandler
     }
 
     /**
-     * Get content of a require file
+     * Get content of a require file.
      *
      * @param string $class File path name
+     *
      * @return mixed
      */
     public function getRequiredContent(string $file)
     {
         // File was not found
-        if ( ! $file = $this->isFile($file) ) {
+        if (!$file = $this->isFile($file)) {
             throw new FileNotFoundException("File [$file] not found.");
         }
 
@@ -79,15 +84,16 @@ class FileHandler
     }
 
     /**
-     * Require a php script
+     * Require a php script.
      *
      * @param string $class File path name
+     *
      * @return mixed
      */
     public function require(string $file)
     {
         // File was not found
-        if ( ! $file = $this->isFile($file) ) {
+        if (!$file = $this->isFile($file)) {
             throw new FileNotFoundException("File [$file] not found.");
         }
 
@@ -95,15 +101,16 @@ class FileHandler
     }
 
     /**
-     * Include a php script
+     * Include a php script.
      *
      * @param string $class File path name
+     *
      * @return mixed
      */
     public function include(string $file)
     {
         // File was not found
-        if ( ! $isFile = $this->isFile($file) ) {
+        if (!$isFile = $this->isFile($file)) {
             throw new FileNotFoundException("File [$file] not found.");
         }
 
@@ -111,20 +118,21 @@ class FileHandler
     }
 
     /**
-     * Check wheter file exists
+     * Check wheter file exists.
      *
      * @param string $file File path
+     *
      * @return bool
      */
     public function isFile(string $file)
     {
         // Try file
-        if ( ! file_exists($file) ) {
+        if (!file_exists($file)) {
 
             // Try file with application base uri
-            $file = $this->application->baseDir() . $file;
+            $file = $this->application->baseDir().$file;
 
-            if ( ! file_exists($file) ) {
+            if (!file_exists($file)) {
                 return false;
             }
         }
@@ -133,10 +141,11 @@ class FileHandler
     }
 
     /**
-     * Append data to file and create file if not exists
+     * Append data to file and create file if not exists.
      *
      * @param string $file Absolute path to file
      * @param string $data Data to write on file
+     *
      * @return void
      */
     public function append(string $file, string $data)
@@ -145,15 +154,16 @@ class FileHandler
     }
 
     /**
-     * Preppend data to file and create file if not exists
+     * Preppend data to file and create file if not exists.
      *
      * @param string $file Absolute path to file
      * @param string $data Data to write on file
+     *
      * @return void
      */
     public function prepend(string $file, string $data)
     {
-        if ( $this->isFile($file) ) {
+        if ($this->isFile($file)) {
             return file_put_contents($file, $data.$this->get($file));
         }
 
@@ -161,19 +171,20 @@ class FileHandler
     }
 
     /**
-     * Clear file content and write data to file
+     * Clear file content and write data to file.
      *
      * @param string $file Absolute path to file
      * @param string $data Data to write on file
+     *
      * @return void
      */
-    public function write(string $file, string $data, $recursively=false)
+    public function write(string $file, string $data, $recursively = false)
     {
-        if ( $recursively ) {
+        if ($recursively) {
             $paths = stack(explode(DIRECTORY_SEPARATOR, $file));
 
             // Parse array
-            if ( $paths->first() == '' ) {
+            if ($paths->first() == '') {
                 $paths->shift();
             }
 
@@ -181,10 +192,10 @@ class FileHandler
             $paths->pop();
 
             $paths->eachSpread(function ($path) {
-                $path = DIRECTORY_SEPARATOR . $path;
-                if ( ! $this->isDirectory($path) ) {
+                $path = DIRECTORY_SEPARATOR.$path;
+                if (!$this->isDirectory($path)) {
                     mkdir($path);
-                } 
+                }
             }, DIRECTORY_SEPARATOR);
         }
 
@@ -192,9 +203,10 @@ class FileHandler
     }
 
     /**
-     * Verify wheter given directory is a valid directory
-     * 
+     * Verify wheter given directory is a valid directory.
+     *
      * @param string $directory Directory path
+     *
      * @return bool
      */
     public function isDirectory(string $directory)
@@ -202,10 +214,11 @@ class FileHandler
         return is_dir($directory);
     }
 
-     /**
-     * Read data from file
+    /**
+     * Read data from file.
      *
      * @param string $file Absolute path to file
+     *
      * @return mixed|false
      */
     public function read(string $file)
@@ -215,20 +228,20 @@ class FileHandler
 
         try {
             $content = fread($handler, filesize($file));
-        } catch ( \Exception $e ) {
+        } catch (\Exception $e) {
             $status = false;
-        }
-        finally {
+        } finally {
             fclose($handler);
         }
 
-        return ! $status ?: $content;
+        return !$status ?: $content;
     }
 
     /**
-     * Get class from name
+     * Get class from name.
      *
      * @param string $name Name of class with namespace
+     *
      * @return string
      */
     private function getClassFromName(string $name)

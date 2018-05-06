@@ -2,23 +2,24 @@
 
 namespace Core\Services;
 
-use Core\Services\Abstracts\Service;
-use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Database\Connection;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
+use Core\Services\Abstracts\Service;
 
 class DatabaseService extends Service
 {
-     /**
-     * Service identifier name
+    /**
+     * Service identifier name.
      *
      * @var string
      */
     public static $name = 'database';
 
     /**
-     * Boot the database service
+     * Boot the database service.
      *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
+     *
      * @return mixed
      */
     public static function boot(ApplicationInterface $app)

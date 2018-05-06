@@ -2,100 +2,101 @@
 
 namespace Core\Database;
 
+use Core\Database\Traits\HasActionEvents;
 use Core\Interfaces\Database\ConnectionInterface;
 use Doctrine\Common\Inflector\Inflector;
-use Core\Database\Traits\HasActionEvents;
 
 abstract class Model
 {
     use HasActionEvents;
 
     /**
-     * Connection class
-     * 
+     * Connection class.
+     *
      * @var Core\Database\Connection
      */
     protected $connection;
 
     /**
-     * The table name
-     * 
+     * The table name.
+     *
      * @var string
      */
     protected $table;
 
     /**
-     * The attributes to mass assignment
-     * 
+     * The attributes to mass assignment.
+     *
      * @var array
      */
     protected $fillable = [];
 
     /**
-     * The primary key for the model
+     * The primary key for the model.
      *
      * @var string
      */
     protected $primaryKey = 'id';
 
     /**
-     * The type of the primary key
+     * The type of the primary key.
      *
      * @var string
      */
     protected $keyType = 'int';
 
     /**
-     * Default created date
-     * 
+     * Default created date.
+     *
      * @var string
      */
     protected $created = 'created_at';
 
     /**
-     * Default updated date
-     * 
+     * Default updated date.
+     *
      * @var string
      */
     protected $updated = 'updated_at';
 
     /**
-     * Indicates if primary should autoincrement
+     * Indicates if primary should autoincrement.
      *
      * @var bool
      */
     public $incrementing = true;
 
     /**
-     * Array with booted models
-     * 
+     * Array with booted models.
+     *
      * @var array
      */
     protected static $bootedModels = [];
 
     /**
-     * Model attributes
-     * 
+     * Model attributes.
+     *
      * @var array
      */
     private $attributes = [];
 
-     /**
-     * The original attributes from table
-     * 
+    /**
+     * The original attributes from table.
+     *
      * @var array
      */
     private $original = [];
 
     /**
-     * Class constructor
-     * 
+     * Class constructor.
+     *
      * @param string $name Model name
      * @param Core\Interfaces\Database\ConnectionInterface
+     *
      * @return void
      */
     public function __construct(array $attributes = [])
-    {    
+    {
         $this->setTableIfNotSet();
         $this->setConnection(Connection::boot());
         $this->setOriginal($attributes);
@@ -106,8 +107,8 @@ abstract class Model
     }
 
     /**
-     * The boot method called when model is instantiated
-     * 
+     * The boot method called when model is instantiated.
+     *
      * @return void
      */
     protected static function boot()
@@ -116,8 +117,8 @@ abstract class Model
     }
 
     /**
-     * Set model connection
-     * 
+     * Set model connection.
+     *
      * @param Core\Interfaces\Database\ConnectionInterface
      */
     public function setConnection(ConnectionInterface $connection)
@@ -126,8 +127,8 @@ abstract class Model
     }
 
     /**
-     * Get table name
-     * 
+     * Get table name.
+     *
      * @return string
      */
     public function getTable()
@@ -136,8 +137,8 @@ abstract class Model
     }
 
     /**
-     * Get table primary key
-     * 
+     * Get table primary key.
+     *
      * @return string
      */
     public function getPrimaryKey()
@@ -146,31 +147,33 @@ abstract class Model
     }
 
     /**
-     * Fecth all rows from table
-     * 
+     * Fecth all rows from table.
+     *
      * @return Core\Stack\Stack;
      */
     public static function all()
     {
-        return (new static)->newQuery()->get();
+        return (new static())->newQuery()->get();
     }
 
     /**
-     * Fill attributes from model
-     * 
+     * Fill attributes from model.
+     *
      * @param array Attributes to set
+     *
      * @return this
      */
     public function fill(array $attributes)
     {
         $newAttributes = $this->guardAttributes($attributes);
         $this->attributes = array_merge($this->attributes, $newAttributes);
+
         return $this;
     }
 
     /**
-     * Return an array representation of user attributes
-     * 
+     * Return an array representation of user attributes.
+     *
      * @return array
      */
     public function toArray()
@@ -181,13 +184,13 @@ abstract class Model
     /**
      * Save model to database. Handle model existence on database
      * when model exists, update query will be executed with attributes
-     * changes, otherwise an insert will be executed with attributes
-     * 
+     * changes, otherwise an insert will be executed with attributes.
+     *
      * @return void
      */
     public function save()
     {
-        if ( $this->exists() ) {
+        if ($this->exists()) {
 
             // Compares the array with visible/changeable model attributes with
             // the original attributes when model was first instantiated
@@ -196,7 +199,7 @@ abstract class Model
                 return true;
             }
 
-            // Get current changes between the model attributes and it's 
+            // Get current changes between the model attributes and it's
             // original attributes
             $changes = array_diff($this->attributes, $this->original);
 
@@ -211,17 +214,17 @@ abstract class Model
     }
 
     /**
-     * Indicates wheter the model exists in database
-     * 
+     * Indicates wheter the model exists in database.
+     *
      * @return bool
      */
     protected function exists()
     {
         // Model has an identifier in attributes
-        if ( isset($this->attributes[$this->primaryKey]) ) {
+        if (isset($this->attributes[$this->primaryKey])) {
 
             // Identifier is valid and has an item with identifier
-            if ( $this->query()->where($this->primaryKey, $this->attributes[$this->primaryKey])->first() ) {
+            if ($this->query()->where($this->primaryKey, $this->attributes[$this->primaryKey])->first()) {
                 return true;
             }
         }
@@ -230,9 +233,10 @@ abstract class Model
     }
 
     /**
-     * Create a new instance of model from attributes
-     * 
+     * Create a new instance of model from attributes.
+     *
      * @param array $attributes Attributes of model
+     *
      * @return Core\Database\Model
      */
     public function newInstance(array $attributes)
@@ -241,27 +245,29 @@ abstract class Model
     }
 
     /**
-     * Begin querying the model
-     * 
+     * Begin querying the model.
+     *
      * @return Core\Database\QueryBuilder
      */
     public function query()
     {
         $builder = new QueryBuilder($this->connection);
         $builder->setModel($this);
+
         return $builder;
     }
 
     /**
-     * Do model update against model changes
-     * 
+     * Do model update against model changes.
+     *
      * @param array $changes Changes between old attributes and original
+     *
      * @return void
      */
     private function performUpdate(array $changes)
     {
         // No changes were made
-        if ( empty($changes) ) {
+        if (empty($changes)) {
             return $this;
         }
 
@@ -279,8 +285,8 @@ abstract class Model
     }
 
     /**
-     * Perform an insert action and create a new row based on model attributes
-     * 
+     * Perform an insert action and create a new row based on model attributes.
+     *
      * @return void
      */
     private function performInsert()
@@ -288,7 +294,7 @@ abstract class Model
         // Dispatch model creating event
         $this->fireEvent('creating');
 
-        // Actually inserts model attributes into database 
+        // Actually inserts model attributes into database
         $this->query()->insert($this->table)->values($this->attributes)
             ->save();
 
@@ -297,9 +303,10 @@ abstract class Model
     }
 
     /**
-     * Set inicial attributes of model
-     * 
+     * Set inicial attributes of model.
+     *
      * @param array $attributes Inicial attributes
+     *
      * @return void
      */
     private function setOriginal(array $attributes)
@@ -309,16 +316,17 @@ abstract class Model
     }
 
     /**
-     * Guard model attributes against mass assignment
-     * 
+     * Guard model attributes against mass assignment.
+     *
      * @param array $attributes Attributes to check
+     *
      * @return array
      */
     private function guardAttributes(array $attributes)
     {
         $newAttributes = [];
-        foreach($attributes as $key => $value) {
-            if ( in_array($key, $this->fillable) ) {
+        foreach ($attributes as $key => $value) {
+            if (in_array($key, $this->fillable)) {
                 $newAttributes[$key] = $value;
             }
         }
@@ -326,25 +334,20 @@ abstract class Model
         return $newAttributes;
     }
 
-    /**
-     * 
-     * 
-     * 
-     */
     private function addDateToFillable()
     {
-        if ( $this->created != null ) {
+        if ($this->created != null) {
             $this->fillable = array_merge($this->fillable, [$this->created]);
         }
 
-        if ( $this->updated != null ) {
+        if ($this->updated != null) {
             $this->fillable = array_merge($this->fillable, [$this->updated]);
         }
     }
 
     /**
-     * Get query builder instance
-     * 
+     * Get query builder instance.
+     *
      * @return Core\Database\QueryBuilder
      */
     private function newQuery()
@@ -355,21 +358,22 @@ abstract class Model
     }
 
     /**
-     * If $table attribute is not set, parse model name to table
-     * 
+     * If $table attribute is not set, parse model name to table.
+     *
      * @param string $model Model name
+     *
      * @return void
      */
     private function setTableIfNotSet()
     {
-        if ( $this->table == null ) {
-            // Match strings with 
+        if ($this->table == null) {
+            // Match strings with
             $model = stack(explode('\\', static::class))->last();
             preg_match_all('([A-Z][A-Z0-9]*(?=$|[A-Z][a-z0-9])|[A-Za-z][a-z0-9]+)', $model, $matches);
 
             // Array matches
             $matchedModel = $matches[0];
-            
+
             // Transform model name
             foreach ($matchedModel as &$match) {
                 $match = $match == strtoupper($match) ? strtolower($match) : lcfirst($match);
@@ -380,13 +384,13 @@ abstract class Model
     }
 
     /**
-     * Boot model
-     * 
+     * Boot model.
+     *
      * @return void
      */
     private static function bootIfNotBooted()
     {
-        if ( ! isset(self::$bootedModels[static::class]) ) {
+        if (!isset(self::$bootedModels[static::class])) {
             self::$bootedModels[static::class] = true;
         }
 
@@ -395,42 +399,41 @@ abstract class Model
     }
 
     /**
-     * Set model attributes
-     * 
-     * @param string $name Attribute name
-     * @param mixed $value Value to attribute
+     * Set model attributes.
+     *
+     * @param string $name  Attribute name
+     * @param mixed  $value Value to attribute
+     *
      * @return mixed
      */
     public function __set($name, $value)
     {
-        if ( isset($this->attributes[$name]) ) {
+        if (isset($this->attributes[$name])) {
             $this->attributes[$name] = $value;
         }
     }
 
     /**
-     * Access model attributes
-     * 
+     * Access model attributes.
+     *
      * @param string $name Attribute name
+     *
      * @return mixed
      */
     public function __get($name)
     {
-        if ( isset($this->attributes[$name]) ) {
+        if (isset($this->attributes[$name])) {
             return $this->attributes[$name];
         }
-
-        return null;
     }
 
     /**
-     * Dinamically create a query builder when calling not found static methods 
-     * 
+     * Dinamically create a query builder when calling not found static methods.
+     *
      * @return Core\Database\QueryBuilder
      */
     public static function __callStatic($method, $arguments)
     {
-        return (new static)->newQuery()->{$method}(...$arguments);
+        return (new static())->newQuery()->{$method}(...$arguments);
     }
 }
-

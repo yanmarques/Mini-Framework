@@ -4,47 +4,46 @@ namespace Core\Console\Commands;
 
 use Core\Console\Command;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
+use Core\Support\Creator;
+use Symfony\Component\Console\Input\InputArgument;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Process\Process;
-use Core\Support\Creator;
 
 class ControllerCommand extends Command
 {
     /**
-     * Controller namespace
-     * 
+     * Controller namespace.
+     *
      * @var string
      */
     private $namespace = 'App\Http\Controllers';
 
     /**
-     * Command name
-     * 
+     * Command name.
+     *
      * @var string
      */
     protected $name = 'build:controller';
 
     /**
-     * Stub name
-     * 
+     * Stub name.
+     *
      * @var string
      */
     protected $stub = 'controller.stub';
 
     /**
-     * Command description
-     * 
+     * Command description.
+     *
      * @var string
      */
     protected $description = 'Build an controller class.';
 
     /**
-     * Class constructor
-     * 
+     * Class constructor.
+     *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
-     * @param string $name Command name
+     * @param string                                            $name Command name
      */
     public function __construct(ApplicationInterface $app)
     {
@@ -52,10 +51,11 @@ class ControllerCommand extends Command
     }
 
     /**
-     * Handle console commands input
-     * 
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * Handle console commands input.
+     *
+     * @param \Symfony\Component\Console\Input\InputInterface   $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
      * @return mixed
      */
     public function handle(InputInterface $input, OutputInterface $output)
@@ -64,16 +64,16 @@ class ControllerCommand extends Command
         $argument = $this->parsePathArgument('name', ['Http', 'Controllers']);
 
         // Stub path
-        $stub =  $this->stubPath() . $this->stub;
+        $stub = $this->stubPath().$this->stub;
 
         // Path to create file
-        $path = $this->getApplication()->appDir() . $argument->path;
-        
+        $path = $this->getApplication()->appDir().$argument->path;
+
         // Verify wheter file already exists
-        if ( $this->getApplication()->fileHandler()->isFile($path) ) {
+        if ($this->getApplication()->fileHandler()->isFile($path)) {
             throw new \RuntimeException("File [$path] already exists");
         }
-        
+
         // Use creator singleton to create a file from stubs configuration
         Creator::parse($path, $stub, $this->dummies($argument->class, $argument->customPath));
 
@@ -84,30 +84,33 @@ class ControllerCommand extends Command
     }
 
     /**
-     * Command arguments
-     * 
+     * Command arguments.
+     *
      * @var array
      */
-    protected function getArguments() {
+    protected function getArguments()
+    {
         return [
             [
-                'name', InputArgument::REQUIRED, 'Controller name'
-            ]
+                'name', InputArgument::REQUIRED, 'Controller name',
+            ],
         ];
     }
 
     /**
-     * Get command dummies
-     * 
-     * @param string $class 
+     * Get command dummies.
+     *
+     * @param string $class
+     *
      * @return array
      */
-    private function dummies(string $class, array $args=[])
+    private function dummies(string $class, array $args = [])
     {
-        $namespace = empty($args) ? $this->namespace : $this->namespace .'\\'. implode('\\', $args);
+        $namespace = empty($args) ? $this->namespace : $this->namespace.'\\'.implode('\\', $args);
+
         return [
             'DummyNamespace' => $namespace,
-            'DummyClass' => $class
+            'DummyClass'     => $class,
         ];
     }
 }

@@ -2,20 +2,17 @@
 
 namespace Core\Routing;
 
-use Core\Routing\RouteManager;
-use Core\Routing\Route;
-
 class Router extends RouteManager
-{   
+{
     /**
-     * Middleware to be registered with route
-     * 
+     * Middleware to be registered with route.
+     *
      * @var array
      */
     private $middlewares;
 
     /**
-     * Constructor of class
+     * Constructor of class.
      */
     public function __construct(array $middlewares = [])
     {
@@ -31,7 +28,7 @@ class Router extends RouteManager
     }
 
     /**
-     * GET Route
+     * GET Route.
      *
      * @param string $url The prefix of url
      * @param Closure|string
@@ -42,7 +39,7 @@ class Router extends RouteManager
     }
 
     /**
-     * PUT Route
+     * PUT Route.
      *
      * @param string $url The prefix of url
      * @param Closure|string
@@ -53,7 +50,7 @@ class Router extends RouteManager
     }
 
     /**
-     * POST Route
+     * POST Route.
      *
      * @param string $url The prefix of url
      * @param Closure|string
@@ -64,7 +61,7 @@ class Router extends RouteManager
     }
 
     /**
-     * PATCH Route
+     * PATCH Route.
      *
      * @param string $url The prefix of url
      * @param Closure|string
@@ -75,7 +72,7 @@ class Router extends RouteManager
     }
 
     /**
-     * DELETE Route
+     * DELETE Route.
      *
      * @param string $url The prefix of url
      * @param Closure|string
@@ -85,13 +82,14 @@ class Router extends RouteManager
         $this->add('DELETE', $url, $action);
     }
 
-   /**
-    * Add route manager to router
-    *
-    * @param string $url Url prefix
-    * @param Closure|string $action Route action
-    * @return void
-    */
+    /**
+     * Add route manager to router.
+     *
+     * @param string         $url    Url prefix
+     * @param Closure|string $action Route action
+     *
+     * @return void
+     */
     private function add(string $method, string $url, $action)
     {
         $this->addRoute(new Route($method, $url, $action, $this->middlewares));

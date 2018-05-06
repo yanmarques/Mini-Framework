@@ -1,15 +1,15 @@
 <?php
 
-use Core\Stack\Stack;
 use Core\Http\Request;
+use Core\Stack\Stack;
 use Core\Support\Hash;
 
-/**
+/*
  * Thanks to ralouphie!
  *
  * @see https://github.com/ralouphie/getallheaders
  */
-if ( ! function_exists('getallheaders') ) {
+if (!function_exists('getallheaders')) {
     /**
      * Get all HTTP header key/values as an associative array for the current request.
      *
@@ -17,12 +17,12 @@ if ( ! function_exists('getallheaders') ) {
      */
     function getallheaders()
     {
-        $headers = array();
-        $copy_server = array(
+        $headers = [];
+        $copy_server = [
             'CONTENT_TYPE'   => 'Content-Type',
             'CONTENT_LENGTH' => 'Content-Length',
             'CONTENT_MD5'    => 'Content-Md5',
-        );
+        ];
         foreach ($_SERVER as $key => $value) {
             if (substr($key, 0, 5) === 'HTTP_') {
                 $key = substr($key, 5);
@@ -39,20 +39,22 @@ if ( ! function_exists('getallheaders') ) {
                 $headers['Authorization'] = $_SERVER['REDIRECT_HTTP_AUTHORIZATION'];
             } elseif (isset($_SERVER['PHP_AUTH_USER'])) {
                 $basic_pass = isset($_SERVER['PHP_AUTH_PW']) ? $_SERVER['PHP_AUTH_PW'] : '';
-                $headers['Authorization'] = 'Basic ' . base64_encode($_SERVER['PHP_AUTH_USER'] . ':' . $basic_pass);
+                $headers['Authorization'] = 'Basic '.base64_encode($_SERVER['PHP_AUTH_USER'].':'.$basic_pass);
             } elseif (isset($_SERVER['PHP_AUTH_DIGEST'])) {
                 $headers['Authorization'] = $_SERVER['PHP_AUTH_DIGEST'];
             }
         }
+
         return $headers;
     }
 }
 
-if ( ! function_exists('stack') ) {
+if (!function_exists('stack')) {
     /**
-     * Create a new stack from array with data
+     * Create a new stack from array with data.
      *
      * @param array $data Data to create stack
+     *
      * @return Core\Stack\Stack
      */
     function stack(array $data = [])
@@ -61,25 +63,28 @@ if ( ! function_exists('stack') ) {
     }
 }
 
-if ( ! function_exists('dd') ) {
+if (!function_exists('dd')) {
     /**
-     * Dump a item on browser
+     * Dump a item on browser.
      *
      * @param mixed $params
+     *
      * @return void
      */
-    function dd(...$params) {
-        echo "<pre/>";
+    function dd(...$params)
+    {
+        echo '<pre/>';
         var_dump(...$params);
         die;
     }
 }
 
-if ( ! function_exists('hcrypt') ) {
+if (!function_exists('hcrypt')) {
     /**
-     * Hash a given value using php password_hash with crypt algorithm
+     * Hash a given value using php password_hash with crypt algorithm.
      *
      * @param string $value Value to hash
+     *
      * @return string
      */
     function hcrypt(string $value)

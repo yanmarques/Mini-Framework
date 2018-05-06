@@ -2,51 +2,50 @@
 
 namespace Core\Support;
 
-use Core\Exceptions\Files\FileNotFoundException;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
-use Core\Crypt\Crypter;
 
 class Config
 {
     /**
-     * Config is booted
+     * Config is booted.
      *
      * @var bool
      */
     private static $booted;
 
     /**
-     * Singleton instance of class
+     * Singleton instance of class.
      *
      * @var Core\Support\Config
      */
     private static $instance;
 
     /**
-     * ApplicationInterface
+     * ApplicationInterface.
      *
      * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
     /**
-     * File handler class
+     * File handler class.
      *
      * @var Core\Files\FileHandler
      */
     private $fileHandler;
 
     /**
-     * Stack with application configuration
+     * Stack with application configuration.
      *
      * @var Core\Stack\Stack
      */
     private $configuration;
 
     /**
-     * Constructor of class
+     * Constructor of class.
      *
      * @param Core\Files\FileHandler $app
+     *
      * @return Core\Support\Config
      */
     public function __construct(ApplicationInterface $app)
@@ -57,14 +56,15 @@ class Config
     }
 
     /**
-     * Boot config class
+     * Boot config class.
      *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
+     *
      * @return Core\Support\Config
      */
     public static function boot(ApplicationInterface $app)
     {
-        if ( ! self::$booted ) {
+        if (!self::$booted) {
             self::$instance = new self($app);
         }
 
@@ -72,16 +72,16 @@ class Config
     }
 
     /**
-     * Resolve application file configuration
+     * Resolve application file configuration.
      *
      * @return void
      */
     public function resolveConfiguration()
     {
-        $path = $this->app->baseDir() . '.env';
+        $path = $this->app->baseDir().'.env';
 
         // Configuration not exists
-        if ( ! $this->fileHandler->isFile($path) ) {
+        if (!$this->fileHandler->isFile($path)) {
             $this->create($path);
         }
 
@@ -93,9 +93,10 @@ class Config
     }
 
     /**
-     * Create configuration file
+     * Create configuration file.
      *
      * @param string $path Path to configuration
+     *
      * @return void
      */
     private function create(string $path)
@@ -104,7 +105,7 @@ class Config
     }
 
     /**
-     * Generate application key
+     * Generate application key.
      *
      * @return string
      */
@@ -114,18 +115,19 @@ class Config
     }
 
     /**
-     * Set application key
+     * Set application key.
      *
      * @return Core\Support\Config
      */
     private function setKey()
     {
         $this->app->services()->crypter()->setKey($this->key);
+
         return $this;
     }
 
     /**
-     * Render configuration template
+     * Render configuration template.
      *
      * @return string
      */
@@ -133,15 +135,15 @@ class Config
     {
         $data = [];
 
-        foreach($this->template() as $key => $value) {
-            $data[] = $key .'='. $value;
+        foreach ($this->template() as $key => $value) {
+            $data[] = $key.'='.$value;
         }
 
         return implode("\n", $data);
     }
 
     /**
-     * Render configuration from file content
+     * Render configuration from file content.
      *
      * @return Core\Stack\Stack
      */
@@ -152,11 +154,11 @@ class Config
         $data = [];
 
         // Iterate into each value
-        foreach($content as $value) {
+        foreach ($content as $value) {
             $value = explode('=', $value);
 
             // If key has a value
-            if ( isset($value[1]) ) {
+            if (isset($value[1])) {
                 $data[strtolower($value[0])] = $value[1];
             }
         }
@@ -165,31 +167,30 @@ class Config
     }
 
     /**
-     * Get configuration template
+     * Get configuration template.
      *
      * @return string
      */
     private function template()
     {
         return [
-            'ENV' => 'dev',
-            'KEY' => $this->generateKey(),
-            'DOMAIN' => 'localhost'
+            'ENV'    => 'dev',
+            'KEY'    => $this->generateKey(),
+            'DOMAIN' => 'localhost',
         ];
     }
 
     /**
-     * Dinamically access configuration stack
+     * Dinamically access configuration stack.
      *
      * @param mixed $name Configuration key
+     *
      * @return mixed|null
      */
     public function __get($name)
     {
-        if ( $this->configuration->has($name) ) {
+        if ($this->configuration->has($name)) {
             return $this->configuration->get($name);
         }
-
-        return null;
     }
 }

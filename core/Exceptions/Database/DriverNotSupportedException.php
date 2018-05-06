@@ -6,5 +6,4 @@ use Core\Exceptions\Exception;
 
 class DriverNotSupportedException extends Exception
 {
-
 }

@@ -2,54 +2,55 @@
 
 namespace Core\Database;
 
-use Doctrine\DBAL\Statement as DoctrineStatement;
 use Core\Interfaces\Database\ConnectionInterface;
+use Doctrine\DBAL\Statement as DoctrineStatement;
 use Doctrine\DBAL\Types\Type;
-use \PDO;
+use PDO;
 
 class Statement extends DoctrineStatement
-{   
+{
     /**
-     * The raw sql string
-     * 
+     * The raw sql string.
+     *
      * @var string
      */
     protected $rawSql;
 
     /**
-     * The sql string with bind values
-     * 
+     * The sql string with bind values.
+     *
      * @var string
      */
     protected $boundSql;
 
     /**
-     * Array with the sql bindings
-     * 
+     * Array with the sql bindings.
+     *
      * @var array
      */
     protected $bindings;
 
     /**
-     * The connection class
-     * 
+     * The connection class.
+     *
      * @var Core\Interfaces\Database\ConnectionInterface
      */
     protected $connection;
 
     /**
-     * Default statement fetch mode
-     * 
-     * @var integer
+     * Default statement fetch mode.
+     *
+     * @var int
      */
     protected $defaultFetchMode = PDO::FETCH_ASSOC;
 
     /**
-     * Class constructor
-     * 
-     * @param string $sql Raw sql
-     * @param array $bindings Array with sql bindings
+     * Class constructor.
+     *
+     * @param string                                       $sql        Raw sql
+     * @param array                                        $bindings   Array with sql bindings
      * @param Core\Interfaces\Database\ConnectionInterface $connection Connection class
+     *
      * @return void
      */
     public function __construct(string $sql, array $bindings, ConnectionInterface $connection)
@@ -65,21 +66,22 @@ class Statement extends DoctrineStatement
     }
 
     /**
-     * Use chaining design pattern to create an instance of class
-     * 
-     * @param string $sql Raw sql
-     * @param array $bindings Array with sql bindings
+     * Use chaining design pattern to create an instance of class.
+     *
+     * @param string                                       $sql        Raw sql
+     * @param array                                        $bindings   Array with sql bindings
      * @param Core\Interfaces\Database\ConnectionInterface $connection Connection class
+     *
      * @return Core\Database\Statement
      */
-    static function boot(string $sql, array $bindings, ConnectionInterface $connection)
+    public static function boot(string $sql, array $bindings, ConnectionInterface $connection)
     {
         return new static($sql, $bindings, $connection);
     }
 
     /**
-     * Return bounded sql string
-     * 
+     * Return bounded sql string.
+     *
      * @return string
      */
     public function toSql()
@@ -88,8 +90,8 @@ class Statement extends DoctrineStatement
     }
 
     /**
-     * Return query parameters
-     * 
+     * Return query parameters.
+     *
      * @return array
      */
     public function getParams()
@@ -100,12 +102,14 @@ class Statement extends DoctrineStatement
     public function executeQuery()
     {
         $this->execute();
+
         return $this->connection->getConnection()->executeQuery($this->sql, $this->bindings);
     }
 
     public function executeFetch()
     {
         $this->execute();
+
         return $this->fetch();
     }
 
@@ -115,26 +119,26 @@ class Statement extends DoctrineStatement
     }
 
     /**
-     * Use array with bindings to bind each "?" with a value
-     *      
+     * Use array with bindings to bind each "?" with a value.
+     *
      * @return void
      */
     protected function resolveBindings()
     {
-        foreach($this->bindings as $index => $value) {
+        foreach ($this->bindings as $index => $value) {
 
             // Binding value is integer
-            if ( \is_int($index) ) {
+            if (\is_int($index)) {
                 $index++;
             }
 
             $mode = Type::STRING;
 
-            if ( is_int($value) ) {
+            if (is_int($value)) {
                 $mode = Type::INTEGER;
-            } 
+            }
 
-            if ( \is_bool($value) ) {
+            if (\is_bool($value)) {
                 $mode = Type::BOOLEAN;
             }
 
@@ -144,8 +148,8 @@ class Statement extends DoctrineStatement
     }
 
     /**
-     * Configure statement to use PDO default fetch mode
-     * 
+     * Configure statement to use PDO default fetch mode.
+     *
      * @return void
      */
     protected function useDefaultFetchMode()

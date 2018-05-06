@@ -7,15 +7,15 @@ use Core\Database\Model;
 class User extends Model
 {
     /**
-     * The attributes to mass assignment
-     * 
+     * The attributes to mass assignment.
+     *
      * @var array
      */
     protected $fillable = [
         'id',
         'name',
         'password',
-        'email'
+        'email',
     ];
 
     protected static function boot()

@@ -3,7 +3,6 @@
 namespace Core\Database;
 
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
-use Core\Reflector\Reflector;
 use Core\Interfaces\Database\ConnectionInterface;
 use Core\Interfaces\Database\ManagerInterface;
 use Doctrine\DBAL\DBALException;
@@ -11,57 +10,57 @@ use Doctrine\DBAL\DBALException;
 class Connection implements ConnectionInterface
 {
     /**
-     * Connection singleton is booted
-     * 
+     * Connection singleton is booted.
+     *
      * @var bool
      */
     private static $booted = false;
 
     /**
-     * Connection instance
-     * 
+     * Connection instance.
+     *
      * @var Core\Database\Connection
      */
     private static $instance;
 
     /**
-     * Database driver
-     * 
+     * Database driver.
+     *
      * @var string
      */
     private $driver;
 
     /**
-     * Connection manager
-     * 
+     * Connection manager.
+     *
      * @var Core\Interfaces\Database\ManagerInterface
      */
     private $manager;
 
     /**
-     * Doctrine connection class
-     * 
+     * Doctrine connection class.
+     *
      * @var Doctrine\DBAL\Connection
      */
     private $connection;
 
     /**
-     * ApplicationInterface
-     * 
-     * @var Core\Interfaces\Bootstrapers\ApplicationInterface $app
+     * ApplicationInterface.
+     *
+     * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
-    private $app;   
+    private $app;
 
     public function __construct(ApplicationInterface $app)
     {
         $this->app = $app;
 
         $this->useDefaultManager();
-        
+
         $driver = $app->database()->driver;
 
         // Driver is not supported
-        if ( ! $this->supported($driver) ) {
+        if (!$this->supported($driver)) {
             throw new \RuntimeException("Database driver [$driver] are not supported.");
         }
 
@@ -69,26 +68,28 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Boot database singleton instance
-     * 
+     * Boot database singleton instance.
+     *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
+     *
      * @return Core\Database\Connection
      */
-    static function boot(ApplicationInterface $app=null)
+    public static function boot(ApplicationInterface $app = null)
     {
         // Database not booted
-        if ( ! static::$booted ) {
+        if (!static::$booted) {
             static::$booted = true;
             static::$instance = new static($app);
         }
-            
+
         return static::$instance;
     }
 
     /**
-     * Verify wheter driver is supported by application
-     * 
+     * Verify wheter driver is supported by application.
+     *
      * @param string $driver Driver name
+     *
      * @return bool
      */
     private function supported(string $driver)
@@ -97,8 +98,8 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Resolve connection class
-     * 
+     * Resolve connection class.
+     *
      * @return void
      */
     public function connect()
@@ -109,39 +110,40 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set default connection manager
-     * 
+     * Set default connection manager.
+     *
      * @return void
      */
     public function useDefaultManager()
     {
-        $this->setManager(new ConnectionManager);
+        $this->setManager(new ConnectionManager());
     }
 
     /**
-     * Get connection instance
-     * 
+     * Get connection instance.
+     *
      * @return mixed
      */
     public function getConnection()
     {
         // Not connected yet, use connect method to connect
-        if ( $this->connection == null ) {
+        if ($this->connection == null) {
             throw new ConnectionException('No connection available.');
         }
 
         // You are not connected on database
-        if ( ! $this->connection->isConnected() ) {
+        if (!$this->connection->isConnected()) {
             throw new ConnectionException('System is not connected.');
         }
 
         return $this->connection;
     }
 
-     /**
-     * Prepares a SQL statement
+    /**
+     * Prepares a SQL statement.
      *
      * @param string $statement The SQL string to prepare
+     *
      * @return Core\Database\Statement The prepared statement
      */
     public function prepare(string $statement, array $bindings)
@@ -156,8 +158,8 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get database name
-     * 
+     * Get database name.
+     *
      * @return string
      */
     public function getDbname()
@@ -166,8 +168,8 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get database host
-     * 
+     * Get database host.
+     *
      * @return string
      */
     public function getHost()
@@ -176,8 +178,8 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get database port
-     * 
+     * Get database port.
+     *
      * @return string
      */
     public function getPort()
@@ -186,8 +188,8 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get connection user
-     * 
+     * Get connection user.
+     *
      * @return string
      */
     public function getUser()
@@ -196,8 +198,8 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get connection password
-     * 
+     * Get connection password.
+     *
      * @return string
      */
     public function getPassword()
@@ -206,9 +208,10 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Set connection manager
-     * 
+     * Set connection manager.
+     *
      * @param Core\Interfaces\Database\ManagerInterface $manager Manager to create connections
+     *
      * @return void
      */
     public function setManager(ManagerInterface $manager)
@@ -217,8 +220,8 @@ class Connection implements ConnectionInterface
     }
 
     /**
-     * Get connection manager
-     * 
+     * Get connection manager.
+     *
      * @return Core\Interfaces\Database\ManagerInterface
      */
     public function getManager()

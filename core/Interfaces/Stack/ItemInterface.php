@@ -5,7 +5,7 @@ namespace Core\Interfaces\Stack;
 interface ItemInterface
 {
     /**
-     * When item is called as string
+     * When item is called as string.
      *
      * @return string
      */

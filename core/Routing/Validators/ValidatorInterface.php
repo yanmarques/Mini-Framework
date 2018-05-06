@@ -8,7 +8,7 @@ interface ValidatorInterface
 {
     public function matches(Route $route);
 
-    public function setNext(ValidatorInterface $validator);
+    public function setNext(self $validator);
 
     public function callNext(Route $route);
 }

@@ -7,8 +7,8 @@ use Core\Exceptions\Exception;
 class HttpResponseException extends Exception
 {
     /**
-     * Http status
-     * 
+     * Http status.
+     *
      * @var int
      */
     protected $status;
@@ -20,8 +20,8 @@ class HttpResponseException extends Exception
     }
 
     /**
-     * Get http status
-     * 
+     * Get http status.
+     *
      * @return int
      */
     public function getStatus()

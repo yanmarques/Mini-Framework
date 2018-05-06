@@ -3,14 +3,12 @@
 namespace Core\Http;
 
 use Core\Interfaces\Http\ResponseInterface;
-use Core\Http\Request;
-use Core\Http\HeadersStack;
 use Core\Views\View;
 
 class Response implements ResponseInterface
 {
     /**
-     * Http response status
+     * Http response status.
      */
     const CONTINUE = 100;
     const SWITCHING_PROTOCOLS = 101;
@@ -54,7 +52,7 @@ class Response implements ResponseInterface
     const HTTP_VERSION_NOT_SUPPORTED = 505;
 
     /**
-     * Status Code with it's correspondent status text
+     * Status Code with it's correspondent status text.
      *
      * @var array
      */
@@ -106,70 +104,71 @@ class Response implements ResponseInterface
         '503' => 'Service Unavailable',
         '504' => 'Gateway Timeout',
         '505' => 'HTTP Version Not Supported',
-        '511' => 'Network Authentication Required'
+        '511' => 'Network Authentication Required',
     ];
 
     /**
-     * ApplicationInterface request
+     * ApplicationInterface request.
      *
      * @var Core\Http\Request
      */
     private $request;
 
     /**
-     * Response content
+     * Response content.
      *
      * @var string
      */
     protected $content;
 
     /**
-     * Response headers
+     * Response headers.
      *
      * @var array
      */
     private $headers;
 
-     /**
-     * Protocol version
+    /**
+     * Protocol version.
      *
      * @var string
      */
     private $version = '1.1';
 
     /**
-     * View to render
+     * View to render.
      *
      * @var Core\Views\View
      */
     private $view;
 
     /**
-     * Redirect response
+     * Redirect response.
      *
      * @var Core\Http\RedirectResponse
      */
     private $redirect;
 
     /**
-     * Response status
+     * Response status.
      *
      * @var int
      */
     protected $statusCode;
 
     /**
-     * Response status text
+     * Response status text.
      *
      * @var string
      */
     protected $statusText;
 
     /**
-     * Constructor of class
+     * Constructor of class.
      *
      * @param $response
      * @param int $status Status code
+     *
      * @return Core\Http\Response
      */
     public function __construct($response, int $status = 200)
@@ -180,7 +179,7 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Send http response
+     * Send http response.
      *
      * @return void
      */
@@ -197,46 +196,46 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Send headers if not sent
+     * Send headers if not sent.
      *
      * @return Core\Http\Response
      */
     private function sendHeaders()
     {
         // Headers already sent
-        if ( headers_sent() ) {
+        if (headers_sent()) {
             return $this;
         }
 
         // Response is a redirect
-        if ( $this->headers->has('Location') ) {
+        if ($this->headers->has('Location')) {
             $location = $this->headers->pull('Location');
         }
-        
-         // Send response headers
+
+        // Send response headers
         $this->headers->each(function ($value, $key) {
-            header($key .": " . $value, false, $this->statusCode);
+            header($key.': '.$value, false, $this->statusCode);
         });
 
         // Send HTTP protocol informations
-        header(sprintf("HTTP/%s %s %s", $this->version, $this->statusCode, $this->statusText), true, $this->statusCode);
+        header(sprintf('HTTP/%s %s %s', $this->version, $this->statusCode, $this->statusText), true, $this->statusCode);
 
         // Redirect to location
-        if ( isset($location) ) {
-            header('Location: ' . $location);
+        if (isset($location)) {
+            header('Location: '.$location);
         }
 
         return $this;
     }
 
     /**
-     * Send response content through buffer
+     * Send response content through buffer.
      *
      * @return Core\Http\Response
      */
     private function sendContent()
     {
-        if ( $this->view ) {
+        if ($this->view) {
             $this->view->render();
         } else {
             echo $this->content;
@@ -246,41 +245,42 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Set response status
+     * Set response status.
      *
      * @param int $statusCode
+     *
      * @return Core\Http\Response
      */
     public function setStatusCode(int $statusCode)
     {
-        if ( ! static::validStatus($statusCode) ) {
+        if (!static::validStatus($statusCode)) {
             throw new \RuntimeException("Invalid status code [{$statusCode}]");
         }
 
         $this->statusCode = $statusCode;
-        $this->statusText = self::$statusTexts[ (string) $statusCode];
+        $this->statusText = self::$statusTexts[(string) $statusCode];
+
         return $this;
     }
 
-
     /**
-     * Get application default response headers
+     * Get application default response headers.
      *
      * @return array
      */
     public static function getDefaultHeaders()
     {
         return [
-            'X-XSS-Protection' => '1; mode=block',
-            'Content-Type' => 'text/html; charset=utf-8',
+            'X-XSS-Protection'  => '1; mode=block',
+            'Content-Type'      => 'text/html; charset=utf-8',
             'Transfer-Encoding' => 'gzip',
             // 'Content-Encoding' => 'gzip, compress',
-            'X-Powerer-By' => 'PHP/7.1.11'
+            'X-Powerer-By' => 'PHP/7.1.11',
         ];
     }
 
     /**
-     * Set default headers
+     * Set default headers.
      *
      * @return Core\Http\HeadersStack
      */
@@ -290,17 +290,18 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Resolve response
+     * Resolve response.
      *
      * @param mixed $response Response
-     * @param int $status
+     * @param int   $status
+     *
      * @return void
      */
     private function resolveResponse($response, int $status)
     {
-        if ( $response instanceof RedirectResponse ) {
+        if ($response instanceof RedirectResponse) {
             $this->resolveRedirect($response);
-        } elseif ( $response instanceof View ) {
+        } elseif ($response instanceof View) {
             $this->view = $response;
         } else {
             $this->content = (string) $response;
@@ -308,16 +309,17 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Resolve redirect response
+     * Resolve redirect response.
      *
      * @param Core\Http\RedirectResponse $response
+     *
      * @return void
      */
     private function resolveRedirect(RedirectResponse $response)
     {
         $this->redirect = $response;
 
-        if ( $response->isView() ) {
+        if ($response->isView()) {
             $this->view = $response->getView();
         }
 
@@ -325,67 +327,73 @@ class Response implements ResponseInterface
     }
 
     /**
-     * Verify wheter status is valid
+     * Verify wheter status is valid.
      *
      * @param int $status Status is valid
+     *
      * @return bool
      */
-    static function validStatus(int $status)
+    public static function validStatus(int $status)
     {
         return in_array((string) $status, array_keys(self::$statusTexts));
     }
 
     /**
-     * Verify wheter an HTTP status is success type
+     * Verify wheter an HTTP status is success type.
      *
      * @param int $status HTTP status code
+     *
      * @return bool
      */
-    static function isSuccessfull(int $status)
+    public static function isSuccessfull(int $status)
     {
         return ($status >= 200 && $status < 300) && self::validStatus($status);
     }
 
     /**
-     * Verify wheter an HTTP status is reading type
+     * Verify wheter an HTTP status is reading type.
      *
      * @param int $status HTTP status code
+     *
      * @return bool
      */
-    static function isReading(int $status)
+    public static function isReading(int $status)
     {
         return ($status >= 100 && $status < 200) && self::validStatus($status);
     }
 
     /**
-     * Verify wheter an HTTP status is redirect type
+     * Verify wheter an HTTP status is redirect type.
      *
      * @param int $status HTTP status code
+     *
      * @return bool
      */
-    static function isRedirect(int $status)
+    public static function isRedirect(int $status)
     {
         return ($status >= 300 && $status < 400) && self::validStatus($status);
     }
 
     /**
-     * Verify wheter an HTTP status is client error type
+     * Verify wheter an HTTP status is client error type.
      *
      * @param int $status HTTP status code
+     *
      * @return bool
      */
-    static function isClientError(int $status)
+    public static function isClientError(int $status)
     {
         return ($status >= 400 && $status < 500) && self::validStatus($status);
     }
 
     /**
-     * Verify wheter an HTTP status is server error type
+     * Verify wheter an HTTP status is server error type.
      *
      * @param int $status HTTP status code
+     *
      * @return bool
      */
-    static function isServerError(int $status)
+    public static function isServerError(int $status)
     {
         return ($status >= 400 && $status < 500) && self::validStatus($status);
     }

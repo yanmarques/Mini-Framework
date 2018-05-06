@@ -2,21 +2,20 @@
 
 namespace Core\Routing;
 
-use Core\Http\RequestKernel;
-
 class RouteMatcher
 {
     /**
-     * Route to match
+     * Route to match.
      *
      * @var Core\Routing\Route
      */
     private $route;
 
     /**
-     * Constructor of class
+     * Constructor of class.
      *
      * @param Core\Routing\Route $route
+     *
      * @return Core\Routing\RouteMatcher
      */
     public function __construct(Route $route)
@@ -25,9 +24,10 @@ class RouteMatcher
     }
 
     /**
-     * Check an route prefix against an uri
+     * Check an route prefix against an uri.
      *
      * @param string $uri Request uri
+     *
      * @return bool
      */
     public function matchAgainstRoute(string $uri, string $method)
@@ -36,7 +36,7 @@ class RouteMatcher
         $matches = preg_match($this->buildPattern(), $uri, $uriFound);
 
         // If regex got something
-        if ( $matches && ! empty($uriFound) ) {
+        if ($matches && !empty($uriFound)) {
 
             // Check if match found is like the request URI
             return $uriFound[0] == $uri;
@@ -46,13 +46,14 @@ class RouteMatcher
     }
 
     /**
-     * Build the regex pattern for route prefix
+     * Build the regex pattern for route prefix.
      *
      * @return string
      */
     private function buildPattern()
     {
         $url = str_replace('/', '\/', $this->route->uri());
+
         return "/\/?($url)+\/?/";
     }
 }

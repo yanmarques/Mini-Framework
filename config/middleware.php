@@ -13,7 +13,7 @@ return [
     */
     'global' => [
         Core\Http\Middleware\NullableStringMiddleware::class,
-        Core\Http\Middleware\CSRFMiddleware::class
+        Core\Http\Middleware\CSRFMiddleware::class,
     ],
 
     /*
@@ -26,6 +26,6 @@ return [
     */
     'web' => [
         //
-    ]
+    ],
 
 ];

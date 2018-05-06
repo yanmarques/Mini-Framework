@@ -7,66 +7,68 @@ use Core\Exceptions\Crypter\CrypterException;
 class Crypter
 {
     /**
-     * Crypter is booted
+     * Crypter is booted.
      *
      * @var bool
      */
     private static $booted;
 
     /**
-     * Crypter instance
+     * Crypter instance.
      *
      * @var Core\Crypter\Crypter
      */
     private static $instance;
 
     /**
-     * Cipher name
+     * Cipher name.
      *
      * @var string
      */
     private $cipher;
 
     /**
-     * Length of cipher
+     * Length of cipher.
      *
      * @var int
      */
     private $length;
 
     /**
-     * ApplicationInterface key
+     * ApplicationInterface key.
      *
      * @var string
      */
     private $key;
 
     /**
-     * Constructor of cryptographic class
+     * Constructor of cryptographic class.
      *
      * @param string $cipher Cipher name to use
+     *
      * @return Core\Crypt\Crypter
      */
     public function __construct(string $cipher)
     {
         // Cipher is not supported
-        if ( ! static::supported($cipher) ) 
+        if (!static::supported($cipher)) {
             throw new \RuntimeException("The only ciphers supported are AES-256-CBC, AES-128-CBC, not [{$cipher}]");
-
+        }
         $this->cipher = $cipher;
         $this->length = $this->length();
         $this->key = static::random($this->length);
     }
 
     /**
-     * Boot crypter
+     * Boot crypter.
      *
      * @param string $cipher
+     *
      * @return Core\Crypter\Crypter
      */
     public static function boot(string $cipher)
     {
-        if ( ! self::$booted ) {
+        if (!self::$booted) {
             self::$instance = new self($cipher);
         }
 
@@ -74,20 +76,22 @@ class Crypter
     }
 
     /**
-     * Verify if given cipher is supported by application
+     * Verify if given cipher is supported by application.
      *
      * @param string $cipher Cipher name
+     *
      * @return bool
      */
-    static function supported(string $cipher)
+    public static function supported(string $cipher)
     {
-        return ($cipher == 'AES-256-CBC' || $cipher == 'AES-128-CBC');
+        return $cipher == 'AES-256-CBC' || $cipher == 'AES-128-CBC';
     }
 
     /**
-     * Verify if given cipher is supported by application
+     * Verify if given cipher is supported by application.
      *
      * @param string $cipher Cipher name
+     *
      * @return bool
      */
     public function validKey(string $key)
@@ -99,7 +103,7 @@ class Crypter
     }
 
     /**
-     * Get application key
+     * Get application key.
      *
      * @return string
      */
@@ -109,32 +113,35 @@ class Crypter
     }
 
     /**
-     * Set a new application key
+     * Set a new application key.
      *
      * @param string $key New application key
+     *
      * @return Core\Cypt\Crypter
      */
     public function setKey(string $key)
     {
-        if ( ! $this->validKey($key) ) {
+        if (!$this->validKey($key)) {
             throw new CrypterException("Invalid key length for cipher [$this->cipher]");
         }
 
         $this->key = $key;
+
         return $this;
     }
 
-     /**
-     * Generate a cryptographically secure random bytes
+    /**
+     * Generate a cryptographically secure random bytes.
      *
      * @param int $length Length of bytes
+     *
      * @return string
      */
-    static function random(int $length = 16)
+    public static function random(int $length = 16)
     {
         $string = '';
 
-        while ( ($str_len = strlen($string)) < $length ) {
+        while (($str_len = strlen($string)) < $length) {
             $size_left = $length - $str_len;
 
             $string .= substr(\str_replace(['/', '=', '+'], '', base64_encode(\random_bytes($size_left))), 0, $size_left);
@@ -144,12 +151,14 @@ class Crypter
     }
 
     /**
-     * Encrypt value using encrypter cipher
+     * Encrypt value using encrypter cipher.
+     *
+     *
+     * @param string $value     Value to encrypt
+     * @param bool   $serialize Wheter should serialize value before encrypt
      *
      * @throws Core\Exceptions\Crypter\CrypterException
      *
-     * @param string $value Value to encrypt
-     * @param bool $serialize Wheter should serialize value before encrypt
      * @return string
      */
     public function encrypt(string $value, bool $serialize = true)
@@ -169,7 +178,7 @@ class Crypter
         );
 
         // Data returned false
-        if ( ! $data ) {
+        if (!$data) {
             throw new CrypterException('Data could not be encrypted.');
         }
 
@@ -180,7 +189,7 @@ class Crypter
         $json = \json_encode(compact('data', 'iv', 'hmac'));
 
         // JSON has errors
-        if ( json_last_error() !== JSON_ERROR_NONE ) {
+        if (json_last_error() !== JSON_ERROR_NONE) {
             throw new CrypterException('Data could not be encrypted.');
         }
 
@@ -188,12 +197,14 @@ class Crypter
     }
 
     /**
-     * Decrypt payload using OpenSSL
+     * Decrypt payload using OpenSSL.
+     *
+     *
+     * @param string $payload     Payload to decrypt
+     * @param bool   $unserialize Should unserialize data after decrypt
      *
      * @throws Core\Exceptions\Crypter\CrypterException
      *
-     * @param string $payload Payload to decrypt
-     * @param bool $unserialize Should unserialize data after decrypt
      * @return string
      */
     public function decrypt(string $payload, bool $unserialize = true)
@@ -213,7 +224,7 @@ class Crypter
             $iv
         );
 
-        if ( ! $decrypted ) {
+        if (!$decrypted) {
             throw new CrypterException('Could not decrypt payload.');
         }
 
@@ -221,11 +232,13 @@ class Crypter
     }
 
     /**
-     * Get JSON payload
+     * Get JSON payload.
+     *
+     *
+     * @param string $payload
      *
      * @throws Core\Exceptions\Crypter\CrypterException
      *
-     * @param string $payload
      * @return array
      */
     private function getPayload(string $payload)
@@ -234,11 +247,11 @@ class Crypter
 
         // Check wheter payload is a valid payload, with valid keys
         // and validate it's authenticity using HMAC to calculate the hash
-        if ( ! $this->validJson($payload) ) {
+        if (!$this->validJson($payload)) {
             throw new CrypterException('Invalid JSON payload.');
         }
 
-        if ( ! $this->validHMAC($payload) ) {
+        if (!$this->validHMAC($payload)) {
             throw new CrypterException('Failed authenticating payload.');
         }
 
@@ -246,9 +259,10 @@ class Crypter
     }
 
     /**
-     * Validate payload JSON with valid keys
+     * Validate payload JSON with valid keys.
      *
      * @param mixed $payload Payload
+     *
      * @return bool
      */
     private function validJson($payload)
@@ -259,9 +273,10 @@ class Crypter
     }
 
     /**
-     * Validate payload JSON with valid keys
+     * Validate payload JSON with valid keys.
      *
      * @param mixed $payload Payload
+     *
      * @return bool
      */
     private function validHMAC($payload)
@@ -274,10 +289,11 @@ class Crypter
     }
 
     /**
-     * Get a calculated HMAC from payload initial vector and data using bytes as key
+     * Get a calculated HMAC from payload initial vector and data using bytes as key.
      *
      * @param mixed $payload
      * @param mixed $bytes@
+     *
      * @return string
      */
     private function calculateHMAC($payload, $bytes)
@@ -286,10 +302,11 @@ class Crypter
     }
 
     /**
-     * Calculate HMAC from initial vector and encrypted data
+     * Calculate HMAC from initial vector and encrypted data.
      *
-     * @param mixed $iv Initial vector
+     * @param mixed $iv   Initial vector
      * @param mixed $data Encrypted data
+     *
      * @return string
      */
     private function hmac($iv, $data)
@@ -298,12 +315,12 @@ class Crypter
     }
 
     /**
-     * Get cipher length
+     * Get cipher length.
      *
      * @return int
      */
     private function length()
     {
-        return $this->cipher == 'AES-128-CBC' ? 16:32;
+        return $this->cipher == 'AES-128-CBC' ? 16 : 32;
     }
 }

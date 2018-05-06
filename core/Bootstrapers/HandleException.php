@@ -5,10 +5,10 @@ namespace Core\Bootstrapers;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class HandleException
-{   
+{
     /**
-     * ApplicationInterface
-     * 
+     * ApplicationInterface.
+     *
      * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
@@ -19,25 +19,26 @@ class HandleException
 
         \error_reporting(-1);
 
-        \set_error_handler([$this, "handleError"]);
+        \set_error_handler([$this, 'handleError']);
 
-        \set_exception_handler([$this, "handleException"]);
+        \set_exception_handler([$this, 'handleException']);
     }
 
     /**
-     * Boot handler
-     * 
+     * Boot handler.
+     *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
+     *
      * @return void
      */
-    static function boot(ApplicationInterface $app)
+    public static function boot(ApplicationInterface $app)
     {
         return new self($app);
     }
 
     /**
-     * Handle uncaught exception
-     * 
+     * Handle uncaught exception.
+     *
      * @param mixed $e Exception
      */
     public function handleException($e)
@@ -47,12 +48,13 @@ class HandleException
     }
 
     /**
-     * Handle php errors
-     * 
+     * Handle php errors.
+     *
      * @param mixed $e Errors
      */
     public function handleError($errno, $errstr, $errfile, $errline)
     {
-        echo "Error: {$errstr}. File: {$errfile}. Line: {$errline}\n";die;
+        echo "Error: {$errstr}. File: {$errfile}. Line: {$errline}\n";
+        die;
     }
 }

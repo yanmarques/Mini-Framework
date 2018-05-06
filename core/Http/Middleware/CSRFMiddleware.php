@@ -2,17 +2,18 @@
 
 namespace Core\Http\Middleware;
 
+use Core\Crypt\Crypter;
+use Core\Exceptions\Http\CSRFException;
 use Core\Http\Request;
 use Core\Interfaces\Http\MiddlewareInterface;
-use Core\Exceptions\Http\CSRFException;
-use Core\Crypt\Crypter;
 
 class CSRFMiddleware implements MiddlewareInterface
 {
     /**
-     * Apply middleware to request
+     * Apply middleware to request.
      *
      * @param App\Http\Request $request
+     *
      * @return
      */
     public function apply(Request $request)
@@ -20,17 +21,18 @@ class CSRFMiddleware implements MiddlewareInterface
         $tokenMatchs = $this->tokenMatchs($request);
         $request->session()->set('CSRFToken', Crypter::random(64));
 
-        if ( ! $request->isShow() && ! $tokenMatchs ) {
-            throw new CSRFException("Cross Site Forgery Request exception.");
+        if (!$request->isShow() && !$tokenMatchs) {
+            throw new CSRFException('Cross Site Forgery Request exception.');
         }
 
         return $request;
     }
 
     /**
-     * Verify wheter token from request matchs CSRFToken from session
+     * Verify wheter token from request matchs CSRFToken from session.
      *
      * @param Core\Http\Request $request Request
+     *
      * @return bool
      */
     private function tokenMatchs(Request $request)

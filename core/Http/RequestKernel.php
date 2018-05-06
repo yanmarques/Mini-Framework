@@ -2,192 +2,191 @@
 
 namespace Core\Http;
 
-use Core\Interfaces\Http\RequestKernelInterface;
 use Core\Http\Abstracts\RequestFactory;
-use Core\Http\IpUtils;
+use Core\Interfaces\Http\RequestKernelInterface;
 
 class RequestKernel extends RequestFactory implements RequestKernelInterface
 {
     /**
-     * Http methods
+     * Http methods.
      */
-    const POST    = 'POST';
-    const GET     = 'GET';
-    const PUT     = 'PUT';
-    const PATCH   = 'PATCH';
-    const DELETE  = 'DELETE';
+    const POST = 'POST';
+    const GET = 'GET';
+    const PUT = 'PUT';
+    const PATCH = 'PATCH';
+    const DELETE = 'DELETE';
     const OPTIONS = 'OPTIONS';
 
     /**
-     * Request factory should override global configurations
+     * Request factory should override global configurations.
      *
      * @var bool
      */
     protected static $overrideGlobalConfigurations = false;
 
-     /**
-     * Gateway php interface
+    /**
+     * Gateway php interface.
      *
      * @var string
      */
     protected $interface;
 
     /**
-     * Server Ip address
+     * Server Ip address.
      *
      * @var string|null
      */
     protected $address;
 
     /**
-     * Server hostname
+     * Server hostname.
      *
      * @var string
      */
     protected $hostname;
 
     /**
-     * Protocol name
+     * Protocol name.
      *
      * @var string
      */
     protected $protocol;
 
     /**
-     * Protocol name
+     * Protocol name.
      *
      * @var string
      */
     protected $headers;
 
     /**
-     * Server identification
+     * Server identification.
      *
      * @var string
      */
     protected $server;
 
     /**
-     * Protocol method
+     * Protocol method.
      *
      * @var string
      */
     protected $method;
 
     /**
-     * Time when request was made
+     * Time when request was made.
      *
      * @var string
      */
     protected $timestamp;
 
     /**
-     * Request query string
+     * Request query string.
      *
      * @var string
      */
     protected $queryString;
 
     /**
-     * Request uri
+     * Request uri.
      *
      * @var string
      */
     protected $requestUri;
 
-     /**
-     * URI used by user before query string
+    /**
+     * URI used by user before query string.
      *
      * @var string
      */
     protected $pathInfo;
 
     /**
-     * Document root where script has run
+     * Document root where script has run.
      *
      * @var string
      */
     protected $root;
 
     /**
-     * Host header
+     * Host header.
      *
      * @var string
      */
     protected $httpHost;
 
     /**
-     * Referer header
+     * Referer header.
      *
      * @var string
      */
     protected $httpReferer;
 
     /**
-     * Http user agent
+     * Http user agent.
      *
      * @var string
      */
     protected $userAgent;
 
-     /**
-     * Script queried through HTTPS protocol
+    /**
+     * Script queried through HTTPS protocol.
      *
      * @var string
      */
     protected $https;
 
     /**
-     * User remote ip
+     * User remote ip.
      *
      * @var string
      */
     protected $remoteAddress;
 
     /**
-     * DNS host
+     * DNS host.
      *
      * @var string
      */
     protected $remoteHost;
 
     /**
-     * Remote port used to comunicate with server
+     * Remote port used to comunicate with server.
      *
      * @var string
      */
     protected $remotePort;
 
     /**
-     * Server port used to serve page
+     * Server port used to serve page.
      *
      * @var string
      */
     protected $serverPort;
 
     /**
-     * GET parameters
+     * GET parameters.
      *
      * @var array|null
      */
     protected $get;
 
     /**
-     * POST parameters
+     * POST parameters.
      *
      * @var array|null
      */
     protected $post;
 
     /**
-     * COOKIE parameters
+     * COOKIE parameters.
      *
      * @var array|null
      */
     protected $cookies;
 
     /**
-     * SESSION parameters
+     * SESSION parameters.
      *
      * @var array|null
      */
@@ -223,7 +222,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Boot request kernel and return an request
+     * Boot request kernel and return an request.
      *
      * @return Core\Http|Request
      */
@@ -231,28 +230,29 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     {
         $instance = new static(...self::globalAttributes());
         $instance->creating();
+
         return $instance;
     }
 
     /**
-     * Get attributes from globals server variables
-     * 
+     * Get attributes from globals server variables.
+     *
      * @return array
      */
     public static function globalAttributes()
     {
         return [
-            self::getInterface(), self::getServerAddr(), self::getHostName(), self::getProtocol(), 
-            self::getHeaders(), self::getServername(), self::getMethod(), self::getRequestTime(), 
-            self::getRequestQueryString(), self::getRequestUri(), self::getPathInfo(), self::getDocumentRoot(), 
-            self::getHttpHost(), self::getHttpReferer(), self::getUserAgent(), self::getHttps(), 
-            self::getRemoteAddr(), self::getRemoteHost(), self::getRemotePort(), self::getServerPort(), 
-            $_GET, $_POST, $_COOKIE, self::getSession()
-        ];  
+            self::getInterface(), self::getServerAddr(), self::getHostName(), self::getProtocol(),
+            self::getHeaders(), self::getServername(), self::getMethod(), self::getRequestTime(),
+            self::getRequestQueryString(), self::getRequestUri(), self::getPathInfo(), self::getDocumentRoot(),
+            self::getHttpHost(), self::getHttpReferer(), self::getUserAgent(), self::getHttps(),
+            self::getRemoteAddr(), self::getRemoteHost(), self::getRemotePort(), self::getServerPort(),
+            $_GET, $_POST, $_COOKIE, self::getSession(),
+        ];
     }
 
     /**
-     * Get server interface
+     * Get server interface.
      *
      * @return string|null
      */
@@ -260,9 +260,9 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     {
         return $_SERVER['GATEWAY_INTERFACE'] ?? null;
     }
-    
+
     /**
-     * Get server IP address if is set
+     * Get server IP address if is set.
      *
      * @return string|null
      */
@@ -272,7 +272,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get identification if server the script is being executed
+     * Get identification if server the script is being executed.
      *
      * @return string|null
      */
@@ -283,7 +283,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
 
     /**
      * Get current protocol server is using
-     * If not set, gets default 'HTTP'
+     * If not set, gets default 'HTTP'.
      *
      * @return string
      */
@@ -292,8 +292,8 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
         return $_SERVER['SERVER_PROTOCOL'] ?? 'http';
     }
 
-     /**
-     * Get headers
+    /**
+     * Get headers.
      *
      * @return array
      */
@@ -303,7 +303,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get server identification
+     * Get server identification.
      *
      * @return string|null
      */
@@ -313,7 +313,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get request method
+     * Get request method.
      *
      * @return string|null
      */
@@ -323,7 +323,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get request timestamp
+     * Get request timestamp.
      *
      * @return int
      */
@@ -333,7 +333,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get query string from request URI
+     * Get query string from request URI.
      *
      * @return array
      */
@@ -343,7 +343,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get normalized request URI
+     * Get normalized request URI.
      *
      * @return array
      */
@@ -353,8 +353,8 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get uri before query string
-     * 
+     * Get uri before query string.
+     *
      * @return string|null
      */
     protected static function getPathInfo()
@@ -363,7 +363,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get document root
+     * Get document root.
      *
      * @return string|null
      */
@@ -373,7 +373,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get http host header
+     * Get http host header.
      *
      * @return string|null
      */
@@ -383,7 +383,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get http referer header
+     * Get http referer header.
      *
      * @return string|null
      */
@@ -393,7 +393,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get request user agent
+     * Get request user agent.
      *
      * @return string|null
      */
@@ -403,7 +403,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get if request uses HTTPS protocol
+     * Get if request uses HTTPS protocol.
      *
      * @return bool
      */
@@ -413,7 +413,7 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get remote addr where request as done
+     * Get remote addr where request as done.
      *
      * @return string
      */
@@ -423,8 +423,8 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get DNS host
-     * 
+     * Get DNS host.
+     *
      * @return string|null
      */
     protected static function getRemoteHost()
@@ -433,8 +433,8 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get user port
-     * 
+     * Get user port.
+     *
      * @return string|null
      */
     protected static function getRemotePort()
@@ -442,9 +442,9 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
         return $_SERVER['REMOTE_PORT'] ?? null;
     }
 
-     /**
-     * Get server port
-     * 
+    /**
+     * Get server port.
+     *
      * @return string|null
      */
     protected static function getServerPort()
@@ -453,8 +453,8 @@ class RequestKernel extends RequestFactory implements RequestKernelInterface
     }
 
     /**
-     * Get php session
-     * 
+     * Get php session.
+     *
      * @return string|null
      */
     protected static function getSession()

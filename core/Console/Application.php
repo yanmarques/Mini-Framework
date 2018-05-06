@@ -2,21 +2,15 @@
 
 namespace Core\Console;
 
-use Core\Interfaces\Bootstrapers\ApplicationInterface;
-use Core\Services\Stack\ServicesStack;
-use Core\Services\Dispatcher\ServiceDispatcher;
-use Core\Files\FileHandler;
-use Core\Files\BasePath;
-use Core\Http\Request;
-use Core\Http\Response;
-use Core\Http\RedirectResponse;
-use Core\Views\View;
-use Core\Exceptions\Reporter;
-use Core\Reflector\Reflector;
-use Core\Support\Creator;
 use Core\Bootstrapers\HandleException;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
+use Core\Exceptions\Reporter;
+use Core\Files\BasePath;
+use Core\Files\FileHandler;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
+use Core\Reflector\Reflector;
+use Core\Services\Dispatcher\ServiceDispatcher;
+use Core\Services\Stack\ServicesStack;
+use Core\Support\Creator;
 use Symfony\Component\Console\Application as SymfonyApplication;
 
 class Application extends SymfonyApplication implements ApplicationInterface
@@ -24,72 +18,73 @@ class Application extends SymfonyApplication implements ApplicationInterface
     use BasePath;
 
     /**
-     * ApplicationInterface instance
+     * ApplicationInterface instance.
      *
      * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private static $instance;
 
     /**
-     * Base application directory
+     * Base application directory.
      *
      * @var string
      */
     private $baseDir;
 
     /**
-     * Services stack
+     * Services stack.
      *
      * @var Core\Services\ServiceStack
      */
     private $services;
 
     /**
-     * Encryption stack
+     * Encryption stack.
      *
      * @var array
      */
     private $encryption;
 
     /**
-     * MIddleware stack
+     * MIddleware stack.
      *
      * @var Core\Stack\Stack
      */
     private $middleware;
 
     /**
-     * Database configuration
-     * 
+     * Database configuration.
+     *
      * @var Core\Stack\Stack
      */
     private $database;
 
     /**
-     * Handle file actions
+     * Handle file actions.
      *
      * @var Core\Files\FileHandler
      */
     private $fileHandler;
 
     /**
-     * Observers configuration
-     * 
+     * Observers configuration.
+     *
      * @var Core\Stack\Stack
      */
     private $observers;
 
-     /**
-     * Exception reporter
+    /**
+     * Exception reporter.
      *
      * @var Core\Exceptions\Reporter
      */
     private $exceptionReporter;
 
-     /**
-     * Constructor of class
+    /**
+     * Constructor of class.
      *
      * @param string $baseDir ApplicationInterface directory
+     *
      * @return Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     public function __construct(string $baseDir)
@@ -99,26 +94,26 @@ class Application extends SymfonyApplication implements ApplicationInterface
 
         // Before application boot
         $this->booting();
-        
+
         // Boot aplication
         $this->boot();
-        
+
         // // Run callbacks
         $this->booted();
     }
 
     /**
-     * Get an instance of application
+     * Get an instance of application.
      *
      * @return Core\Interfaces\Bootstrapers\ApplicationInterface
      */
-    static function instance()
+    public static function instance()
     {
         return self::$instance;
     }
 
     /**
-     * Return services stack class
+     * Return services stack class.
      *
      * @return Core\Stack\Stack
      */
@@ -128,7 +123,7 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Return encryption stack class
+     * Return encryption stack class.
      *
      * @return Core\Stack\Stack
      */
@@ -138,7 +133,7 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Return middleware stack class
+     * Return middleware stack class.
      *
      * @return Core\Stack\Stack
      */
@@ -148,7 +143,7 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Return file handler class
+     * Return file handler class.
      *
      * @return Core\Files\FileHandler
      */
@@ -158,7 +153,7 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Return exception reporter
+     * Return exception reporter.
      *
      * @return Core\Exceptions\Reporter
      */
@@ -168,7 +163,7 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Return database configuration
+     * Return database configuration.
      *
      * @return Core\Stack\Stack
      */
@@ -178,8 +173,8 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Return observers configuration
-     * 
+     * Return observers configuration.
+     *
      * @return Core\Stack\Stack
      */
     public function observers()
@@ -188,19 +183,20 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Return application base directory
+     * Return application base directory.
      *
      * @return string
      */
     public function baseDir()
     {
-        return $this->baseDir . DIRECTORY_SEPARATOR;
+        return $this->baseDir.DIRECTORY_SEPARATOR;
     }
 
     /**
-     * Handle an an $input argument
+     * Handle an an $input argument.
      *
      * @param mixed
+     *
      * @return mixed
      */
     public function handle($input, $secondary = null)
@@ -210,22 +206,22 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Executed before application boot services
-     * 
+     * Executed before application boot services.
+     *
      * @return void
      */
     public function booting()
     {
         $this->fileHandler = new FileHandler($this);
-        $this->services = new ServicesStack;
+        $this->services = new ServicesStack();
 
         // Include some helper functions to boot system
         $this->fileHandler->include('core/Support/baseFunctions.php');
     }
 
     /**
-     * Boot application
-     * 
+     * Boot application.
+     *
      * @return void
      */
     public function boot()
@@ -236,8 +232,8 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Executed after application has been booted
-     * 
+     * Executed after application has been booted.
+     *
      * @return void
      */
     public function booted()
@@ -247,14 +243,14 @@ class Application extends SymfonyApplication implements ApplicationInterface
         // Include all application helper functions
         $this->fileHandler->include('core/Console/helpers.php');
 
-        foreach($this->commands() as $command) {
+        foreach ($this->commands() as $command) {
             $this->add(new $command($this));
         }
     }
 
     /**
-     * Register initial singleton classes
-     * 
+     * Register initial singleton classes.
+     *
      * @return void
      */
     private function registerSingletons()
@@ -264,7 +260,7 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Initialize all services from configuration
+     * Initialize all services from configuration.
      *
      * @return void
      */
@@ -282,18 +278,18 @@ class Application extends SymfonyApplication implements ApplicationInterface
     }
 
     /**
-     * Initialize encyption application service
+     * Initialize encyption application service.
      *
      * @return void
      */
     private function bootConfiguration()
-    {   
+    {
         // Initialize exception report
         $this->exceptionReporter = Reporter::boot($this)->setOnConsole();
-        
+
         // Php exception handler
-        // Use exception reporter 
-        HandleException::boot($this); 
+        // Use exception reporter
+        HandleException::boot($this);
 
         // Get encryption configuration from file
         $this->encryption = stack($this->fileHandler->getRequiredContent(
@@ -309,19 +305,19 @@ class Application extends SymfonyApplication implements ApplicationInterface
         $this->database = stack($this->fileHandler->getRequiredContent(
             $this->databaseConfigPath()
         ));
-    
-        // Initialize configurations services 
+
+        // Initialize configurations services
         stack($this->configurationServices())->each(function ($value) {
             $this->services->add(
                 ServiceDispatcher::dispatch($this, $value)
             );
         });
     }
-    
+
     /**
      * Get configuration services to run before application boots
-     * Configuration services are needed for application to boots
-     * 
+     * Configuration services are needed for application to boots.
+     *
      * @return array
      */
     private function configurationServices()
@@ -330,7 +326,7 @@ class Application extends SymfonyApplication implements ApplicationInterface
             \Core\Services\CrypterService::class,
             \Core\Services\ConfigService::class,
             \Core\Services\DatabaseService::class,
-            \Core\Services\ObserverService::class
+            \Core\Services\ObserverService::class,
         ];
     }
 
@@ -339,7 +335,7 @@ class Application extends SymfonyApplication implements ApplicationInterface
         return [
             \Core\Console\Commands\ControllerCommand::class,
             \Core\Console\Commands\BuildMigrationCommand::class,
-            \Core\Console\Commands\MigrateCommand::class
-        ];  
+            \Core\Console\Commands\MigrateCommand::class,
+        ];
     }
 }

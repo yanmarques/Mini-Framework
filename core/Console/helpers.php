@@ -1,17 +1,18 @@
 <?php
 
-use Core\Support\Config;
-use Core\Crypt\Crypter;
 use Core\Console\Application;
+use Core\Crypt\Crypter;
 use Core\Http\RedirectResponse;
 use Core\Http\Request;
+use Core\Support\Config;
 use Core\Views\View;
 
-if ( ! function_exists('app') ) {
+if (!function_exists('app')) {
     /**
-     * Application instance
+     * Application instance.
      *
      * @param string $value Value to hash
+     *
      * @return string
      */
     function app()
@@ -20,11 +21,12 @@ if ( ! function_exists('app') ) {
     }
 }
 
-if ( ! function_exists('config') ) {
+if (!function_exists('config')) {
     /**
-     * Get application configuration by it key name
+     * Get application configuration by it key name.
      *
      * @param string $name
+     *
      * @return string
      */
     function config(string $name)
@@ -33,9 +35,9 @@ if ( ! function_exists('config') ) {
     }
 }
 
-if ( ! function_exists('session') ) {
+if (!function_exists('session')) {
     /**
-     * Get application session manager
+     * Get application session manager.
      *
      * @return Core\Sessions\SessionManager
      */
@@ -45,11 +47,12 @@ if ( ! function_exists('session') ) {
     }
 }
 
-if ( ! function_exists('encrypt') ) {
+if (!function_exists('encrypt')) {
     /**
-     * Hash a given value using php password_hash with crypt algorithm
+     * Hash a given value using php password_hash with crypt algorithm.
      *
      * @param string $value Value to hash
+     *
      * @return string
      */
     function encrypt(string $value, bool $serialize = true)
@@ -58,11 +61,12 @@ if ( ! function_exists('encrypt') ) {
     }
 }
 
-if ( ! function_exists('decrypt') ) {
+if (!function_exists('decrypt')) {
     /**
-     * Decrypt a payload with Crypter
+     * Decrypt a payload with Crypter.
      *
      * @param string $value Value to hash
+     *
      * @return string
      */
     function decrypt(string $payload, bool $unserialize = true)
@@ -71,11 +75,12 @@ if ( ! function_exists('decrypt') ) {
     }
 }
 
-if ( ! function_exists('randomize') ) {
+if (!function_exists('randomize')) {
     /**
-     * Get a secure random string
+     * Get a secure random string.
      *
      * @param string $length Length of string
+     *
      * @return string
      */
     function randomize(int $length = 16)
@@ -84,9 +89,9 @@ if ( ! function_exists('randomize') ) {
     }
 }
 
-if ( ! function_exists('request') ) {
+if (!function_exists('request')) {
     /**
-     * Get current application request
+     * Get current application request.
      *
      * @return Core\Http\Request
      */
@@ -96,9 +101,9 @@ if ( ! function_exists('request') ) {
     }
 }
 
-if ( ! function_exists('redirect') ) {
+if (!function_exists('redirect')) {
     /**
-     * Get response class
+     * Get response class.
      *
      * @return Core\Http\Response
      */
@@ -108,9 +113,9 @@ if ( ! function_exists('redirect') ) {
     }
 }
 
-if ( ! function_exists('view') ) {
+if (!function_exists('view')) {
     /**
-     * Get response class
+     * Get response class.
      *
      * @return Core\Http\Response
      */
@@ -120,27 +125,28 @@ if ( ! function_exists('view') ) {
     }
 }
 
-if ( ! function_exists('csrf_field') ) {
+if (!function_exists('csrf_field')) {
     /**
-     * CSRF form input with token
+     * CSRF form input with token.
      *
      * @return string
      */
-     function csrf_field()
-     {
-         $token = app()->services()->session()->CSRFToken;
-         return "<input type='hidden' name='csrf_token' value='$token'>";
-     }
+    function csrf_field()
+    {
+        $token = app()->services()->session()->CSRFToken;
+
+        return "<input type='hidden' name='csrf_token' value='$token'>";
+    }
 }
 
-if ( ! function_exists('observe') ) {
+if (!function_exists('observe')) {
     /**
-     * Call global observer
+     * Call global observer.
      *
      * @return string
      */
-     function observe($name)
-     {
+    function observe($name)
+    {
         app()->services()->observer->dispatch($name);
-     }
+    }
 }

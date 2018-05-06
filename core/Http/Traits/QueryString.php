@@ -7,8 +7,9 @@ trait QueryString
     public function normalizeQueryString(string $queryString)
     {
         $query = explode('=', explode('&', $queryString));
-        echo "<pre/>";
-        var_dump($query);die;
+        echo '<pre/>';
+        var_dump($query);
+        die;
     }
 
     public function uriWithoutQueryString(string $uri, $queryString = '')

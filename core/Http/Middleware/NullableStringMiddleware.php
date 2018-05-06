@@ -8,9 +8,10 @@ use Core\Interfaces\Http\MiddlewareInterface;
 class NullableStringMiddleware implements MiddlewareInterface
 {
     /**
-     * Apply middleware to request
+     * Apply middleware to request.
      *
      * @param App\Http\Request $request
+     *
      * @return
      */
     public function apply(Request $request)
@@ -18,7 +19,7 @@ class NullableStringMiddleware implements MiddlewareInterface
         $params = [];
 
         foreach ($request->all() as $key => $value) {
-            if ( $value == "" ) {
+            if ($value == '') {
                 $value = null;
             }
 

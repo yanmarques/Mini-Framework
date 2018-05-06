@@ -8,37 +8,38 @@ use Core\Interfaces\Bootstrapers\ApplicationInterface;
 class SessionManager
 {
     /**
-     * Session booted
+     * Session booted.
      *
      * @var bool
      */
     private static $booted;
 
     /**
-     * Single instance of session manager
+     * Single instance of session manager.
      *
      * @var Core\Sessions\SessionManager
      */
     private static $instance;
 
     /**
-     * Session stack with params
+     * Session stack with params.
      *
      * @var Core\Sessions\SessionStack
      */
     private $session;
 
     /**
-     * ApplicationInterface class
+     * ApplicationInterface class.
      *
      * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
     /**
-     * Constructor of class
+     * Constructor of class.
      *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface
+     *
      * @return Core\Sessions\SessionManager
      */
     public function __construct(ApplicationInterface $app)
@@ -49,14 +50,15 @@ class SessionManager
     }
 
     /**
-     * Boot session manager
+     * Boot session manager.
      *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface
+     *
      * @return Core\Sessions\SessionManager
      */
     public static function boot(ApplicationInterface $app)
     {
-        if ( ! self::$booted ) {
+        if (!self::$booted) {
             self::$instance = new self($app);
         }
 
@@ -64,7 +66,7 @@ class SessionManager
     }
 
     /**
-     * Get session stack with values
+     * Get session stack with values.
      *
      * @return Core\Sessions\SessionStack
      */
@@ -74,7 +76,7 @@ class SessionManager
     }
 
     /**
-     * Start session
+     * Start session.
      *
      * @return void
      */
@@ -85,23 +87,21 @@ class SessionManager
     }
 
     /**
-     * Set Cross Site Request Forgery token for session
+     * Set Cross Site Request Forgery token for session.
      *
      * @return Core\Sessions\SessionManager
      */
     private function setCSRFToken()
     {
-        if ( isset($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], ['GET', 'HEAD', 'OPTIONS']) ) {
+        if (isset($_SERVER['SERVER_PROTOCOL']) && in_array($_SERVER['SERVER_PROTOCOL'], ['GET', 'HEAD', 'OPTIONS'])) {
             $this->session->set('CSRFToken', Crypter::random(64));
         }
     }
 
     public function __get($name)
     {
-        if ( $value = $this->session->get($name) ) {
+        if ($value = $this->session->get($name)) {
             return $value;
         }
-
-        return null;
     }
 }

@@ -5,53 +5,54 @@ namespace Core\Exceptions;
 class Exception extends \Exception implements \Throwable
 {
     /**
-     * Exception message
+     * Exception message.
      *
      * @var string
      */
     protected $message;
 
-     /**
-     * Exception code
+    /**
+     * Exception code.
      *
      * @var string
      */
     protected $code;
 
     /**
-     * Exception file
+     * Exception file.
      *
      * @var string
      */
     protected $file;
 
     /**
-     * Exception line
+     * Exception line.
      *
      * @var string
      */
     protected $line;
 
     /**
-     * Exception trace
+     * Exception trace.
      *
      * @var array
      */
     protected $trace;
 
     /**
-     * Previous exception
+     * Previous exception.
      *
      * @var Throwable
      */
     protected $previous;
 
     /**
-     * Contructor class
+     * Contructor class.
      *
-     * @param string $message Message of exception
-     * @param int $code Exception code
+     * @param string     $message   Message of exception
+     * @param int        $code      Exception code
      * @param \Exception $exception Previous exception
+     *
      * @return Core\Exceptions\Exception
      */
     public function __construct($message, $code = 0, Excetion $previous = null)
@@ -60,7 +61,7 @@ class Exception extends \Exception implements \Throwable
     }
 
     /**
-     * Diplay a friendly text message of the expetion
+     * Diplay a friendly text message of the expetion.
      *
      * @return void
      */
@@ -69,12 +70,12 @@ class Exception extends \Exception implements \Throwable
         echo "
             <p style='color: red'>{$this->message}<p>
         ";
-        echo "<pre>";
+        echo '<pre>';
 
-        foreach($this->getTrace() as $trace) {
+        foreach ($this->getTrace() as $trace) {
             var_dump($trace);
         }
 
-        echo "<pre>";
+        echo '<pre>';
     }
 }

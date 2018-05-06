@@ -4,42 +4,41 @@ namespace Core\Console\Commands;
 
 use Core\Console\Command;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
-use Symfony\Component\Console\Input\InputInterface;
-use Symfony\Component\Console\Output\OutputInterface;
-use Symfony\Component\Console\Input\InputArgument;
-use Symfony\Component\Console\Input\InputOption;
-use Symfony\Component\Process\Process;
-use Phinx\Util\Util;
 use Core\Support\Creator;
+use Phinx\Util\Util;
+use Symfony\Component\Console\Input\InputArgument;
+use Symfony\Component\Console\Input\InputInterface;
+use Symfony\Component\Console\Input\InputOption;
+use Symfony\Component\Console\Output\OutputInterface;
 
 class BuildMigrationCommand extends Command
 {
     /**
-     * Command name
-     * 
+     * Command name.
+     *
      * @var string
      */
     protected $name = 'build:migration';
 
     /**
-     * Stub name
-     * 
+     * Stub name.
+     *
      * @var string
      */
     protected $stub = 'migration.stub';
 
     /**
-     * Command description
-     * 
+     * Command description.
+     *
      * @var string
      */
     protected $description = 'Build an migration class.';
 
     /**
-     * Class constructor
-     * 
+     * Class constructor.
+     *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
-     * @param string $name Command name
+     * @param string                                            $name Command name
      */
     public function __construct(ApplicationInterface $app)
     {
@@ -47,10 +46,11 @@ class BuildMigrationCommand extends Command
     }
 
     /**
-     * Handle console commands input
-     * 
-     * @param  \Symfony\Component\Console\Input\InputInterface  $input
-     * @param  \Symfony\Component\Console\Output\OutputInterface  $output
+     * Handle console commands input.
+     *
+     * @param \Symfony\Component\Console\Input\InputInterface   $input
+     * @param \Symfony\Component\Console\Output\OutputInterface $output
+     *
      * @return mixed
      */
     public function handle(InputInterface $input, OutputInterface $output)
@@ -62,7 +62,7 @@ class BuildMigrationCommand extends Command
         $path = ['database', 'migrations'];
 
         // Add argument path to default path
-        $argument->each(function ($customPath) use(&$path) {
+        $argument->each(function ($customPath) use (&$path) {
             $path[] = $customPath;
         });
 
@@ -70,24 +70,24 @@ class BuildMigrationCommand extends Command
         $class = $class->implode('', null, function ($item) {
             return ucfirst($item);
         });
-        
-        $path[count($path) - 1] = (string) Util::getCurrentTimestamp().'_'.$path[count($path) - 1]. '.php';  
+
+        $path[count($path) - 1] = (string) Util::getCurrentTimestamp().'_'.$path[count($path) - 1].'.php';
 
         // Path to create file
-        $path = $this->getApplication()->baseDir() . DIRECTORY_SEPARATOR . implode(DIRECTORY_SEPARATOR, $path);
-        
+        $path = $this->getApplication()->baseDir().DIRECTORY_SEPARATOR.implode(DIRECTORY_SEPARATOR, $path);
+
         // Verify wheter file already exists
-        if ( $this->getApplication()->fileHandler()->isFile($path) ) {
+        if ($this->getApplication()->fileHandler()->isFile($path)) {
             throw new \RuntimeException("File [$path] already exists");
         }
 
         $table = $input->getOption('table');
 
         // Stub path
-        $stub =  $this->stubPath();
+        $stub = $this->stubPath();
 
         // Parse table configuration
-        if ( $table == null ) {
+        if ($table == null) {
             $stub .= 'migration_blank.stub';
         } else {
             $stub .= $this->stub;
@@ -101,50 +101,53 @@ class BuildMigrationCommand extends Command
         // Dispatch autoload event
         observe('autoload');
     }
-    
+
     /**
-     * Command arguments
-     * 
+     * Command arguments.
+     *
      * @var array
      */
-    protected function getArguments() {
+    protected function getArguments()
+    {
         return [
             [
-                'name', InputArgument::REQUIRED, 'Controller name'
-            ]
+                'name', InputArgument::REQUIRED, 'Controller name',
+            ],
         ];
     }
 
     /**
-     * Command options
-     * 
+     * Command options.
+     *
      * @var array
      */
-    protected function getOptions() {
+    protected function getOptions()
+    {
         return [
             [
-                'table', null, InputOption::VALUE_REQUIRED, 'Table name'
-            ]
+                'table', null, InputOption::VALUE_REQUIRED, 'Table name',
+            ],
         ];
     }
 
     /**
-     * Get command dummies
-     * 
-     * @param string $class 
+     * Get command dummies.
+     *
+     * @param string $class
+     *
      * @return array
      */
     private function dummies(string $class, $table)
     {
-        if ( $table == null ) {
+        if ($table == null) {
             return [
                 'DummyClass' => $class,
             ];
-        } 
+        }
 
         return [
             'DummyClass' => $class,
-            'DummyTable' => "'".$table."'"
+            'DummyTable' => "'".$table."'",
         ];
     }
 }

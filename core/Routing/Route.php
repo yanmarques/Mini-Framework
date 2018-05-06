@@ -2,52 +2,50 @@
 
 namespace Core\Routing;
 
-use Core\Http\Request;
-use Core\Http\RedirectResponse;
-use Core\Routing\RouteMatcher;
-use Core\Routing\ControllerDispatcher;
 use Core\Exceptions\Http\MethodNotAllowedException;
+use Core\Http\RedirectResponse;
+use Core\Http\Request;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
 
 class Route
 {
     /**
-     * Route HTTP method
+     * Route HTTP method.
      *
      * @var string
      */
     private $method;
 
     /**
-     * Route URI
+     * Route URI.
      *
      * @var string
      */
     private $uri;
 
     /**
-     * Route action
+     * Route action.
      *
      * @var Closure|string
      */
     private $action;
 
     /**
-     * Route matcher handles matching a route with given URI
+     * Route matcher handles matching a route with given URI.
      *
      * @var Core\Routing\RouteMatcher
      */
     private $matcher;
 
     /**
-     * Request bound to route
+     * Request bound to route.
      *
      * @var Core\Http\Request
      */
     private $request;
 
     /**
-     * Route middleware
+     * Route middleware.
      *
      * @var array
      */
@@ -62,7 +60,7 @@ class Route
     }
 
     /**
-     * Get URI route
+     * Get URI route.
      *
      * @return string
      */
@@ -72,7 +70,7 @@ class Route
     }
 
     /**
-     * Get route method
+     * Get route method.
      *
      * @return string
      */
@@ -82,21 +80,21 @@ class Route
     }
 
     /**
-     * Get the full route action
+     * Get the full route action.
      *
      * @return string
      */
     public function action()
     {
-        if ( $this->isCallable() ) {
+        if ($this->isCallable()) {
             return $this->action;
         }
 
-        return $this->getController() .'@'. $this->getAction();
+        return $this->getController().'@'.$this->getAction();
     }
 
     /**
-     * Get the route action
+     * Get the route action.
      *
      * @return string
      */
@@ -106,7 +104,7 @@ class Route
     }
 
     /**
-     * Get the route controller
+     * Get the route controller.
      *
      * @return string
      */
@@ -116,7 +114,7 @@ class Route
     }
 
     /**
-     * Check wheter route action is an anonymous function
+     * Check wheter route action is an anonymous function.
      *
      * @return bool
      */
@@ -126,9 +124,10 @@ class Route
     }
 
     /**
-     * Match the route URI against URI request
+     * Match the route URI against URI request.
      *
      * @param Core\Http\Request $request
+     *
      * @return bool
      */
     public function matches(Request $request)
@@ -137,10 +136,11 @@ class Route
     }
 
     /**
-     * Bind request to route
+     * Bind request to route.
      *
-     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app ApplicationInterface
-     * @param Core\Http\Request $request Request to bind route
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app     ApplicationInterface
+     * @param Core\Http\Request                                 $request Request to bind route
+     *
      * @return void
      */
     public function bind(ApplicationInterface $app, Request $request)
@@ -153,10 +153,11 @@ class Route
     }
 
     /**
-     * Run global middlewares from configuration
+     * Run global middlewares from configuration.
      *
-     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app ApplicationInterface
-     * @param Core\Http\Request $request Request to run middlewares
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app     ApplicationInterface
+     * @param Core\Http\Request                                 $request Request to run middlewares
+     *
      * @return void
      */
     private function runMiddlewares(ApplicationInterface $app, Request $request)
@@ -165,17 +166,19 @@ class Route
     }
 
     /**
-     * Match the route method against the request method
+     * Match the route method against the request method.
+     *
+     *
+     * @param Core\Http\Request $request Request to match route method
      *
      * @throws Core\Exceptions\Http\MethodNotAllowedException
      *
-     * @param Core\Http\Request $request Request to match route method
      * @return Core\Routing\RouteMatcher
      */
     private function matchRequestMethod(Request $request)
     {
-        if ( strcasecmp($this->method, $request->method()) != 0 ) {
-            throw new MethodNotAllowedException("Method not allowed");
+        if (strcasecmp($this->method, $request->method()) != 0) {
+            throw new MethodNotAllowedException('Method not allowed');
         }
 
         return $this;
@@ -183,21 +186,22 @@ class Route
 
     /**
      * Resolve response from middleware
-     * Response can be a request to be dispached or can be a redirect response
-     * 
-     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app ApplicationInterface
-     * @param Core\Http\Request|Core\Http\RedirectResponse $response Response to resolve
+     * Response can be a request to be dispached or can be a redirect response.
+     *
+     * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app      ApplicationInterface
+     * @param Core\Http\Request|Core\Http\RedirectResponse      $response Response to resolve
+     *
      * @return mixed
      */
     private function resolveMiddlewareResponse(ApplicationInterface $app, $response)
     {
         // Redirect to route
-        if ( $response instanceof RedirectResponse ) {
+        if ($response instanceof RedirectResponse) {
             return $response;
         }
 
         // Run anonymous function
-        if ( $this->isCallable() ) {
+        if ($this->isCallable()) {
             return $this->runCallable($response);
         }
 
@@ -208,7 +212,7 @@ class Route
     }
 
     /**
-     * Get a route matcher
+     * Get a route matcher.
      *
      * @return Core\Routing\RouteMatcher
      */
@@ -218,9 +222,10 @@ class Route
     }
 
     /**
-     * Run controller action
+     * Run controller action.
      *
      * @param Core\Http\Request $request
+     *
      * @return mixed
      */
     private function runCallable(Request $request)
@@ -229,18 +234,20 @@ class Route
     }
 
     /**
-     * Parse the action checking wheter is a function or a controller
+     * Parse the action checking wheter is a function or a controller.
      *
      * @param mixed $action
+     *
      * @return mixed
      */
     private function parseAction($action)
     {
-        if ( is_callable($action) ) {
+        if (is_callable($action)) {
             return $action;
         }
 
         $action = explode('@', $action);
+
         return ['controller' => $action[0], 'action' => $action[1]];
     }
 }

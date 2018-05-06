@@ -4,33 +4,32 @@ namespace Core\Routing;
 
 use Core\Http\Request;
 use Core\Reflector\Reflector;
-use Core\Contracts\Http\MiddlewareInterface;
 
 class ControllerDispatcher
 {
     /**
-     * Controller action
+     * Controller action.
      *
      * @var string
      */
     private $action;
 
     /**
-     * Controller name
+     * Controller name.
      *
      * @var string
      */
     private $controller;
 
     /**
-     * Path to controllers
+     * Path to controllers.
      *
      * @var string
      */
     private $controllersPath = 'App\\Http\\Controllers\\';
 
     /**
-     * Request to pass as parameter on controller action
+     * Request to pass as parameter on controller action.
      *
      * @var Core\Http\Request
      */
@@ -39,12 +38,12 @@ class ControllerDispatcher
     public function __construct(Request $request, string $controller, string $action)
     {
         $this->request = $request;
-        $this->controller = $this->controllersPath . $controller;
+        $this->controller = $this->controllersPath.$controller;
         $this->action = $action;
     }
 
     /**
-     * Dispatch the controller action with request parameter
+     * Dispatch the controller action with request parameter.
      *
      * @return mixed
      */

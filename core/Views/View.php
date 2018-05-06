@@ -2,73 +2,74 @@
 
 namespace Core\Views;
 
-use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Exceptions\Files\FileNotFoundException;
 use Core\Http\Response;
+use Core\Interfaces\Bootstrapers\ApplicationInterface;
 use Core\Interfaces\Http\ResponseStatusInterface;
 
 class View implements ResponseStatusInterface
 {
     /**
-     * View is booted
+     * View is booted.
      *
      * @var bool
      */
     protected static $booted = false;
 
     /**
-     * Singleton instance of class
+     * Singleton instance of class.
      *
      * @var Core\Views\View
      */
     private static $instance;
 
     /**
-     * ApplicationInterface
+     * ApplicationInterface.
      *
      * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
     /**
-     * View matcher
+     * View matcher.
      *
      * @var Core\Views\ViewMatcher
      */
     private $matcher;
 
     /**
-     * View absolute path
-     * 
+     * View absolute path.
+     *
      * @var string
      */
     private $path;
 
     /**
-     * Use a custom base path to views
-     * 
+     * Use a custom base path to views.
+     *
      * @var string
      */
     private $customBasePath;
 
     /**
-     * View params
-     * 
+     * View params.
+     *
      * @var array
      */
     protected $params = [];
 
     /**
-     * View response status
-     * 
+     * View response status.
+     *
      * @var int
      */
-    protected $status = 200;    
+    protected $status = 200;
 
     /**
-     * Constructor of class
+     * Constructor of class.
      *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
+     *
      * @return Core\Views\View
      */
     public function __construct(ApplicationInterface $app)
@@ -78,14 +79,15 @@ class View implements ResponseStatusInterface
     }
 
     /**
-     * Boot singleton class
+     * Boot singleton class.
      *
      * @param Core\Interfaces\Bootstrapers\ApplicationInterface $app
+     *
      * @return Core\Views\View
      */
     public static function boot(ApplicationInterface $app)
     {
-        if ( ! self::$booted ) {
+        if (!self::$booted) {
             self::$instance = new self($app);
         }
 
@@ -93,42 +95,46 @@ class View implements ResponseStatusInterface
     }
 
     /**
-     * Make view path
-     * 
-     * @param string $path Realtive path to view
+     * Make view path.
+     *
+     * @param string $path       Realtive path to view
      * @param string $customPath Custom path to view
+     *
      * @return void
      */
-    static function make(string $path, string $customPath = null)
+    public static function make(string $path, string $customPath = null)
     {
         $instance = static::$instance;
         $absolutePath = $instance->matcher->get($path, $customPath);
-        
+
         // View was not found
-        if ( ! $instance->app->fileHandler()->isFile($absolutePath) ) {
+        if (!$instance->app->fileHandler()->isFile($absolutePath)) {
             throw new FileNotFoundException("View [{$absolutePath}] was not found.");
         }
 
         $instance->path = $absolutePath;
+
         return $instance;
     }
 
     /**
-     * Parameters to render view with
-     * 
-     * @param string $name Parameter name
-     * @param mixed $value Parameter value
+     * Parameters to render view with.
+     *
+     * @param string $name  Parameter name
+     * @param mixed  $value Parameter value
+     *
      * @return Core\Views\View
      */
     public function with(array $params)
     {
         $this->params = array_merge($this->params, $params);
+
         return $this;
     }
 
     /**
-     * Get view response status code
-     * 
+     * Get view response status code.
+     *
      * @return int
      */
     public function getStatus()
@@ -137,38 +143,40 @@ class View implements ResponseStatusInterface
     }
 
     /**
-     * Set response Http status
-     * 
+     * Set response Http status.
+     *
      * @param int $status Http success status
+     *
      * @return Core\Views\View
      */
     public function status(int $status)
     {
-        if ( ! Response::isSuccessfull($status) ) {
+        if (!Response::isSuccessfull($status)) {
             throw new \RuntimeException("Invalid status [$status] for successfull response.");
         }
 
         $this->status = $status;
+
         return $this;
     }
 
     /**
-     * Include view file to script with parameters
-     * 
+     * Include view file to script with parameters.
+     *
      * @return void
      */
     public function render()
     {
-        foreach($this->params as $key => $value) {
+        foreach ($this->params as $key => $value) {
             ${$key} = $value;
         }
-        
+
         include $this->path;
     }
 
     /**
-     * Get view path
-     * 
+     * Get view path.
+     *
      * @return string
      */
     public function path()

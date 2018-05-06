@@ -7,9 +7,10 @@ use Core\Stack\Stack;
 class ServicesStack extends Stack
 {
     /**
-     * Constructor of class
-     * 
+     * Constructor of class.
+     *
      * @param Core\Stack\Stack
+     *
      * @return Core\Services\ServicesStack
      */
     public function __construct($services = [])
@@ -18,17 +19,19 @@ class ServicesStack extends Stack
     }
 
     /**
-     * Dinamically access service through __call method
-     * 
+     * Dinamically access service through __call method.
+     *
+     *
+     * @param string $name      Name of method called
+     * @param mixed  $arguments Arguments passed to method
+     *
      * @throws Exception
-     * 
-     * @param string $name Name of method called
-     * @param mixed $arguments Arguments passed to method
+     *
      * @return mixed
      */
     public function __call($name, $arguments)
     {
-        if ( in_array($name, $this->keys()) ) {
+        if (in_array($name, $this->keys())) {
             return $this->get($name);
         }
 

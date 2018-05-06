@@ -2,45 +2,43 @@
 
 namespace Core\Http;
 
-use Core\Http\RequestKernel;
+use Core\Exceptions\Http\MethodNotAllowedException;
 use Core\Http\Traits\InteractsWithParam;
 use Core\Http\Traits\QueryString;
-use Core\Sessions\SessionStack;
-use Core\Exceptions\Http\MethodNotAllowedException;
 
 class Request extends RequestKernel
 {
     use InteractsWithParam, QueryString;
 
     /**
-     * Request is booted
+     * Request is booted.
      *
      * @var bool
      */
     private static $booted;
 
     /**
-     * Request instance
+     * Request instance.
      *
      * @var Core\Http\Request
      */
     private static $instance;
 
     /**
-     * Request parameters
+     * Request parameters.
      *
      * @var Core\Stack\Stack
      */
     private $parameters;
 
     /**
-     * Create an request instance from globals
+     * Create an request instance from globals.
      *
      * @return Core\Http\Request
      */
     public static function get()
     {
-        if ( ! self::$booted ) {
+        if (!self::$booted) {
             self::$instance = parent::createFromGlobals();
         }
 
@@ -48,7 +46,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Execute resolvers when request is created
+     * Execute resolvers when request is created.
      *
      * @return void
      */
@@ -61,25 +59,25 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get the request method
+     * Get the request method.
      *
      * @return string
      */
     public function method()
     {
-        if ( $this->method == RequestKernel::POST && $this->parameters->has('_method') ) {
-            if ( in_array($this->parameters->_method, [RequestKernel::PUT, RequestKernel::PATCH, RequestKernel::DELETE]) ) {
+        if ($this->method == RequestKernel::POST && $this->parameters->has('_method')) {
+            if (in_array($this->parameters->_method, [RequestKernel::PUT, RequestKernel::PATCH, RequestKernel::DELETE])) {
                 return $this->parameters->_method;
             }
-            
+
             throw new MethodNotAllowedException("Invalid method [$this->parameters->_method]");
         }
 
         return $this->method;
     }
 
-     /**
-     * Get the request protocol
+    /**
+     * Get the request protocol.
      *
      * @return string
      */
@@ -89,7 +87,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get only the request uri without query string
+     * Get only the request uri without query string.
      *
      * @return string
      */
@@ -99,7 +97,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get request uri with query string
+     * Get request uri with query string.
      *
      * @return string
      */
@@ -109,7 +107,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Verify wheter request method is show type
+     * Verify wheter request method is show type.
      *
      * @return bool
      */
@@ -119,7 +117,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get all request parameters
+     * Get all request parameters.
      *
      * @return array
      */
@@ -129,19 +127,21 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get all request parameters and merge with parameters passed
+     * Get all request parameters and merge with parameters passed.
      *
      * @param array $params Parameters to merge
+     *
      * @return Core\Http\Request
      */
     public function merge(array $params)
     {
         $this->parameters = $this->parameters->merge($params);
+
         return $this;
     }
 
     /**
-     * Get php running interface
+     * Get php running interface.
      *
      * @return string|null
      */
@@ -150,8 +150,8 @@ class Request extends RequestKernel
         return $this->interface;
     }
 
-     /**
-     * Get server ip address
+    /**
+     * Get server ip address.
      *
      * @return string|null
      */
@@ -161,7 +161,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get server hostname
+     * Get server hostname.
      *
      * @return string|null
      */
@@ -171,7 +171,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get server identification name
+     * Get server identification name.
      *
      * @return string|null
      */
@@ -181,7 +181,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get timestamp when request was executed
+     * Get timestamp when request was executed.
      *
      * @return string|null
      */
@@ -192,7 +192,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get document root where script has run
+     * Get document root where script has run.
      *
      * @return string|null
      */
@@ -202,7 +202,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get http host header
+     * Get http host header.
      *
      * @return string|null
      */
@@ -212,7 +212,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get http referer header
+     * Get http referer header.
      *
      * @return string|null
      */
@@ -222,7 +222,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get http user agent header
+     * Get http user agent header.
      *
      * @return string|null
      */
@@ -232,7 +232,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Request use HTTPS protocol
+     * Request use HTTPS protocol.
      *
      * @return bool
      */
@@ -242,7 +242,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get DNS lookup host
+     * Get DNS lookup host.
      *
      * @return string|null
      */
@@ -252,7 +252,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get remote port
+     * Get remote port.
      *
      * @return string|null
      */
@@ -262,7 +262,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get server port
+     * Get server port.
      *
      * @return string|null
      */
@@ -272,7 +272,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get request cookie
+     * Get request cookie.
      *
      * @return string|null
      */
@@ -281,8 +281,8 @@ class Request extends RequestKernel
         return $this->cookies->all();
     }
 
-     /**
-     * Get request session
+    /**
+     * Get request session.
      *
      * @return string|null
      */
@@ -292,7 +292,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Get request headers
+     * Get request headers.
      *
      * @return string|null
      */
@@ -301,8 +301,8 @@ class Request extends RequestKernel
         return $this->headers->all();
     }
 
-     /**
-     * Get current local ip address
+    /**
+     * Get current local ip address.
      *
      * @return string|null
      */
@@ -312,9 +312,10 @@ class Request extends RequestKernel
     }
 
     /**
-     * Request has given attribute name
+     * Request has given attribute name.
      *
      * @param string $name
+     *
      * @return bool
      */
     public function has(string $name)
@@ -323,7 +324,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Resolve get and/or post parameters into a custom stack
+     * Resolve get and/or post parameters into a custom stack.
      *
      * @return Core\Stack\Stack
      */
@@ -332,15 +333,15 @@ class Request extends RequestKernel
         $params = [];
 
         // Parse get parameters if not empty
-        if ( ! empty($this->get) ) {
-            foreach($this->get as $key => $value) {
+        if (!empty($this->get)) {
+            foreach ($this->get as $key => $value) {
                 $params[$key] = $value;
             }
         }
 
         // Parse post parameters if not empty
-        if ( ! empty($this->post) ) {
-            foreach($this->post as $key => $value) {
+        if (!empty($this->post)) {
+            foreach ($this->post as $key => $value) {
                 $params[$key] = $value;
             }
         }
@@ -349,7 +350,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Resolve get and/or post parameters into a custom Stack
+     * Resolve get and/or post parameters into a custom Stack.
      *
      * @return Core\Http\HeadersStack
      */
@@ -359,7 +360,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Resolve request cookies and
+     * Resolve request cookies and.
      *
      * @return Core\Http\CookieStack
      */
@@ -369,7 +370,7 @@ class Request extends RequestKernel
     }
 
     /**
-     * Resolve get and/or post parameters into a custom Stack
+     * Resolve get and/or post parameters into a custom Stack.
      *
      * @return Core\Session\SessionStack
      */

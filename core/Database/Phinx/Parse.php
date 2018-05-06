@@ -2,24 +2,24 @@
 
 namespace Core\Database\Phinx;
 
-use Core\Support\Creator;
 use Core\Interfaces\Bootstrapers\ApplicationInterface;
+use Core\Support\Creator;
 
 class Parse
 {
     /**
-     * ApplicationInterface
-     * 
+     * ApplicationInterface.
+     *
      * @var Core\Interfaces\Bootstrapers\ApplicationInterface
      */
     private $app;
 
     /**
-     * Path to phinx stub
-     * 
+     * Path to phinx stub.
+     *
      * @var string
      */
-    private $phinxStub = __DIR__ .DIRECTORY_SEPARATOR. 'stubs' .DIRECTORY_SEPARATOR. 'phinx.yml.stub'; 
+    private $phinxStub = __DIR__.DIRECTORY_SEPARATOR.'stubs'.DIRECTORY_SEPARATOR.'phinx.yml.stub';
 
     public function __construct(ApplicationInterface $app)
     {
@@ -27,18 +27,18 @@ class Parse
     }
 
     /**
-     * Create phinx migration configuration
-     * 
+     * Create phinx migration configuration.
+     *
      * @return void
      */
     public function create()
     {
         Creator::parse($this->app->baseDir().'phinx.yml', $this->phinxStub, $this->parseDatabaseConfiguration());
-    }  
+    }
 
     /**
-     * Create a stub configuration with database configuration from application
-     * 
+     * Create a stub configuration with database configuration from application.
+     *
      * @return array
      */
     private function parseDatabaseConfiguration()
@@ -56,6 +56,6 @@ class Parse
             'DummyUser'               => $config->user,
             'DummyPassword'           => $config->password,
             'DummyPort'               => $config->port,
-        ];  
+        ];
     }
 }

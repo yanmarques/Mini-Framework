@@ -3,9 +3,9 @@
 namespace Core\Database\Migrations;
 
 use Phinx\Db\Adapter\AdapterInterface;
+use Phinx\Migration\AbstractMigration;
 use Symfony\Component\Console\Input\InputInterface;
 use Symfony\Component\Console\Output\OutputInterface;
-use Phinx\Migration\AbstractMigration;
 
 abstract class Migration extends AbstractMigration
 {
@@ -30,28 +30,28 @@ abstract class Migration extends AbstractMigration
     protected $input;
 
     /**
-     * Table name
-     * 
+     * Table name.
+     *
      * @var string
      */
     protected $name;
 
     /**
-     * Table instance
-     * 
+     * Table instance.
+     *
      * @var Core\Database\Migrations\Table
      */
     protected $table;
 
     /**
-     * Table options
-     * 
+     * Table options.
+     *
      * @var array
      */
     protected $options = [];
 
     /**
-     * Whether this migration is being applied or reverted
+     * Whether this migration is being applied or reverted.
      *
      * @var bool
      */
@@ -60,8 +60,8 @@ abstract class Migration extends AbstractMigration
     /**
      * Class Constructor.
      *
-     * @param int $version Migration Version
-     * @param InputInterface|null $input
+     * @param int                  $version Migration Version
+     * @param InputInterface|null  $input
      * @param OutputInterface|null $output
      */
     public function __construct($version, InputInterface $input = null, OutputInterface $output = null)
@@ -86,13 +86,14 @@ abstract class Migration extends AbstractMigration
     {
         $this->adapter = $adapter;
         Table::setAdapterOnCurrent($adapter);
+
         return $this;
     }
 
     /**
      * {@inheritdoc}
      */
-    public function table($tableName, $options = array())
+    public function table($tableName, $options = [])
     {
         return Table::boot()->setName($name)->setOptions($options);
     }

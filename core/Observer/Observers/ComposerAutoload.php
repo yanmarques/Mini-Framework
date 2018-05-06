@@ -8,15 +8,15 @@ use Symfony\Component\Process\Process;
 class ComposerAutoload implements ObserverInterface
 {
     /**
-     * Observer name
-     * 
+     * Observer name.
+     *
      * @var string
      */
     private $name = 'autoload';
 
     /**
-     * Handle observer event
-     * 
+     * Handle observer event.
+     *
      * @return void
      */
     public function handle()
@@ -25,8 +25,8 @@ class ComposerAutoload implements ObserverInterface
     }
 
     /**
-     * Get observer name
-     * 
+     * Get observer name.
+     *
      * @return string
      */
     public function name()

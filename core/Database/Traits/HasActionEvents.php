@@ -5,21 +5,22 @@ namespace Core\Database\Traits;
 trait HasActionEvents
 {
     /**
-     * Named actions to execute
-     * 
+     * Named actions to execute.
+     *
      * @var array
      */
     protected static $actions = [
         'creating' => [],
-        'created' => [],
+        'created'  => [],
         'updating' => [],
-        'updated' => []
+        'updated'  => [],
     ];
 
     /**
-     * Add function to "creating" event
-     * 
+     * Add function to "creating" event.
+     *
      * @param \Closure $callback Function to execute
+     *
      * @return void
      */
     protected static function creating(\Closure $callback)
@@ -28,9 +29,10 @@ trait HasActionEvents
     }
 
     /**
-     * Add function to "created" event
-     * 
+     * Add function to "created" event.
+     *
      * @param \Closure $callback Function to execute
+     *
      * @return void
      */
     protected static function created(\Closure $callback)
@@ -39,9 +41,10 @@ trait HasActionEvents
     }
 
     /**
-     * Add function to "updating" event
-     * 
+     * Add function to "updating" event.
+     *
      * @param \Closure $callback Function to execute
+     *
      * @return void
      */
     protected static function updating(\Closure $callback)
@@ -50,9 +53,10 @@ trait HasActionEvents
     }
 
     /**
-     * Add function to "updated" event
-     * 
+     * Add function to "updated" event.
+     *
      * @param \Closure $callback Function to execute
+     *
      * @return void
      */
     protected static function updated(\Closure $callback)
@@ -61,16 +65,17 @@ trait HasActionEvents
     }
 
     /**
-     * Dispatch a registered event
-     * 
-     * @param string $action Action name
-     * @param mixed $argument Argument to pass as function parameter
+     * Dispatch a registered event.
+     *
+     * @param string $action   Action name
+     * @param mixed  $argument Argument to pass as function parameter
+     *
      * @return void
      */
-    private function fireEvent(string $action, $argument=null)
+    private function fireEvent(string $action, $argument = null)
     {
         // Event exist
-        if ( ! isset(static::$actions[$action]) ) {
+        if (!isset(static::$actions[$action])) {
             throw new \Exception("Call to invalid named action event [$action]");
         }
 
@@ -79,7 +84,7 @@ trait HasActionEvents
         // Argument to pass as parameter to closure
         $argument = $argument ?: $this;
 
-        foreach($closures as $clousure) {
+        foreach ($closures as $clousure) {
             call_user_func_array($clousure, [&$argument]);
         }
     }

@@ -7,9 +7,10 @@ use Core\Stack\Stack;
 class SessionStack extends Stack
 {
     /**
-     * Constructor of class
+     * Constructor of class.
      *
      * @param array $args Array with params
+     *
      * @return Core\Sessions\SessionStack
      */
     public function __construct(array $args)
@@ -18,10 +19,11 @@ class SessionStack extends Stack
     }
 
     /**
-     * Set a session key/value and add to stack
-     * 
-     * @param string $key Key of session
-     * @param mixed $value Key value
+     * Set a session key/value and add to stack.
+     *
+     * @param string $key   Key of session
+     * @param mixed  $value Key value
+     *
      * @return Core\Sessions\SessionStack
      */
     public function set(string $key, $value)
@@ -31,9 +33,10 @@ class SessionStack extends Stack
     }
 
     /**
-     * Unset session key
-     * 
+     * Unset session key.
+     *
      * @param string $key Key of session
+     *
      * @return void
      */
     public function unset(string $key)
